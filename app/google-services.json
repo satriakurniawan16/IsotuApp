@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "637369348771",
+    "firebase_url": "https://isocialfinal.firebaseio.com",
+    "project_id": "isocialfinal",
+    "storage_bucket": "isocialfinal.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:637369348771:android:ae74804aa6b0a521",
+        "android_client_info": {
+          "package_name": "com.example.user.isotuapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "637369348771-6b5lgth04bcds8u14pg8o084tb6akcur.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.user.isotuapp",
+            "certificate_hash": "363c345a842f4e3522a6fdd6da5eddb78f006273"
+          }
+        },
+        {
+          "client_id": "637369348771-1qspnd6dcn71sqbd0kihimg2d88g07oo.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBZlO9HKIdLHi2aWSE-GAGpyR3Fe_sN9j4"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "637369348771-1qspnd6dcn71sqbd0kihimg2d88g07oo.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
