@@ -122,7 +122,7 @@ public class Register extends AppCompatActivity {
 
                                         dbf.setValue(user);
                                         Toast.makeText(Register.this, "Register Success", Toast.LENGTH_SHORT).show();
-                                        Intent intent = new Intent(Register.this,Dashboard.class);
+                                        Intent intent = new Intent(Register.this,CompleteProfile.class);
                                         startActivity(intent);
                                     }
 
