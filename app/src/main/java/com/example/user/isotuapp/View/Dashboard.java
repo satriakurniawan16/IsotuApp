@@ -1,5 +1,7 @@
 package com.example.user.isotuapp.View;
 
+import android.content.Intent;
+import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -9,6 +11,8 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.view.View;
+import android.widget.Toast;
 
 import com.example.user.isotuapp.R;
 import com.example.user.isotuapp.fragment.ChatFragment;
@@ -25,6 +29,7 @@ public class Dashboard extends AppCompatActivity {
     private Toolbar toolbar;
     private TabLayout tabLayout;
     private ViewPager viewPager;
+    FloatingActionButton fab;
     private int[] tabIcons = {
             R.drawable.home,
             R.drawable.phone,
@@ -41,6 +46,15 @@ public class Dashboard extends AppCompatActivity {
         setSupportActionBar(toolbar);
         getSupportActionBar().setTitle("Home");
 
+        fab = (FloatingActionButton) findViewById(R.id.to_posting);
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent =  new Intent(Dashboard.this,Posting.class);
+                Toast.makeText(Dashboard.this, "intent", Toast.LENGTH_SHORT).show();
+                startActivity(intent);
+            }
+        });
 
 
         viewPager = (ViewPager) findViewById(R.id.viewpager);

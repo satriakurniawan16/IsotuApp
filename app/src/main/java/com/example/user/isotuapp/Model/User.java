@@ -1,12 +1,12 @@
 package com.example.user.isotuapp.Model;
 
 public class User {
-    String username,email,image,fullname,nim,fakultas,jurusan,nohp;
+    String username,email,image,fullname,nim,fakultas,jurusan,nohp,uid;
     int completeProfile;
 
     public User (){}
 
-    public User(String username, String email, String image, String fullname, String nim, String fakultas, String jurusan, String nohp, int completeProfile) {
+    public User(String username, String email, String image, String fullname, String nim, String fakultas, String jurusan, String nohp, String uid, int completeProfile) {
         this.username = username;
         this.email = email;
         this.image = image;
@@ -15,7 +15,16 @@ public class User {
         this.fakultas = fakultas;
         this.jurusan = jurusan;
         this.nohp = nohp;
+        this.uid = uid;
         this.completeProfile = completeProfile;
+    }
+
+    public String getUid() {
+        return uid;
+    }
+
+    public void setUid(String uid) {
+        this.uid = uid;
     }
 
     public String getUsername() {

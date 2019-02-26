@@ -12,6 +12,7 @@ import android.widget.Button;
 
 import com.example.user.isotuapp.R;
 import com.example.user.isotuapp.View.CompleteProfile;
+import com.example.user.isotuapp.View.Posting;
 
 
 public class HomeFragment extends Fragment {
@@ -34,7 +35,7 @@ public class HomeFragment extends Fragment {
         tes.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(getContext(),CompleteProfile.class);
+                Intent intent = new Intent(getContext(),Posting.class);
                 startActivity(intent);
             }
         });

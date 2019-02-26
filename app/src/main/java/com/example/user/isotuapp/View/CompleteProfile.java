@@ -44,6 +44,7 @@ public class CompleteProfile extends AppCompatActivity {
     Button saveProfile;
     private Uri filepath;
     FirebaseUser currentUser;
+    private FirebaseAuth mFirebaseAuth;
     private FirebaseStorage storage;
     private StorageReference storageReference;
     DatabaseReference dbs;
@@ -52,6 +53,8 @@ public class CompleteProfile extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_complete_profile);
+
+        mFirebaseAuth=FirebaseAuth.getInstance();
 
         fullnameField = (EditText) findViewById(R.id.fullname);
         nimField = (EditText) findViewById(R.id.nim);
@@ -152,7 +155,7 @@ public class CompleteProfile extends AppCompatActivity {
                                 @Override
                                 public void onSuccess(Uri uri) {
                                     final String urlGambar = uri.toString();
-                                    final FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
+                                    final FirebaseUser currentUser = mFirebaseAuth.getCurrentUser();
                                     final DatabaseReference dbf = FirebaseDatabase.getInstance().getReference("user").child(currentUser.getUid());
                                     dbf.addListenerForSingleValueEvent(new ValueEventListener() {
                                         @Override
@@ -160,7 +163,7 @@ public class CompleteProfile extends AppCompatActivity {
                                             User usr = dataSnapshot.getValue(User.class);
                                             final HashMap<String, Object> user= new HashMap<>();
                                             user.put("username",usr.getUsername());
-                                            user.put("idEmail",usr.getEmail());
+                                            user.put("email",usr.getEmail());
                                             user.put("image", urlGambar);
                                             user.put("fullname", fullnameString);
                                             user.put("nim",nimString);
@@ -168,6 +171,7 @@ public class CompleteProfile extends AppCompatActivity {
                                             user.put("jurusan",majorString);
                                             user.put("nohp",numberString);
                                             user.put("completeProfile",1);
+                                            user.put("Uid",currentUser.getUid());
                                             dbs.setValue(user);
                                             Toast.makeText(CompleteProfile.this, "Profile tersimpan ", Toast.LENGTH_SHORT).show();
                                             Intent intent = new Intent(CompleteProfile.this, Dashboard.class);

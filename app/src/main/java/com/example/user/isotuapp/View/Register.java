@@ -45,6 +45,7 @@ public class Register extends AppCompatActivity {
     String fakultas = "";
     String jurusan = "";
     String nohp = "";
+    String uid = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -105,13 +106,14 @@ public class Register extends AppCompatActivity {
                                 final FirebaseUser currentUser = mFirebaseAuth.getCurrentUser();
                                 final HashMap<String, Object> user= new HashMap<>();
                                 userString = currentUser.getDisplayName();
+                                final String uidString = currentUser.getUid();
                                 final DatabaseReference dbf = FirebaseDatabase.getInstance().getReference("user").child(currentUser.getUid());
                                 dbf.addListenerForSingleValueEvent(new ValueEventListener() {
                                     @Override
                                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                                         User us = dataSnapshot.getValue(User.class);
                                         user.put("username",usernameString);
-                                        user.put("idEmail",emailString);
+                                        user.put("email",emailString);
                                         user.put("image", imageString);
                                         user.put("fullname", fullnameString);
                                         user.put("nim",nim);
@@ -119,6 +121,7 @@ public class Register extends AppCompatActivity {
                                         user.put("jurusan",jurusan);
                                         user.put("nohp",nohp);
                                         user.put("completeProfile",completeProfile);
+                                        user.put("Uid",uidString);
 
                                         dbf.setValue(user);
                                         Toast.makeText(Register.this, "Register Success", Toast.LENGTH_SHORT).show();

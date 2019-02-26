@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".View.Posting">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <android.support.v7.widget.Toolbar
+            android:id="@+id/ToolbarHome"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:background="@color/colorMain"
+            android:elevation="2dp">
+
+            <ImageView
+                android:id="@+id/backPress"
+                android:layout_width="wrap_content"
+                android:layout_height="42dp"
+                android:layout_alignParentLeft="true"
+                android:layout_marginTop="10dp"
+                android:adjustViewBounds="false"
+                android:tint="@color/colorWhite"
+                android:src="@drawable/ic_back" />
+
+            <TextView
+                android:id="@+id/titleBar"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="30dp"
+                android:textColor="#FFF"
+                android:textSize="18dp"
+                android:text="Postingan Baru"
+                android:textStyle="bold" />
+        </android.support.v7.widget.Toolbar>
+        
+        <ImageView
+            android:id="@+id/imagePosting"
+            android:layout_width="match_parent"
+            android:layout_height="300dp"/>
+        
+        <EditText
+            android:id="@+id/textPosting"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Tuliskan Sesuatu ..."
+            android:layout_margin="10dp"
+            android:inputType="textMultiLine"/>
+    </LinearLayout>
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/sentPost"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp"
+        android:backgroundTint="@color/colorMain"
+        android:src="@drawable/sent_posting"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintRight_toRightOf="parent"/>
+
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/open_camera"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toTopOf="@id/sentPost"
+        android:layout_margin="10dp"
+        android:src="@drawable/cam_post"
+        android:tint="@color/colorWhite"
+        android:backgroundTint="@color/colorMain"
+        app:layout_constraintRight_toRightOf="parent"/>
+
+</android.support.constraint.ConstraintLayout>
