@@ -72,10 +72,11 @@ public class Posting extends AppCompatActivity {
         mFirebaseAuth=FirebaseAuth.getInstance();
         currentUser = FirebaseAuth.getInstance().getCurrentUser();;
 
+        image_posting.setVisibility(View.GONE);
         storage = FirebaseStorage.getInstance();
         storageReference = storage.getReference();
 
-        dbs = FirebaseDatabase.getInstance().getReference("posting").child(currentUser.getUid());
+        dbs = FirebaseDatabase.getInstance().getReference("posting");
 
 
         button_camera.setOnClickListener(new View.OnClickListener() {
@@ -104,6 +105,7 @@ public class Posting extends AppCompatActivity {
                 CropImage.ActivityResult result = CropImage.getActivityResult(data);
                 if (resultCode == RESULT_OK) {
                     filepath = result.getUri();
+                    image_posting.setVisibility(View.VISIBLE);
                     image_posting.setImageURI(filepath);
                 } else if (resultCode == CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE) {
                     Exception error = result.getError();
@@ -112,6 +114,7 @@ public class Posting extends AppCompatActivity {
             }
             else if (requestCode == IMG_CAMERA) {
                 Bitmap thumbnail = (Bitmap) data.getExtras().get("data");
+                image_posting.setVisibility(View.VISIBLE);
                 image_posting.setImageBitmap(thumbnail);
             }
         }catch (Exception e){

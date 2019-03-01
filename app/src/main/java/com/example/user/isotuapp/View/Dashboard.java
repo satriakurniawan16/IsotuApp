@@ -1,5 +1,6 @@
 package com.example.user.isotuapp.View;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.TabLayout;
@@ -31,12 +32,13 @@ public class Dashboard extends AppCompatActivity {
     private ViewPager viewPager;
     FloatingActionButton fab;
     private int[] tabIcons = {
-            R.drawable.home,
-            R.drawable.phone,
-            R.drawable.comment,
-            R.drawable.news,
-            R.drawable.profile
+            R.mipmap.dashboard,
+            R.mipmap.contact,
+            R.mipmap.chat,
+            R.mipmap.news,
+            R.mipmap.profile
     };
+    @SuppressLint("RestrictedApi")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -55,7 +57,7 @@ public class Dashboard extends AppCompatActivity {
                 startActivity(intent);
             }
         });
-
+        fab.setVisibility(View.VISIBLE);
 
         viewPager = (ViewPager) findViewById(R.id.viewpager);
         setupViewPager(viewPager);
@@ -74,18 +76,23 @@ public class Dashboard extends AppCompatActivity {
                 switch (i) {
                     case 0:
                         toolbar.setTitle("Home");
+                        fab.setVisibility(View.VISIBLE);
                         break;
                     case 1:
                         toolbar.setTitle("Contact");
+                        fab.setVisibility(View.GONE);
                         break;
                     case 2:
                         toolbar.setTitle("Chat");
+                        fab.setVisibility(View.GONE);
                         break;
                     case 3:
                         toolbar.setTitle("Event");
+                        fab.setVisibility(View.GONE);
                         break;
                     case 4:
                         toolbar.setTitle("Profile");
+                        fab.setVisibility(View.GONE);
                         break;
                 }
             }

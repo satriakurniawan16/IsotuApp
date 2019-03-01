@@ -40,8 +40,11 @@
         android:layout_height="wrap_content"
         android:layout_gravity="right|bottom"
         android:layout_margin="15dp"
+        android:elevation="20dp"
+        app:borderWidth="0dp"
+        android:background="#00ffffff"
         android:backgroundTint="@color/colorMain"
-        android:src="@drawable/write"/>
+        android:src="@mipmap/write"/>
 
     <android.support.v4.view.ViewPager
         android:id="@+id/viewpager"

@@ -2,7 +2,7 @@ package com.example.user.isotuapp.Model;
 
 import java.io.Serializable;
 
-public class Post implements Serializable {
+public class Post implements Serializable{
     User user;
     String postId,image,text,type;
     long numlikes,numComment,timeCreated;

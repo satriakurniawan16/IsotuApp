@@ -60,7 +60,10 @@
         android:layout_height="wrap_content"
         android:layout_margin="10dp"
         android:backgroundTint="@color/colorMain"
-        android:src="@drawable/sent_posting"
+        android:src="@mipmap/sent"
+        android:elevation="20dp"
+        app:borderWidth="0dp"
+        android:background="#00ffffff"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintRight_toRightOf="parent"/>
 
@@ -71,8 +74,10 @@
         android:layout_height="wrap_content"
         app:layout_constraintBottom_toTopOf="@id/sentPost"
         android:layout_margin="10dp"
-        android:src="@drawable/cam_post"
-        android:tint="@color/colorWhite"
+        android:src="@mipmap/camera"
+        android:elevation="20dp"
+        app:borderWidth="0dp"
+        android:background="#00ffffff"
         android:backgroundTint="@color/colorMain"
         app:layout_constraintRight_toRightOf="parent"/>
 

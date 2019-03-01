@@ -22,7 +22,7 @@ public class FirebaseUtils {
 
     public static DatabaseReference getPostRef(){
         return FirebaseDatabase.getInstance()
-                .getReference(Constants.POST_KEY);
+                .getReference("posting");
     }
 
     public static DatabaseReference getPostLikedRef(){
@@ -31,7 +31,7 @@ public class FirebaseUtils {
     }
 
     public static DatabaseReference getPostLikedRef(String postId){
-        return getPostLikedRef().child(getCurrentUser().getEmail()
+        return getPostLikedRef().child(getCurrentUser().getUid()
                 .replace(".",","))
                 .child(postId);
     }
@@ -51,7 +51,7 @@ public class FirebaseUtils {
 
     public static DatabaseReference getMyPostRef(){
         return FirebaseDatabase.getInstance().getReference(Constants.MY_POSTS)
-                .child(getCurrentUser().getEmail().replace(".",","));
+                .child(getCurrentUser().getUid().replace(".",","));
     }
 
     public static DatabaseReference getCommentRef(String postId){
@@ -61,7 +61,7 @@ public class FirebaseUtils {
 
     public static DatabaseReference getMyRecordRef(){
         return FirebaseDatabase.getInstance().getReference(Constants.USER_RECORD)
-                .child(getCurrentUser().getEmail().replace(".",","));
+                .child(getCurrentUser().getUid().replace(".",","));
     }
 
     public static void addToMyRecord(String node, final String id){
