@@ -46,6 +46,18 @@
         android:backgroundTint="@color/colorMain"
         android:src="@mipmap/write"/>
 
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/to_addevent"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="right|bottom"
+        android:layout_margin="15dp"
+        android:elevation="20dp"
+        app:borderWidth="0dp"
+        android:background="#00ffffff"
+        android:backgroundTint="@color/colorMain"
+        android:src="@mipmap/writing"/>
+
     <android.support.v4.view.ViewPager
         android:id="@+id/viewpager"
         android:layout_width="match_parent"

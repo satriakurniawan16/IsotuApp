@@ -30,7 +30,7 @@ public class Dashboard extends AppCompatActivity {
     private Toolbar toolbar;
     private TabLayout tabLayout;
     private ViewPager viewPager;
-    FloatingActionButton fab;
+    FloatingActionButton fab,fabevent;
     private int[] tabIcons = {
             R.mipmap.dashboard,
             R.mipmap.contact,
@@ -49,16 +49,25 @@ public class Dashboard extends AppCompatActivity {
         getSupportActionBar().setTitle("Home");
 
         fab = (FloatingActionButton) findViewById(R.id.to_posting);
+        fabevent = (FloatingActionButton) findViewById(R.id.to_addevent);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent =  new Intent(Dashboard.this,Posting.class);
-                Toast.makeText(Dashboard.this, "intent", Toast.LENGTH_SHORT).show();
                 startActivity(intent);
             }
         });
-        fab.setVisibility(View.VISIBLE);
 
+        fabevent.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent =  new Intent(Dashboard.this,EventActivity.class);
+                startActivity(intent);
+            }
+        });
+
+        fabevent.setVisibility(View.GONE);
+        fab.setVisibility(View.VISIBLE);
         viewPager = (ViewPager) findViewById(R.id.viewpager);
         setupViewPager(viewPager);
 
@@ -77,22 +86,28 @@ public class Dashboard extends AppCompatActivity {
                     case 0:
                         toolbar.setTitle("Home");
                         fab.setVisibility(View.VISIBLE);
+
+                        fabevent.setVisibility(View.GONE);
                         break;
                     case 1:
                         toolbar.setTitle("Contact");
                         fab.setVisibility(View.GONE);
+                        fabevent.setVisibility(View.GONE);
                         break;
                     case 2:
                         toolbar.setTitle("Chat");
                         fab.setVisibility(View.GONE);
+                        fabevent.setVisibility(View.GONE);
                         break;
                     case 3:
                         toolbar.setTitle("Event");
                         fab.setVisibility(View.GONE);
+                        fabevent.setVisibility(View.VISIBLE);
                         break;
                     case 4:
                         toolbar.setTitle("Profile");
                         fab.setVisibility(View.GONE);
+                        fabevent.setVisibility(View.GONE);
                         break;
                 }
             }

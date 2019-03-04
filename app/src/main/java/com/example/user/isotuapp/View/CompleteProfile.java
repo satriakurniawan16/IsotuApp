@@ -39,7 +39,7 @@ import java.util.UUID;
 public class CompleteProfile extends AppCompatActivity {
 
     private static int IMG_CAMERA = 2;
-    EditText fullnameField,nimField,facultyField,majorField,numberField;
+    EditText fullnameField,nimField,facultyField,majorField,numberField,asalField;
     ImageView profilePict;
     Button saveProfile;
     private Uri filepath;
@@ -62,6 +62,7 @@ public class CompleteProfile extends AppCompatActivity {
         majorField = (EditText) findViewById(R.id.major);
         saveProfile = (Button) findViewById(R.id.save);
         numberField = (EditText)findViewById(R.id.numberPhone);
+        asalField = (EditText) findViewById(R.id.asal);
 
         storage = FirebaseStorage.getInstance();
         storageReference = storage.getReference();
@@ -120,6 +121,7 @@ public class CompleteProfile extends AppCompatActivity {
         final String facultyString = facultyField.getText().toString().trim();
         final String majorString = majorField.getText().toString().trim();
         final String numberString = numberField.getText().toString().trim();
+        final String asalString= asalField.getText().toString().trim();
         dbs.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -170,6 +172,7 @@ public class CompleteProfile extends AppCompatActivity {
                                             user.put("fakultas",facultyString);
                                             user.put("jurusan",majorString);
                                             user.put("nohp",numberString);
+                                            user.put("asal",asalString);
                                             user.put("completeProfile",1);
                                             user.put("Uid",currentUser.getUid());
                                             dbs.setValue(user);
