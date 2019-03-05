@@ -102,7 +102,7 @@ public class HomeFragment extends Fragment implements Serializable {
                 dblike.addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                        Log.d("datasnapshotnya", "onDataChange: " + dataSnapshot);
+                        Log.d("datasnapshot", "onDataChange: " + dataSnapshot);
                         for(DataSnapshot ds : dataSnapshot.getChildren()){
                             Log.d("datasnapshotnya lagi", "onDataChange: " + ds);
                             if(model.getPostId() != ds.getKey()){

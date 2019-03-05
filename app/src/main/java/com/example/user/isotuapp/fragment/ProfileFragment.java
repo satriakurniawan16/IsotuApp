@@ -68,7 +68,7 @@ public class ProfileFragment extends Fragment {
     FirebaseUser currentUser;
     HobiModel hobi;
     String key ,keyorganiasasi;
-    private DatabaseReference database,databaseuserhobi,databaseorganiasi,databaseuserorganisasi;
+    private DatabaseReference database,databaseuserhobi,databaseorganiasi;
     String Image;
     private FirebaseAuth mFirebaseAuth;
 
@@ -458,6 +458,7 @@ public class ProfileFragment extends Fragment {
         });
 
     }
+
 
     private void submitOrganisasi(Organiasasi word) {
         keyorganiasasi = databaseorganiasi.push().getKey();

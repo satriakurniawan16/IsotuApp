@@ -51,7 +51,9 @@
             tools:ignore="InnerclassSeparator" />
         <activity android:name=".View.EditProfil" />
         <activity android:name=".View.DetailUserHobi" />
-        <activity android:name=".View.EventActivity"></activity>
+        <activity android:name=".View.EventActivity" />
+        <activity android:name=".View.FriendProfile" />
+        <activity android:name=".View.MessageActivity"></activity>
     </application>
 
 </manifest>

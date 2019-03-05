@@ -21,6 +21,7 @@ import com.example.user.isotuapp.Controller.HobiUserAdapter;
 import com.example.user.isotuapp.Controller.OrganisasiAdapter;
 import com.example.user.isotuapp.Model.HobiModel;
 import com.example.user.isotuapp.Model.Organiasasi;
+import com.example.user.isotuapp.Model.User;
 import com.example.user.isotuapp.Model.UserHobi;
 import com.example.user.isotuapp.R;
 import com.google.firebase.auth.FirebaseAuth;
@@ -103,20 +104,15 @@ public class DetailUserHobi extends AppCompatActivity {
                     @Override
                     public void onItemClick(int position) {
 
-//                        HobiModel pet = mData.get(position);
-//                        Intent intent = new Intent(getContext(), DetailUserHobi.class);
-//                        intent.putExtra("reference",pet.getHobi());
-//                        startActivity(intent);
+                        UserHobi pet = mData.get(position);
+                        Intent intent = new Intent(DetailUserHobi.this, FriendProfile.class);
+                        intent.putExtra("iduser",pet.getIduser());
+                        startActivity(intent);
                     }
 
                     @Override
                     public boolean onItemLongClick(int position) {
                         if (mActionMode != null) return false;
-                        UserHobi pet = mData.get(position);
-                        final String editKey = pet.getIduser();
-
-
-
                         return true;
                     }
                 });
