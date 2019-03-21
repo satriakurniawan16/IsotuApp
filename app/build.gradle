@@ -38,14 +38,23 @@ dependencies {
 
     implementation 'com.theartofdev.edmodo:android-image-cropper:2.6.0'
     implementation 'de.hdodenhof:circleimageview:2.1.0'
+    implementation 'com.rengwuxian.materialedittext:library:2.1.4'
+    implementation 'com.google.android.gms:play-services-maps:16.0.0'
+    implementation 'com.google.android.gms:play-services-places:16.0.0'
+    implementation 'com.google.android.gms:play-services-location:16.0.0'
     implementation 'com.squareup.picasso:picasso:2.71828'
     implementation 'com.android.support:support-v4:28.0.0'
-    implementation 'com.github.bumptech.glide:glide:3.7.0'
     implementation 'com.firebaseui:firebase-ui-storage:1.1.1'
     implementation 'com.firebaseui:firebase-ui-database:1.1.1'
     implementation 'com.squareup.picasso:picasso:2.71828'
-    // Glide v4 uses this new annotation processor -- see https://bumptech.github.io/glide/doc/generatedapi.html
-    annotationProcessor 'com.github.bumptech.glide:compiler:4.7.1'
+    implementation 'com.karumi:dexter:4.2.0'
+
+    // ButterKnife view binding
+    implementation 'com.jakewharton:butterknife:8.8.1'
+    implementation 'com.github.bumptech.glide:glide:4.9.0'
+    annotationProcessor 'com.github.bumptech.glide:compiler:4.9.0'
+    annotationProcessor 'com.jakewharton:butterknife-compiler:8.8.1'
+
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'

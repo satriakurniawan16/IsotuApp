@@ -134,7 +134,7 @@ public class EditProfil extends AppCompatActivity {
                     user.put("nohp",noHpProfile.getText().toString());
                     user.put("asal",AsalProfile.getText().toString());
                     user.put("completeProfile",usr.getCompleteProfile());
-                    user.put("Uid",currentUser.getUid());
+                    user.put("uid",currentUser.getUid());
                     dbf.setValue(user);
                     Toast.makeText(EditProfil.this, "Profile tersimpan ", Toast.LENGTH_SHORT).show();
                     Intent intent = new Intent(EditProfil.this, Dashboard.class);

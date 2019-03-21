@@ -389,11 +389,6 @@
                             android:background="#eeeeee"/>
 
 
-                        <View
-                            android:layout_width="match_parent"
-                            android:layout_height="1dp"
-                            android:layout_marginTop="10dp"
-                            android:background="#eeeeee"/>
 
                         <LinearLayout
                             android:layout_width="match_parent"
@@ -441,14 +436,7 @@
                             android:layout_height="1dp"
                             android:background="#eeeeee"/>
 
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginLeft="10dp"
-                            android:text="Tambahkan hobi kamu klik dan tahan list untuk opsi "
-                            android:textColor="#000"
-                            android:textSize="14dp"
-                            android:layout_marginTop="10dp"/>
+                        
                         <LinearLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"

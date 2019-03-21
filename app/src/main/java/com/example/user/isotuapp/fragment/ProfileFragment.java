@@ -17,6 +17,7 @@ import android.view.ActionMode;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -32,6 +33,7 @@ import com.example.user.isotuapp.Model.UserHobi;
 import com.example.user.isotuapp.R;
 import com.example.user.isotuapp.View.DetailUserHobi;
 import com.example.user.isotuapp.View.EditProfil;
+import com.example.user.isotuapp.View.LoginScreen;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -63,6 +65,8 @@ public class ProfileFragment extends Fragment {
     private ArrayList<Organiasasi> mDataOrganisasi;
     private ArrayList<String> mDataIdOrganisasi;
     private OrganisasiAdapter mAdapterOrganisasi;
+
+    Button logout;
 
     private ActionMode mActionMode;
     FirebaseUser currentUser;
@@ -162,7 +166,13 @@ public class ProfileFragment extends Fragment {
         noHpProfile = (TextView) mRootView.findViewById(R.id.nohp);
         AsalProfile = (TextView) mRootView.findViewById(R.id.asal);
         fotoProfile = (ImageView) mRootView.findViewById(R.id.imageprofil);
-
+        logout = (Button) mRootView.findViewById(R.id.logout);
+        logout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                logOut();
+            }
+        });
         RecyclerView recyclerView = mRootView.findViewById(R.id.listhobi);
         recyclerView.setHasFixedSize(true);
         LinearLayoutManager layoutManager =
@@ -491,6 +501,18 @@ public class ProfileFragment extends Fragment {
 
     }
 
+    private void goLogInScreen() {
+        Intent intent = new Intent(getContext(), LoginScreen.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(intent);
+    }
+
+    public void logOut() {
+                    FirebaseAuth.getInstance().signOut();
+                    goLogInScreen();
+    }
+
+
     private void loadProfile() {
 
         final DatabaseReference dbprofile = FirebaseDatabase.getInstance().getReference("user").child(currentUser.getUid());
@@ -507,7 +529,7 @@ public class ProfileFragment extends Fragment {
                     ProdiProfile.setText(usr.getJurusan());
                     noHpProfile.setText(usr.getNohp());
                     AsalProfile.setText(usr.getAsal());
-                    Image = usr.getImage().toString();
+                    Image = usr.getImage();
                 }
 
                 @Override

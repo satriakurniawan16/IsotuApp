@@ -1,12 +1,13 @@
 package com.example.user.isotuapp.Model;
 
 public class User {
-    String username,email,image,fullname,nim,fakultas,jurusan,nohp,asal,uid;
+    String username,email,image,fullname,nim,fakultas,jurusan,nohp,asal,uid,status,search;
     int completeProfile;
+    Double latitude,longitude;
 
     public User (){}
 
-    public User(String username, String email, String image, String fullname, String nim, String fakultas, String jurusan, String nohp, String asal, String uid, int completeProfile) {
+    public User(String username, String email, String image, String fullname, String nim, String fakultas, String jurusan, String nohp, String asal, String uid, String status, String search, int completeProfile, Double latitude, Double longitude) {
         this.username = username;
         this.email = email;
         this.image = image;
@@ -17,7 +18,27 @@ public class User {
         this.nohp = nohp;
         this.asal = asal;
         this.uid = uid;
+        this.status = status;
+        this.search = search;
         this.completeProfile = completeProfile;
+        this.latitude = latitude;
+        this.longitude = longitude;
+    }
+
+    public Double getLatitude() {
+        return latitude;
+    }
+
+    public void setLatitude(Double latitude) {
+        this.latitude = latitude;
+    }
+
+    public Double getLongitude() {
+        return longitude;
+    }
+
+    public void setLongitude(Double longitude) {
+        this.longitude = longitude;
     }
 
     public String getAsal() {
@@ -30,6 +51,22 @@ public class User {
 
     public String getUid() {
         return uid;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    public String getSearch() {
+        return search;
+    }
+
+    public void setSearch(String search) {
+        this.search = search;
     }
 
     public void setUid(String uid) {
@@ -106,5 +143,24 @@ public class User {
 
     public void setCompleteProfile(int completeProfile) {
         this.completeProfile = completeProfile;
+    }
+
+    @Override
+    public String toString() {
+        return "User{" +
+                "username='" + username + '\'' +
+                ", email='" + email + '\'' +
+                ", image='" + image + '\'' +
+                ", fullname='" + fullname + '\'' +
+                ", nim='" + nim + '\'' +
+                ", fakultas='" + fakultas + '\'' +
+                ", jurusan='" + jurusan + '\'' +
+                ", nohp='" + nohp + '\'' +
+                ", asal='" + asal + '\'' +
+                ", uid='" + uid + '\'' +
+                ", status='" + status + '\'' +
+                ", search='" + search + '\'' +
+                ", completeProfile=" + completeProfile +
+                '}';
     }
 }

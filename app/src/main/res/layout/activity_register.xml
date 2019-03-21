@@ -23,6 +23,7 @@
         android:backgroundTint="@color/colorWhite"
         android:drawablePadding="5dp"
         android:layout_below="@+id/title1"
+        android:inputType="textCapWords"
         android:paddingBottom="14dp"
         android:paddingLeft="6dp"
         android:layout_marginLeft="50dp"

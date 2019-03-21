@@ -46,6 +46,8 @@ public class Register extends AppCompatActivity {
     String jurusan = "";
     String nohp = "";
     String uid = "";
+    String status = "";
+    String search = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -100,6 +102,8 @@ public class Register extends AppCompatActivity {
                         @Override
                         public void onComplete(@NonNull Task<AuthResult> task) {
                             if (!task.isSuccessful()) {
+                                Log.e("lolpliss", "onComplete: " + task.getException() );
+                                pDialog.dismiss();
                                 Toast.makeText(Register.this, "Authentication failed : Account already exist", Toast.LENGTH_SHORT).show();
                             }else{
                                 Log.d("LOL", "onComplete: success");
@@ -121,7 +125,9 @@ public class Register extends AppCompatActivity {
                                         user.put("jurusan",jurusan);
                                         user.put("nohp",nohp);
                                         user.put("completeProfile",completeProfile);
-                                        user.put("Uid",uidString);
+                                        user.put("uid",uidString);
+                                        user.put("status","offline");
+                                        user.put("search",usernameString);
 
                                         dbf.setValue(user);
                                         Toast.makeText(Register.this, "Register Success", Toast.LENGTH_SHORT).show();
@@ -131,7 +137,7 @@ public class Register extends AppCompatActivity {
 
                                     @Override
                                     public void onCancelled(@NonNull DatabaseError databaseError) {
-
+                                        Log.e("errorregister", "onCancelled: "+databaseError );
                                     }
                                 });
                             }
@@ -148,7 +154,7 @@ public class Register extends AppCompatActivity {
         toLogin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(Register.this,CompleteProfile.class);
+                Intent intent = new Intent(Register.this,LoginScreen.class);
                 startActivity(intent);
             }
         });

@@ -3,13 +3,12 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_height="wrap_content"
     tools:context=".View.CompleteProfile">
 
         <android.support.constraint.ConstraintLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:paddingBottom="50dp">
+            android:layout_height="wrap_content">
 
 
     <android.support.constraint.Guideline
@@ -54,7 +53,6 @@
         android:layout_marginLeft="20dp"
         android:layout_marginRight="20dp"
         android:layout_marginTop="50dp"
-        android:layout_marginBottom="100dp"
         android:orientation="vertical"
         android:padding="20dp"
         app:layout_constraintTop_toTopOf="@+id/imageView">
@@ -101,6 +99,7 @@
             android:id="@+id/fullname"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:inputType="textCapWords"
             android:backgroundTint="@color/colorMain"
             android:hint="e.g Rahmad Satria Kurniawan"
             android:textColor="@color/colorMain"
@@ -139,6 +138,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:backgroundTint="@color/colorMain"
+            android:inputType="textCapWords"
             android:hint="e.g Fakultas Ilmu Terapan"
             android:textColor="@color/colorMain"
             android:textColorHint="@color/colorPrimary" />
@@ -156,6 +156,7 @@
             android:id="@+id/major"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:inputType="textCapWords"
             android:backgroundTint="@color/colorMain"
             android:hint="e.g D3 RPLA"
             android:textColor="@color/colorMain"
@@ -175,6 +176,7 @@
             android:id="@+id/numberPhone"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:inputType="phone"
             android:backgroundTint="@color/colorMain"
             android:hint="e.g D3 08131231231"
             android:textColor="@color/colorMain"
@@ -193,6 +195,7 @@
             android:id="@+id/asal"
             android:layout_marginBottom="40dp"
             android:layout_width="match_parent"
+            android:inputType="textCapWords"
             android:layout_height="wrap_content"
             android:backgroundTint="@color/colorMain"
             android:hint="e.g D3 Bukittinggi, Sumatra Barat"

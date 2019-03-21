@@ -20,7 +20,10 @@
             android:layout_height="?attr/actionBarSize"
             android:background="@color/colorMain"
             app:titleTextColor="@color/colorWhite"
-            app:layout_scrollFlags="scroll|enterAlways" />
+            app:layout_scrollFlags="scroll|enterAlways" >
+
+
+        </android.support.v7.widget.Toolbar>
 
         <android.support.design.widget.TabLayout
             android:id="@+id/tabs"
@@ -57,6 +60,18 @@
         android:background="#00ffffff"
         android:backgroundTint="@color/colorMain"
         android:src="@mipmap/writing"/>
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/to_search"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="right|bottom"
+        android:layout_margin="15dp"
+        android:elevation="20dp"
+        app:borderWidth="0dp"
+        android:background="#00ffffff"
+        android:backgroundTint="@color/colorMain"
+        android:src="@mipmap/add_contact"/>
 
     <android.support.v4.view.ViewPager
         android:id="@+id/viewpager"

@@ -2,35 +2,36 @@
 <android.support.constraint.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="wrap_content">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center"
-        android:orientation="vertical"
-        android:padding="10dp">
+        android:padding="10dp"
+        android:orientation="vertical">
 
         <android.support.v7.widget.CardView
             android:layout_width="match_parent"
-            android:layout_height="350dp"
+            android:layout_height="320dp"
             android:background="@color/colorWhite">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="350dp"
                 android:orientation="vertical"
-                android:gravity="center"
                 >
 
                 <ImageView
+                    android:id="@+id/image_event"
                     android:layout_width="match_parent"
-                    android:layout_height="250dp"
+                    android:layout_height="220dp"
                     android:background="@color/colorMain"
                     android:src="@mipmap/ic_launcher"
                     />
 
                 <TextView
+                    android:id="@+id/title_event"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Dies Natlies Himadif"
@@ -39,6 +40,7 @@
                     android:textColor="#000"
                     android:layout_marginTop="10dp"/>
                 <TextView
+                    android:id="@+id/time_event"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="14 Februari"

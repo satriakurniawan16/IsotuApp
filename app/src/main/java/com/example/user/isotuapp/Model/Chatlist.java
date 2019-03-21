@@ -1,13 +1,15 @@
 package com.example.user.isotuapp.Model;
 
-public class Chatlist {
+import java.io.Serializable;
+
+public class Chatlist implements Serializable {
     public String id;
+
+    public Chatlist() {
+    }
 
     public Chatlist(String id) {
         this.id = id;
-    }
-
-    public Chatlist() {
     }
 
     public String getId() {

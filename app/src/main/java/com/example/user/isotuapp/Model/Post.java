@@ -21,6 +21,16 @@ public class Post implements Serializable{
         this.timeCreated = timeCreated;
     }
 
+    public Post(User user, String postId, String text, String type, long numlikes, long numComment, long timeCreated) {
+        this.user = user;
+        this.postId = postId;
+        this.text = text;
+        this.type = type;
+        this.numlikes = numlikes;
+        this.numComment = numComment;
+        this.timeCreated = timeCreated;
+    }
+
     public User getUser() {
         return user;
     }

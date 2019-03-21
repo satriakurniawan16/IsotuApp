@@ -15,7 +15,7 @@
       },
       "oauth_client": [
         {
-          "client_id": "637369348771-6b5lgth04bcds8u14pg8o084tb6akcur.apps.googleusercontent.com",
+          "client_id": "637369348771-ob6jddmsccks80rgl303bcvg7db302i6.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
             "package_name": "com.example.user.isotuapp",
@@ -29,7 +29,7 @@
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyBZlO9HKIdLHi2aWSE-GAGpyR3Fe_sN9j4"
+          "current_key": "AIzaSyAUYzjdmwERTs5wt1Xkc05_hMMHVSkUk_g"
         }
       ],
       "services": {
