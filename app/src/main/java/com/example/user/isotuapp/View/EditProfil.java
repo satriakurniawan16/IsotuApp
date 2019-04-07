@@ -135,6 +135,7 @@ public class EditProfil extends AppCompatActivity {
                     user.put("asal",AsalProfile.getText().toString());
                     user.put("completeProfile",usr.getCompleteProfile());
                     user.put("uid",currentUser.getUid());
+                    user.put("search",namaProfileEditText.getText().toString().toLowerCase());
                     dbf.setValue(user);
                     Toast.makeText(EditProfil.this, "Profile tersimpan ", Toast.LENGTH_SHORT).show();
                     Intent intent = new Intent(EditProfil.this, Dashboard.class);

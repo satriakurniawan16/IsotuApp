@@ -28,7 +28,6 @@
             android:name="com.google.android.geo.API_KEY"
             android:value="@string/google_maps_key" />
 
-
         <activity android:name=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -45,8 +44,24 @@
                 <action android:name="com.example.user.isotuapp.utils.LocationService" />
             </intent-filter>
         </service>
+        <service
+            android:name=".Notification.MyFirebaseIdService"
+            android:enabled="true"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="com.google.firebase.INSTANCE_ID_EVENT" />
+            </intent-filter>
+        </service>
+        <service
+            android:name=".Notification.MyFirebaseMessaging"
+            android:enabled="true"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="com.google.firebase.MESSAGING_EVENT" />
+            </intent-filter>
+        </service>
 
-        <!--<service android:name=".utils.GPSTracker"/>-->
+        <!-- <service android:name=".utils.GPSTracker"/> -->
 
         <activity
             android:name="com.theartofdev.edmodo.cropper.CropImageActivity"
@@ -69,7 +84,7 @@
         <activity
             android:name=".View.PostActivity"
             tools:ignore="InnerclassSeparator" />
-        <activity android:name=".View$EditProfil" />
+        <activity android:name=".View.EditProfil" />
         <activity android:name=".View.DetailUserHobi" />
         <activity android:name=".View.EventActivity" />
         <activity android:name=".View.FriendProfile" />
@@ -77,8 +92,12 @@
         <activity android:name=".View.SearchFriendActivity" />
         <activity android:name=".View.DetailEventActivity" />
         <activity android:name=".View.FindingFriend" />
-        <activity android:name=".View.MapActivity"
+        <activity
+            android:name=".View.MapActivity"
             tools:ignore="InnerclassSeparator" />
+        <activity android:name=".View.GroupActivity" />
+        <activity android:name=".View.ShareActivity" />
+        <activity android:name=".View.ShareDetailActivity"></activity>
     </application>
 
 </manifest>

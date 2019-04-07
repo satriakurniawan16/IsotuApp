@@ -13,6 +13,7 @@ import android.support.v4.app.Fragment;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.ActionMode;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -211,7 +212,8 @@ public class ProfileFragment extends Fragment {
                         }
                         HobiModel pet = mData.get(position);
                         Intent intent = new Intent(getContext(), DetailUserHobi.class);
-                        intent.putExtra("reference",pet.getHobi());
+                        intent.putExtra("reference","list_hobi_user");
+                        intent.putExtra("child",pet.getHobi());
                         startActivity(intent);
                     }
 
@@ -220,7 +222,6 @@ public class ProfileFragment extends Fragment {
                         if (mActionMode != null) return false;
                         HobiModel pet = mData.get(position);
                         final String editKey = pet.getIdHobi();
-                        FirebaseDatabase.getInstance().getReference("latihan").child(currentUser.getUid());
 
                         AlertDialog.Builder mBuilder = new AlertDialog.Builder(getContext());
 
@@ -291,7 +292,8 @@ public class ProfileFragment extends Fragment {
                         }
                         Organiasasi pet = mDataOrganisasi.get(position);
                         Intent intent = new Intent(getContext(), DetailUserHobi.class);
-                        intent.putExtra("reference",pet.getNama());
+                        intent.putExtra("reference","list_user_organisasi");
+                        intent.putExtra("child",pet.getNama());
                         startActivity(intent);
                     }
 
@@ -448,7 +450,7 @@ public class ProfileFragment extends Fragment {
                                 "Berhasil Ditambahkan", Toast.LENGTH_LONG).show();
                     }
                 });
-        databaseuserhobi = FirebaseDatabase.getInstance().getReference(word.getHobi());
+        databaseuserhobi = FirebaseDatabase.getInstance().getReference("list_hobi_user").child(word.getHobi());
         final DatabaseReference dbf = FirebaseDatabase.getInstance().getReference("user").child(currentUser.getUid());
         dbf.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -480,7 +482,7 @@ public class ProfileFragment extends Fragment {
                                 "Berhasil Ditambahkan", Toast.LENGTH_LONG).show();
                     }
                 });
-        databaseuserhobi = FirebaseDatabase.getInstance().getReference(word.getNama());
+        databaseuserhobi = FirebaseDatabase.getInstance().getReference("list_user_organisasi").child(word.getNama());
         final DatabaseReference dbf = FirebaseDatabase.getInstance().getReference("user").child(currentUser.getUid());
         dbf.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -502,9 +504,7 @@ public class ProfileFragment extends Fragment {
     }
 
     private void goLogInScreen() {
-        Intent intent = new Intent(getContext(), LoginScreen.class);
-        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
-        startActivity(intent);
+        startActivity(new Intent(getContext(), LoginScreen.class).setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
     }
 
     public void logOut() {

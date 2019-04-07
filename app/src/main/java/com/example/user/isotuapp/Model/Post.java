@@ -4,13 +4,13 @@ import java.io.Serializable;
 
 public class Post implements Serializable{
     User user;
-    String postId,image,text,type;
-    long numlikes,numComment,timeCreated;
+    String postId,image,text,type ,idpost,iduser,imageuser,nameUser,captionshare;
+    long numlikes,numComment,numshare,timeCreated,newtimeCreate;
 
     public Post() {
     }
 
-    public Post(User user, String postId, String image, String text, String type, long numlikes, long numComment, long timeCreated) {
+    public Post(User user, String postId, String image, String text, String type, long numlikes, long numComment,long numshare, long timeCreated) {
         this.user = user;
         this.postId = postId;
         this.image = image;
@@ -18,7 +18,82 @@ public class Post implements Serializable{
         this.type = type;
         this.numlikes = numlikes;
         this.numComment = numComment;
+        this.numshare = numshare;
         this.timeCreated = timeCreated;
+    }
+
+    public Post(User user, String postId, String image, String text, String type, long numlikes, long numComment, long numshare, long timeCreated, String idpost, String iduser, String imageuser, String nameUser, String captionshare,long newtimeCreate) {
+        this.user = user;
+        this.postId = postId;
+        this.image = image;
+        this.text = text;
+        this.type = type;
+        this.idpost = idpost;
+        this.iduser = iduser;
+        this.imageuser = imageuser;
+        this.nameUser = nameUser;
+        this.captionshare = captionshare;
+        this.numlikes = numlikes;
+        this.numComment = numComment;
+        this.numshare = numshare;
+        this.timeCreated = timeCreated;
+        this.newtimeCreate = newtimeCreate;
+    }
+
+    public String getIdpost() {
+        return idpost;
+    }
+
+    public void setIdpost(String idpost) {
+        this.idpost = idpost;
+    }
+
+    public String getIduser() {
+        return iduser;
+    }
+
+    public void setIduser(String iduser) {
+        this.iduser = iduser;
+    }
+
+    public String getImageuser() {
+        return imageuser;
+    }
+
+    public void setImageuser(String imageuser) {
+        this.imageuser = imageuser;
+    }
+
+    public long getNewtimeCreate() {
+        return newtimeCreate;
+    }
+
+    public void setNewtimeCreate(long newtimeCreate) {
+        this.newtimeCreate = newtimeCreate;
+    }
+
+    public String getNameUser() {
+        return nameUser;
+    }
+
+    public void setNameUser(String nameUser) {
+        this.nameUser = nameUser;
+    }
+
+    public String getCaptionshare() {
+        return captionshare;
+    }
+
+    public void setCaptionshare(String captionshare) {
+        this.captionshare = captionshare;
+    }
+
+    public long getNumshare() {
+        return numshare;
+    }
+
+    public void setNumshare(long numshare) {
+        this.numshare = numshare;
     }
 
     public Post(User user, String postId, String text, String type, long numlikes, long numComment, long timeCreated) {

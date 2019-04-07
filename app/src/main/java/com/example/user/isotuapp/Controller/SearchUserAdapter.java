@@ -23,7 +23,7 @@ public class SearchUserAdapter  extends RecyclerView.Adapter<SearchUserAdapter.V
     private ArrayList<String> mDataId;
     private ArrayList<String> mSelectedId;
     public SearchUserAdapter(Context context, ArrayList<User> data, ArrayList<String> dataId,
-                          ClickHandler handler) {
+                             ClickHandler handler) {
         mContext = context;
         mData = data;
         mDataId = dataId;
@@ -45,8 +45,9 @@ public class SearchUserAdapter  extends RecyclerView.Adapter<SearchUserAdapter.V
         User pet = mData.get(position);
         holder.nameTextView.setText(pet.getFullname());
         holder.keteranganTextView.setText(pet.getJurusan()+", "+pet.getFakultas());
-        Picasso.get().load(pet.getImage()).into(holder.profilImageview);
-        holder.itemView.setSelected(mSelectedId.contains(mDataId.get(position)));
+        if(!pet.getImage().equals("")) {
+            Picasso.get().load(pet.getImage()).into(holder.profilImageview);
+        }
     }
 
     @Override

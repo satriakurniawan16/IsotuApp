@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".View.ShareActivity">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="10dp"
+        android:layout_margin="10dp"
+        android:orientation="vertical">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Membagikan postingan "/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="20dp"
+            android:padding="10dp"
+            android:background="@drawable/custom_border"
+            android:gravity="left|center">
+
+            <ImageView
+                android:id="@+id/image_post_share"
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                android:src="@mipmap/ic_launcher"
+                />
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/fullname_share"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="#000"
+                    android:layout_marginLeft="20dp"
+                    android:text="Satria Kurniawan"
+                    android:textStyle="bold"/>
+                <TextView
+                    android:id="@+id/caption_post_share"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="#000"
+                    android:maxLines="2"
+                    android:layout_marginLeft="20dp"
+                    android:layout_marginTop="2dp"
+                    android:text="Lorem ipsum dolor sit amet, consectetur adipiscing elit,  sed do eiusmod tempor incididunt ut labore et dolore  magna aliqua. Ut enim ad minim veniam,  in culpa qui officia ."/>
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <EditText
+            android:id="@+id/write_text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:hint="Tuliskan sesuatu ..."
+            android:textColor="#000"
+            android:background="@null"/>
+    </LinearLayout>
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/btn_share_post"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="15dp"
+        android:elevation="20dp"
+        app:borderWidth="0dp"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentBottom="true"
+        android:background="#00ffffff"
+        android:backgroundTint="@color/colorMain"
+        android:src="@mipmap/sent"/>
+
+</RelativeLayout>

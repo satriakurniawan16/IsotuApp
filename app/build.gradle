@@ -48,12 +48,18 @@ dependencies {
     implementation 'com.firebaseui:firebase-ui-database:1.1.1'
     implementation 'com.squareup.picasso:picasso:2.71828'
     implementation 'com.karumi:dexter:4.2.0'
+    implementation 'com.sothree.slidinguppanel:library:3.4.0';
 
     // ButterKnife view binding
     implementation 'com.jakewharton:butterknife:8.8.1'
     implementation 'com.github.bumptech.glide:glide:4.9.0'
     annotationProcessor 'com.github.bumptech.glide:compiler:4.9.0'
     annotationProcessor 'com.jakewharton:butterknife-compiler:8.8.1'
+
+    //notif
+    implementation 'com.squareup.retrofit2:retrofit:2.3.0'
+    implementation 'com.squareup.retrofit2:converter-gson:2.3.0'
+    implementation 'com.google.firebase:firebase-messaging:17.4.0'
 
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'com.android.support.test:runner:1.0.2'

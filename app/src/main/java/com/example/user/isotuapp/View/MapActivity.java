@@ -2,11 +2,13 @@ package com.example.user.isotuapp.View;
 
 import android.Manifest;
 import android.app.Dialog;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
 import android.location.Location;
+import android.net.Uri;
 import android.os.Handler;
 import android.os.StrictMode;
 import android.support.annotation.NonNull;
@@ -18,6 +20,10 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
+import android.widget.FrameLayout;
+import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.user.isotuapp.MainActivity;
@@ -25,6 +31,7 @@ import com.example.user.isotuapp.Model.MarkerData;
 import com.example.user.isotuapp.Model.User;
 import com.example.user.isotuapp.R;
 import com.example.user.isotuapp.utils.BubleTransformation;
+import com.example.user.isotuapp.utils.Utils;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -39,11 +46,14 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
 
@@ -51,13 +61,19 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 public class MapActivity extends AppCompatActivity implements OnMapReadyCallback {
 
     FloatingActionButton fab;
-    private ArrayList<Marker> markers;
-
+    MarkerOptions markerOption;
+    Utils utils;
+    List<Target> targets;
+    HashMap<Marker, MarkerData> mMarkersHashMap;
+    private SlidingUpPanelLayout mLayout;
+    private static int TIME_OUT = 2000;
+    public View rootView, progressOverlay;
 
 
     @Override
@@ -74,6 +90,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                     Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
                 return;
             }
+
             mMap.setMyLocationEnabled(true);
             mMap.getUiSettings().setMyLocationButtonEnabled(false);
             final Handler handler = new Handler();
@@ -84,6 +101,38 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                     getUserLocation();
                 }
             }, 100);
+            final Utils utils = new Utils(getApplicationContext());
+            googleMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
+                @Override
+                public boolean onMarkerClick(final Marker marker) {
+                    final double vlat = marker.getPosition().latitude;
+                    final double vlong = marker.getPosition().latitude;
+                    utils.animateView(progressOverlay, View.VISIBLE, 0.4f, 200);
+                    new Handler().postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            mLayout.setPanelState(SlidingUpPanelLayout.PanelState.ANCHORED);
+                            utils.animateView(progressOverlay, View.GONE, 0, 200);
+                            final TextView Fullname = (TextView) findViewById(R.id.nameMarker);
+                            Fullname.setText(marker.getTitle());
+                            displayInfo(marker.getSnippet());
+                        }
+                    }, TIME_OUT);
+
+                    final Button buttonDirection = (Button) findViewById(R.id.getdirec);
+                    buttonDirection.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            Uri gmmIntentUri = Uri.parse("geo:"+vlat+","+vlong+"?q="+marker.getTitle());
+                            Intent mapIntent = new Intent(Intent.ACTION_VIEW, gmmIntentUri);
+                            mapIntent.setPackage("com.google.android.apps.maps");
+                            startActivity(mapIntent);
+                        }
+                    });
+                    return true;
+                }
+            });
+
         }
 
     }
@@ -104,6 +153,10 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_map);
         getLocationPermission();
+        mLayout = (SlidingUpPanelLayout ) findViewById(R.id.sliding_layout);
+        progressOverlay = (FrameLayout) findViewById(R.id.progress_overlay);
+        mMarkersHashMap = new HashMap<>();
+        targets = new ArrayList<>();
 
         fab = (FloatingActionButton) findViewById(R.id.getmy);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -130,7 +183,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                         if(task.isSuccessful()){
                             Log.d(TAG, "onComplete: found location!");
                             Location currentLocation = (Location) task.getResult();
-
+                            getUserLocation();
                             moveCamera(new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude()),
                                     DEFAULT_ZOOM);
 
@@ -138,7 +191,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                             Log.d(TAG, "onComplete: current location is null");
                             Toast.makeText(MapActivity.this, "unable to get current location", Toast.LENGTH_SHORT).show();
                         }
-                    }
+                     }
                 });
             }
         }catch (SecurityException e){
@@ -214,9 +267,10 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                     User user = snapshot.getValue(User.class);
-                    createMarker(user.getLatitude(),user.getLongitude(),user.getFullname(),user.getImage());
-
-
+                    ArrayList<MarkerData> markers = new ArrayList<MarkerData>();
+                    markers.clear();
+                    markers.add(new MarkerData(user.getUid(),user.getImage(),user.getLatitude(),user.getLongitude(),user.getFullname()));
+                    plotMarkers(markers);
                     }
                 }
 
@@ -225,6 +279,35 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
             }
         });
+    }
+
+    public void plotMarkers(ArrayList<MarkerData> markers) {
+        if (markers.size() > 0) {
+            for (MarkerData myMarker : markers) {
+
+                markerOption = new MarkerOptions().title(myMarker.getName()).position(new LatLng(myMarker.getLat(), myMarker.getLng())).snippet(myMarker.getId());
+                Marker location_marker = mMap.addMarker(markerOption);
+
+                Target target = new PicassoMarker(location_marker);
+                targets.add(target);
+                Picasso.get().load(myMarker.getImageUrl()).resize(200, 200).centerCrop().transform(new BubleTransformation(20)).
+                into(target);
+
+                mMarkersHashMap.put(location_marker, myMarker);
+
+//                i = getIntent();
+//                if (i.getBooleanExtra("maps", true)) {
+//                    // buttonNavigasi.setVisibility(View.VISIBLE);
+
+                    location_marker.setTitle(myMarker.getName());
+//                    LatLng dest = new LatLng(myMarker.getLat(), myMarker.getLng());
+//                    mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(dest, DEFAULT_ZOOM));
+//                } else {
+//                    Log.d(MapsActivity.class.getSimpleName(), "In else{}");
+                    // mMap.setInfoWindowAdapter(new MarkerInfoWindowAdapter());
+//                }
+            }
+        }
     }
 
     protected Marker createMarker(final double latitude, final double longitude, final String title,final String image) {
@@ -292,6 +375,48 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     protected void onStart() {
         super.onStart();
         getUserLocation();
+    }
+
+    public void displayInfo(final String id) {
+        final TextView major = (TextView) findViewById(R.id.majorMarker);
+        final ImageView ProfileImage = (ImageView) findViewById(R.id.imageMarker);
+        final Button buttonChat = (Button) findViewById(R.id.to_chatfriend);
+        final Button buttonProfile = (Button) findViewById(R.id.toshowProfile);
+        final Button buttonDirection = (Button) findViewById(R.id.getdirec);
+
+        buttonChat.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(MapActivity.this,MessageActivity.class);
+                intent.putExtra("id",id);
+                startActivity(intent);
+            }
+        });
+
+        buttonProfile.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(MapActivity.this,FriendProfile.class);
+                intent.putExtra("iduser",id);
+                startActivity(intent);
+            }
+        });
+
+
+        DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("user").child(FirebaseAuth.getInstance().getCurrentUser().getUid());
+        databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                User user = dataSnapshot.getValue(User.class);
+                Picasso.get().load(user.getImage()).into(ProfileImage);
+                major.setText(user.getJurusan()+", "+user.getFakultas());
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
     }
 }
 

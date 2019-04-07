@@ -178,7 +178,7 @@ public class CompleteProfile extends AppCompatActivity {
                                             user.put("completeProfile",1);
                                             user.put("uid",currentUser.getUid());
                                             user.put("status","offline");
-                                            user.put("search",usr.getUsername());
+                                            user.put("search",fullnameString.toLowerCase());
                                             dbs.setValue(user);
                                             Toast.makeText(CompleteProfile.this, "Profile tersimpan", Toast.LENGTH_SHORT).show();
                                             Intent intent = new Intent(CompleteProfile.this, Dashboard.class);

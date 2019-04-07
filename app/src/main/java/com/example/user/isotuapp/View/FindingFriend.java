@@ -145,7 +145,7 @@ public class FindingFriend extends AppCompatActivity {
                                     return;
                                 }
                                 User pet = mData.get(position);
-                                Intent intent = new Intent(getApplicationContext(), MessageActivity.class);
+                                Intent intent = new Intent(getApplicationContext(), FriendProfile.class);
 
                                 startActivity(intent);
                             }

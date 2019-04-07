@@ -6,15 +6,46 @@ public class Chat {
     private String receiver;
     private String message;
     private boolean isseen;
+    private String idpost;
+    private String imagepost;
+    private String userpost;
 
-    public Chat(String sender, String receiver, String message, boolean isseen) {
+    public Chat() {
+    }
+
+
+    public Chat(String sender, String receiver, String message, boolean isseen, String idpost, String imagepost, String userpost) {
         this.sender = sender;
         this.receiver = receiver;
         this.message = message;
         this.isseen = isseen;
+        this.idpost = idpost;
+        this.imagepost = imagepost;
+        this.userpost = userpost;
     }
 
-    public Chat() {
+    public String getIdpost() {
+        return idpost;
+    }
+
+    public void setIdpost(String idpost) {
+        this.idpost = idpost;
+    }
+
+    public String getImagepost() {
+        return imagepost;
+    }
+
+    public void setImagepost(String imagepost) {
+        this.imagepost = imagepost;
+    }
+
+    public String getUserpost() {
+        return userpost;
+    }
+
+    public void setUserpost(String userpost) {
+        this.userpost = userpost;
     }
 
     public String getSender() {

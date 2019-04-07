@@ -3,6 +3,7 @@ package com.example.user.isotuapp.Controller;
 import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,7 +15,9 @@ import com.example.user.isotuapp.Model.Chat;
 import com.example.user.isotuapp.R;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.squareup.picasso.Picasso;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHolder> {
@@ -25,13 +28,15 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHold
     private Context mContext;
     private List<Chat> mChat;
     private String imageurl;
+    private ClickHandler mClickHandler;
 
     FirebaseUser fuser;
 
-    public MessageAdapter(Context mContext, List<Chat> mChat, String imageurl){
+    public MessageAdapter(Context mContext, List<Chat> mChat, String imageurl,ClickHandler handler){
         this.mChat = mChat;
         this.mContext = mContext;
         this.imageurl = imageurl;
+        mClickHandler = handler;
     }
 
     @NonNull
@@ -58,12 +63,29 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHold
         } else {
             Glide.with(mContext).load(imageurl).into(holder.profile_image);
         }
+        Log.d("sitololsiah", "onBindViewHolder: " + chat.getImagepost());
+        if(!chat.getImagepost().equals("")){
+            holder.imagePost.setVisibility(View.VISIBLE);
+            Picasso.get().load(chat.getImagepost()).into(holder.imagePost);
+        }else{
+            holder.imagePost.setVisibility(View.GONE);
+        }
+
+        if(!chat.getUserpost().equals("")){
+            holder.createdby.setVisibility(View.VISIBLE);
+            holder.shareStatus.setVisibility(View.VISIBLE);
+            holder.createdby.setText("by : "+chat.getUserpost());
+        }else{
+            holder.shareStatus.setVisibility(View.GONE);
+            holder.createdby.setVisibility(View.GONE);
+        }
+
 
         if (position == mChat.size()-1){
             if (chat.isIsseen()){
-                holder.txt_seen.setText("Seen");
+                holder.txt_seen.setText("Dilihat");
             } else {
-                holder.txt_seen.setText("Delivered");
+                holder.txt_seen.setText("Terkirim");
             }
         } else {
             holder.txt_seen.setVisibility(View.GONE);
@@ -76,11 +98,20 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHold
         return mChat.size();
     }
 
-    public  class ViewHolder extends RecyclerView.ViewHolder{
+
+
+    public  class ViewHolder extends RecyclerView.ViewHolder implements
+            View.OnClickListener,
+            View.OnLongClickListener{
 
         public TextView show_message;
         public ImageView profile_image;
         public TextView txt_seen;
+        public TextView createdby;
+        public ImageView imagePost;
+        public TextView shareStatus ;
+
+
 
         public ViewHolder(View itemView) {
             super(itemView);
@@ -88,6 +119,22 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHold
             show_message = itemView.findViewById(R.id.show_message);
             profile_image = itemView.findViewById(R.id.profile_image);
             txt_seen = itemView.findViewById(R.id.txt_seen);
+            createdby = itemView.findViewById(R.id.user_share);
+            imagePost = itemView.findViewById(R.id.imageShare);
+            shareStatus = itemView.findViewById(R.id.status_share);
+            itemView.setFocusable(true);
+            itemView.setOnClickListener(this);
+            itemView.setOnLongClickListener(this);
+        }
+
+        @Override
+        public void onClick(View itemView) {
+            mClickHandler.onItemClick(getAdapterPosition());
+        }
+
+        @Override
+        public boolean onLongClick(View v) {
+            return mClickHandler.onItemLongClick(getAdapterPosition());
         }
     }
 
@@ -99,5 +146,10 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHold
         } else {
             return MSG_TYPE_LEFT;
         }
+    }
+
+    public interface ClickHandler {
+        void onItemClick(int position);
+        boolean onItemLongClick(int position);
     }
 }

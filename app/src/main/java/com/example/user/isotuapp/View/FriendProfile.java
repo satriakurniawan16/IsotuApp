@@ -164,7 +164,7 @@ public class FriendProfile extends AppCompatActivity {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                         User usr = dataSnapshot.getValue(User.class);
-                        addContact(new Contact(iduser,namaProfile.getText().toString(),usr.getImage(),ProdiProfile.getText().toString(),FakultasProfile.getText().toString()));
+                        addContact(new Contact(iduser,namaProfile.getText().toString(),usr.getImage(),ProdiProfile.getText().toString(),FakultasProfile.getText().toString(),usr.getSearch()));
                     }
 
                     @Override

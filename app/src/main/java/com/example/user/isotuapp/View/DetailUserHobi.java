@@ -40,6 +40,7 @@ public class DetailUserHobi extends AppCompatActivity {
     private ArrayList<String> mDataId;
     private HobiUserAdapter mAdapter;
     private String link;
+    private String child;
     FirebaseUser currentUser;
     private DatabaseReference database;
     private ActionMode mActionMode;
@@ -89,7 +90,8 @@ public class DetailUserHobi extends AppCompatActivity {
 
         Intent intent = getIntent();
         link = intent.getStringExtra("reference");
-        database = FirebaseDatabase.getInstance().getReference(link);
+        child = intent.getStringExtra("child");
+        database = FirebaseDatabase.getInstance().getReference(link).child(child);
 
         RecyclerView recyclerView = (RecyclerView) findViewById(R.id.listUser);
         recyclerView.setHasFixedSize(true);

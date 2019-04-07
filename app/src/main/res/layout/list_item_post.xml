@@ -1,74 +1,192 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
+
     <LinearLayout
+        android:id="@+id/root_post_item"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
         <LinearLayout
+            android:id="@+id/first_child_post_item"
             android:layout_width="match_parent"
-            android:layout_height="80dp"
+            android:layout_height="60dp"
+            android:gravity="left|center"
+            android:visibility="gone"
             android:orientation="horizontal">
 
             <de.hdodenhof.circleimageview.CircleImageView
-                android:id="@+id/image_profile"
-                android:layout_width="60dp"
-                android:layout_height="60dp"
+                android:id="@+id/image_profile_share"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
                 android:layout_margin="10dp"
                 android:src="@mipmap/ic_launcher" />
 
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
-                android:gravity="center"
+                android:gravity="left|center"
+                android:padding="5dp"
                 android:orientation="vertical">
-            <TextView
-                android:id="@+id/name_profile"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:gravity="center"
-                android:text="Satria Kurniawan"
-                android:textColor="#000"
-                android:textSize="20dp"
-                android:textStyle="bold" />
 
-            <TextView
-                android:id="@+id/date_posting"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="left"
-                android:text="tetew" />
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="left|center"
+                    android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/name_profile_share"
+                    android:layout_width="wrap_content"
+                    android:layout_height="20dp"
+                    android:gravity="center"
+                    android:text="Satria Kurniawan"
+                    android:textColor="#000"
+                    android:textStyle="bold"
+                    tools:ignore="RtlCompat" />
+
+                    <TextView
+                    android:id="@+id/name_profile_shared"
+                    android:layout_width="wrap_content"
+                    android:layout_height="20dp"
+                    android:gravity="center"
+                    android:layout_marginLeft="3dp"
+                    android:text="membagikan postingan dari"
+                    android:textColor="#000"
+                    tools:ignore="RtlCompat" />
+
+                </LinearLayout>
+
+                <TextView
+                    android:id="@+id/name_profile_shared_user"
+                    android:layout_width="wrap_content"
+                    android:layout_height="20dp"
+                    android:gravity="center"
+                    android:text="Danah Mifta"
+                    android:textColor="#000"
+                    android:textStyle="bold"
+                    tools:ignore="RtlCompat" />
+                <TextView
+                    android:id="@+id/date_posting_share"
+                    android:layout_width="300dp"
+                    android:layout_height="20dp"
+                    android:gravity="left"
+                    android:text="tetew" />
             </LinearLayout>
         </LinearLayout>
 
-        <ImageView
-            android:id="@+id/image_posting"
-            android:layout_width="match_parent"
-            android:layout_height="270dp"
-            android:src="@mipmap/ic_launcher" />
-
-        <TextView
-            android:id="@+id/caption_posting"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="10dp"
-            android:layout_marginTop="10dp"
-            android:layout_marginRight="10dp"
-            android:maxLines="4"
-            android:text="Lorem ipsum dolor sit amet, consectetur adipiscing elit,  sed do eiusmod tempor incididunt ut labore et dolore  magna aliqua. Ut enim ad minim veniam,  in culpa qui officia ."
-            android:textColor="#000" />
-
-        <TextView
-            android:id="@+id/more_caption"
+        <LinearLayout
+            android:id="@+id/child_post_item"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginRight="10dp"
-            android:layout_marginBottom="10dp"
-            android:gravity="right"
-            android:text="more >" />
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:id="@+id/second_child_post_item"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+
+                <LinearLayout
+                    android:id="@+id/profile_direction"
+                    android:layout_width="match_parent"
+                    android:layout_height="60dp"
+                    android:gravity="left|center"
+                    android:orientation="horizontal">
+
+                    <de.hdodenhof.circleimageview.CircleImageView
+                        android:id="@+id/image_profile"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:layout_margin="10dp"
+                        android:src="@mipmap/ic_launcher" />
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:gravity="left|center"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:id="@+id/name_profile"
+                            android:layout_width="wrap_content"
+                            android:layout_height="20dp"
+                            android:gravity="center"
+                            android:text="Satria Kurniawan"
+                            android:textColor="#000"
+                            android:textStyle="bold"
+                            tools:ignore="RtlCompat" />
+
+                        <TextView
+                            android:id="@+id/date_posting"
+                            android:layout_width="300dp"
+                            android:layout_height="20dp"
+                            android:gravity="left"
+                            android:text="tetew" />
+                    </LinearLayout>
+                </LinearLayout>
+
+            <ImageView
+                android:id="@+id/image_posting"
+                android:layout_width="match_parent"
+                android:layout_height="300dp"
+                android:scaleType="centerCrop"
+                android:src="@mipmap/ic_launcher" />
+
+                <LinearLayout
+                    android:id="@+id/detail_post_direction"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/caption_posting"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="10dp"
+                        android:layout_marginTop="10dp"
+                        android:layout_marginRight="10dp"
+                        android:maxLines="4"
+                        android:text="Lorem ipsum dolor sit amet, consectetur adipiscing elit,  sed do eiusmod tempor incididunt ut labore et dolore  magna aliqua. Ut enim ad minim veniam,  in culpa qui officia ."
+                        android:textColor="#000" />
+
+                    <TextView
+                        android:id="@+id/more_caption"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginRight="10dp"
+                        android:layout_marginBottom="10dp"
+                        android:gravity="right"
+                        android:text="more >" />
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/share_post_direction"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+            <TextView
+                android:id="@+id/caption_posting_share"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:visibility="gone"
+                android:layout_marginLeft="10dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginRight="10dp"
+                android:maxLines="4"
+                android:text="Lorem ipsum dolor sit amet, consectetur adipiscing elit,  sed do eiusmod tempor incididunt ut labore et dolore  magna aliqua. Ut enim ad minim veniam,  in culpa qui officia ."
+                android:textColor="#000" />
+            </LinearLayout>
+
+        </LinearLayout>
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -92,6 +210,19 @@
 
             <LinearLayout
                 android:id="@+id/comment_posting"
+                android:layout_width="30dp"
+                android:layout_height="match_parent"
+                android:gravity="center">
+
+                <ImageView
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:layout_marginLeft="10dp"
+                    android:src="@mipmap/comment" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/comment_posting_share"
                 android:layout_width="30dp"
                 android:layout_height="match_parent"
                 android:gravity="center">
@@ -134,6 +265,7 @@
                 android:textSize="16dp" />
 
             <TextView
+                android:id="@+id/tolistliker"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="2dp"
@@ -168,6 +300,7 @@
                 android:textSize="16dp" />
 
             <TextView
+                android:id="@+id/textShare"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="2dp"
@@ -176,16 +309,19 @@
                 android:textSize="16dp" />
 
         </LinearLayout>
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="5dp"
             android:layout_marginBottom="10dp">
+
             <TextView
+                android:id="@+id/seeComment"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="10dp"
-                android:text="Lihat komentar"/>
+                android:text="Lihat komentar" />
         </LinearLayout>
     </LinearLayout>
 

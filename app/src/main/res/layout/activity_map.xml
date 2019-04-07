@@ -3,15 +3,146 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-
-
-    <fragment xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:tools="http://schemas.android.com/tools"
+    <com.sothree.slidinguppanel.SlidingUpPanelLayout
+        xmlns:sothree="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/sliding_layout"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:id="@+id/map"
-        tools:context=".MapsActivity"
-        android:name="com.google.android.gms.maps.SupportMapFragment" />
+        android:layout_height="wrap_content"
+        android:gravity="bottom"
+        android:background="#fff"
+        android:alpha="0.8"
+        sothree:umanoDragView="@+id/dragView"
+        sothree:umanoPanelHeight="0dp"
+        sothree:umanoShadowHeight="2dp"
+        sothree:umanoOverlay="true">
+
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <fragment xmlns:android="http://schemas.android.com/apk/res/android"
+                xmlns:tools="http://schemas.android.com/tools"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:id="@+id/map"
+                tools:context=".MapsActivity"
+                android:name="com.google.android.gms.maps.SupportMapFragment" />/>
+        </FrameLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/rounded_edge"
+            android:alpha="0.9"
+            android:orientation="vertical"
+            android:clickable="true"
+            android:focusable="false"
+            android:id="@+id/dragView">
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="horizontal">
+
+                <Button
+                    android:id="@+id/follow"
+                    android:layout_width="50dp"
+                    android:layout_height="10dp"
+                    android:textSize="14sp"
+                    android:gravity="center"
+                    android:layout_marginTop="12dp"
+                    android:layout_marginBottom="5dp"
+                    android:layout_centerHorizontal="true"/>
+                <RelativeLayout
+                    android:layout_below="@+id/follow"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:paddingTop="0dp"
+                    android:paddingBottom="0dp"
+                    android:layout_margin="10dp">
+                    <de.hdodenhof.circleimageview.CircleImageView
+                        android:id="@+id/imageMarker"
+                        android:layout_width="130dp"
+                        android:layout_height="100dp"
+                        android:clickable="true"
+                        android:src="@drawable/bagikan"
+                        android:layout_centerHorizontal="true"/>
+
+                    <TextView
+                        android:id="@+id/nameMarker"
+                        android:layout_below="@+id/imageMarker"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:textColor="@color/textColorDefault"
+                        android:layout_marginTop="10dp"
+                        android:layout_marginLeft="5dp"
+                        android:text="Fullname "
+                        android:textSize="12sp"
+                        android:textStyle="bold"
+                        android:typeface="sans"
+                        android:gravity="center"
+                        />
+
+                    <TextView
+                        android:id="@+id/majorMarker"
+                        android:layout_below="@+id/nameMarker"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:textColor="@color/textColorDefault"
+                        android:layout_marginTop="3dp"
+                        android:layout_marginBottom="15dp"
+                        android:layout_marginLeft="5dp"
+                        android:text="www.google.com"
+                        android:textSize="12sp"
+                        android:typeface="sans"
+                        android:gravity="center"
+                        />
+
+                    <Button
+                        android:id="@+id/to_chatfriend"
+                        android:layout_below="@+id/majorMarker"
+                        android:layout_width="match_parent"
+                        android:layout_height="40dp"
+                        android:text="Chat"
+                        android:background="@drawable/button_main"
+                        android:textSize="12sp"
+                        android:textColor="@color/colorWhite"
+                        android:layout_marginBottom="10dp"/>
+
+                    <Button
+                        android:id="@+id/toshowProfile"
+                        android:layout_below="@+id/to_chatfriend"
+                        android:layout_width="match_parent"
+                        android:layout_height="40dp"
+                        android:text="Lihat Profile"
+                        android:drawablePadding="10dp"
+                        android:background="@drawable/button_main"
+                        android:textSize="12sp"
+                        android:textColor="@color/colorWhite"
+                        android:layout_marginBottom="10dp"/>
+
+                    <Button
+                        android:id="@+id/getdirec"
+                        android:layout_below="@+id/toshowProfile"
+                        android:layout_width="match_parent"
+                        android:layout_height="40dp"
+                        android:text="Get Direction"
+                        android:drawablePadding="10dp"
+                        android:background="@drawable/button_main"
+                        android:textSize="12sp"
+                        android:textColor="@color/colorWhite"/>
+                </RelativeLayout>
+            </RelativeLayout>
+
+
+        </LinearLayout>
+
+    </com.sothree.slidinguppanel.SlidingUpPanelLayout>
+
+    <include layout="@layout/include_progress_overlay"/>
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/getmy"
@@ -20,9 +151,5 @@
         android:layout_alignParentRight="true"
         android:layout_margin="15dp"
         android:backgroundTint="@color/colorMain"
-        android:src="@drawable/ic_stat_name"
-        />
-
-
-
+        android:src="@drawable/ic_stat_name"/>
 </RelativeLayout>

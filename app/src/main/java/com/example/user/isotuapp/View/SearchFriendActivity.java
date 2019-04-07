@@ -30,6 +30,8 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
+import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 
@@ -39,6 +41,7 @@ public class SearchFriendActivity extends AppCompatActivity {
     private ArrayList<String> mDataId;
     private SearchUserAdapter mAdapter;
     private EditText SearchUser;
+    RecyclerView recyclerView;
 
     private ActionMode mActionMode;
     FirebaseUser currentUser;
@@ -53,37 +56,7 @@ public class SearchFriendActivity extends AppCompatActivity {
     private static final long MIN_TIME_BW_UPDATES = 1000 * 60 * 1; // 1 minute
 
 
-    private ChildEventListener childEventListener = new ChildEventListener() {
-        @Override
-        public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
-            mData.add(dataSnapshot.getValue(User.class));
-            mDataId.add(dataSnapshot.getKey());
-            mAdapter.notifyDataSetChanged();
-        }
 
-        @Override
-        public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
-            int pos = mDataId.indexOf(dataSnapshot.getKey());
-            mData.set(pos, dataSnapshot.getValue(User.class));
-            mAdapter.notifyDataSetChanged();
-        }
-
-        @Override
-        public void onChildRemoved(@NonNull DataSnapshot dataSnapshot) {
-            int pos = mDataId.indexOf(dataSnapshot.getKey());
-            mDataId.remove(pos);
-            mData.remove(pos);
-            mAdapter.notifyDataSetChanged();
-        }
-
-        @Override
-        public void onChildMoved(@NonNull DataSnapshot dataSnapshot, @Nullable String s) { }
-
-        @Override
-        public void onCancelled(@NonNull DatabaseError databaseError) {
-            Toast.makeText(getApplicationContext(), "Tidak Ada Koneksi Internet", Toast.LENGTH_SHORT).show();
-        }
-    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -119,7 +92,7 @@ public class SearchFriendActivity extends AppCompatActivity {
 
 
 
-        RecyclerView recyclerView = findViewById(R.id.listSearch);
+        recyclerView = findViewById(R.id.listSearch);
         recyclerView.setHasFixedSize(true);
         LinearLayoutManager layoutManager =
                 new LinearLayoutManager(getApplicationContext(), LinearLayoutManager.VERTICAL, false);
@@ -134,7 +107,7 @@ public class SearchFriendActivity extends AppCompatActivity {
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-
+            searchUsers(s.toString().toLowerCase());
             }
 
             @Override
@@ -144,34 +117,110 @@ public class SearchFriendActivity extends AppCompatActivity {
         });
 
         database = FirebaseDatabase.getInstance().getReference("user");
-        database.addChildEventListener(childEventListener);
+        database.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                if (SearchUser.getText().toString().equals("")) {
+                    mData.clear();
+                    for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                        User user = snapshot.getValue(User.class);
 
-        mAdapter = new SearchUserAdapter(getApplicationContext(), mData, mDataId,
-                new SearchUserAdapter.ClickHandler() {
-                    @Override
-                    public void onItemClick(int position) {
-                        if (mActionMode != null) {
-                            mAdapter.toggleSelection(mDataId.get(position));
-                              if (mAdapter.selectionCount() == 0)
-                                mActionMode.finish();
-                            else
-                                mActionMode.invalidate();
-                            return;
+                        if (!user.getUid().equals(currentUser.getUid())) {
+                            mData.add(user);
                         }
-                        User pet = mData.get(position);
-                        Intent intent = new Intent(getApplicationContext(), FriendProfile.class);
-                        intent.putExtra("iduser",pet.getUid());
-                        startActivity(intent);
-                    }
 
-                    @Override
-                    public boolean onItemLongClick(int position) {
-                        if (mActionMode != null) return false;
-                        return true;
                     }
-                });
-        recyclerView.setAdapter(mAdapter);
+                    mAdapter = new SearchUserAdapter(getApplicationContext(), mData, mDataId,
+                            new SearchUserAdapter.ClickHandler() {
+                                @Override
+                                public void onItemClick(int position) {
+                                    if (mActionMode != null) {
+                                        mAdapter.toggleSelection(mDataId.get(position));
+                                        if (mAdapter.selectionCount() == 0)
+                                            mActionMode.finish();
+                                        else
+                                            mActionMode.invalidate();
+                                        return;
+                                    }
+                                    User pet = mData.get(position);
+                                    Intent intent = new Intent(getApplicationContext(), FriendProfile.class);
+                                    intent.putExtra("iduser",pet.getUid());
+                                    startActivity(intent);
+                                }
+
+                                @Override
+                                public boolean onItemLongClick(int position) {
+                                    if (mActionMode != null) return false;
+                                    return true;
+                                }
+                            });
+                    recyclerView.setAdapter(mAdapter);
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
 
 
     }
+
+    private void searchUsers(String s) {
+
+        final FirebaseUser fuser = FirebaseAuth.getInstance().getCurrentUser();
+        Query query = FirebaseDatabase.getInstance().getReference("user").orderByChild("search")
+                .startAt(s)
+                .endAt(s+"\uf8ff");
+
+        query.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                mData.clear();
+                for (DataSnapshot snapshot : dataSnapshot.getChildren()){
+                    User user = snapshot.getValue(User.class);
+
+                    assert user != null;
+                    assert fuser != null;
+                    if (!user.getUid().equals(fuser.getUid())){
+                        mData.add(user);
+                    }
+                }
+                mAdapter = new SearchUserAdapter(getApplicationContext(), mData, mDataId,
+                        new SearchUserAdapter.ClickHandler() {
+                            @Override
+                            public void onItemClick(int position) {
+                                if (mActionMode != null) {
+                                    mAdapter.toggleSelection(mDataId.get(position));
+                                    if (mAdapter.selectionCount() == 0)
+                                        mActionMode.finish();
+                                    else
+                                        mActionMode.invalidate();
+                                    return;
+                                }
+                                User pet = mData.get(position);
+                                Intent intent = new Intent(getApplicationContext(), FriendProfile.class);
+                                intent.putExtra("iduser",pet.getUid());
+                                startActivity(intent);
+                            }
+
+                            @Override
+                            public boolean onItemLongClick(int position) {
+                                if (mActionMode != null) return false;
+                                return true;
+                            }
+                        });
+                recyclerView.setAdapter(mAdapter);
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+
+    }
+
 }

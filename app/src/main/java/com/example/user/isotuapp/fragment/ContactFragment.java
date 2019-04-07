@@ -132,6 +132,15 @@ public class ContactFragment extends Fragment {
                     @Override
                     public boolean onItemLongClick(int position) {
                         if (mActionMode != null) return false;
+                        AlertDialog.Builder mBuilder = new AlertDialog.Builder(getContext());
+                        View mView = getActivity().getLayoutInflater().inflate(R.layout.popup_message,
+                                null);
+
+
+                        mBuilder.setView(mView);
+                        final AlertDialog dialognya = mBuilder.create();
+                        dialognya.show();
+
                         return true;
                     }
                 });

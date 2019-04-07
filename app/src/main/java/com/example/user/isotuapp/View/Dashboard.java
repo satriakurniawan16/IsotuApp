@@ -15,10 +15,12 @@ import android.location.Location;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Binder;
+import android.os.Handler;
 import android.os.IBinder;
 import android.os.Looper;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.ActivityCompat;
@@ -29,12 +31,22 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
+import android.widget.EditText;
+import android.widget.FrameLayout;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import com.example.user.isotuapp.BuildConfig;
+import com.example.user.isotuapp.Controller.SearchUserAdapter;
+import com.example.user.isotuapp.Controller.ShareAdapter;
+import com.example.user.isotuapp.Model.Contact;
 import com.example.user.isotuapp.Model.User;
 import com.example.user.isotuapp.R;
 import com.example.user.isotuapp.fragment.ChatFragment;
@@ -44,6 +56,7 @@ import com.example.user.isotuapp.fragment.HomeFragment;
 import com.example.user.isotuapp.fragment.ProfileFragment;
 import com.example.user.isotuapp.utils.GPS_Service;
 import com.example.user.isotuapp.utils.LocationService;
+import com.example.user.isotuapp.utils.Utils;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.common.api.ResolvableApiException;
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -55,16 +68,19 @@ import com.google.android.gms.location.LocationSettingsRequest;
 import com.google.android.gms.location.LocationSettingsResponse;
 import com.google.android.gms.location.LocationSettingsStatusCodes;
 import com.google.android.gms.location.SettingsClient;
+import com.google.android.gms.maps.model.Dash;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.karumi.dexter.Dexter;
 import com.karumi.dexter.PermissionToken;
@@ -72,6 +88,7 @@ import com.karumi.dexter.listener.PermissionDeniedResponse;
 import com.karumi.dexter.listener.PermissionGrantedResponse;
 import com.karumi.dexter.listener.PermissionRequest;
 import com.karumi.dexter.listener.single.PermissionListener;
+import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 
 import java.text.DateFormat;
 import java.util.ArrayList;
@@ -86,7 +103,12 @@ public class Dashboard extends AppCompatActivity  {
     private Toolbar toolbar;
     double latitudeDouble,longitudeDouble;
     private TabLayout tabLayout;
+    FrameLayout addGroup,notification;
     private ViewPager viewPager;
+    View progressOverlay;
+    String idpost= "";
+    Context context;
+    RecyclerView recyclerView;
     private BroadcastReceiver broadcastReceiver;
     FloatingActionButton fab,fabevent,fab_addfriend;
     private int[] tabIcons = {
@@ -99,6 +121,8 @@ public class Dashboard extends AppCompatActivity  {
 
     FirebaseUser firebaseUser;
     DatabaseReference reference;
+    private FirebaseAuth mAuth;
+    FirebaseAuth.AuthStateListener mAuthListener;
     // location last updated time
     private String mLastUpdateTime;
     private static final long UPDATE_INTERVAL_IN_MILLISECONDS = 10000;
@@ -112,8 +136,54 @@ public class Dashboard extends AppCompatActivity  {
     private LocationCallback mLocationCallback;
     private Location mCurrentLocation;
 
+    FirebaseUser currentUser;
+    EditText searchUser;
+    private DatabaseReference database;
+    private FirebaseAuth mFirebaseAuth;
+
+
+    private SlidingUpPanelLayout mLayout;
+    private ArrayList<Contact> mData;
+    private ArrayList<String> mDataId;
+    private ShareAdapter mAdapter;
+
+    private static int TIME_OUT = 1000;
+
     LocationService mService;
     boolean mBound = false;
+
+
+    private ChildEventListener childEventListener = new ChildEventListener() {
+        @Override
+        public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+            mData.add(dataSnapshot.getValue(Contact.class));
+            mDataId.add(dataSnapshot.getKey());
+            mAdapter.notifyDataSetChanged();
+        }
+
+        @Override
+        public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+            int pos = mDataId.indexOf(dataSnapshot.getKey());
+            mData.set(pos, dataSnapshot.getValue(Contact.class));
+            mAdapter.notifyDataSetChanged();
+        }
+
+        @Override
+        public void onChildRemoved(@NonNull DataSnapshot dataSnapshot) {
+            int pos = mDataId.indexOf(dataSnapshot.getKey());
+            mDataId.remove(pos);
+            mData.remove(pos);
+            mAdapter.notifyDataSetChanged();
+        }
+
+        @Override
+        public void onChildMoved(@NonNull DataSnapshot dataSnapshot, @Nullable String s) { }
+
+        @Override
+        public void onCancelled(@NonNull DatabaseError databaseError) {
+            Toast.makeText(getApplicationContext(), "Tidak Ada Koneksi Internet", Toast.LENGTH_SHORT).show();
+        }
+    };
 
 
     private ServiceConnection mConnection = new ServiceConnection() {
@@ -146,6 +216,45 @@ public class Dashboard extends AppCompatActivity  {
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setTitle("Home");
+        getSupportActionBar().setDisplayShowHomeEnabled(true);
+
+//
+//        notification = (FrameLayout) findViewById(R.id.notif);
+//        addGroup = (FrameLayout)findViewById(R.id.grupadd);
+//        addGroup.setVisibility(View.GONE);
+
+        mLayout = (SlidingUpPanelLayout ) findViewById(R.id.sliding_layout_share);
+        progressOverlay = (FrameLayout) findViewById(R.id.progress_overlay);
+
+        mFirebaseAuth=FirebaseAuth.getInstance();
+        currentUser = FirebaseAuth.getInstance().getCurrentUser();
+
+        mData = new ArrayList<>();
+        mDataId = new ArrayList<>();
+        searchUser = (EditText) findViewById(R.id.searchuser_topost);
+
+        recyclerView = findViewById(R.id.listusertoshare);
+        recyclerView.setHasFixedSize(true);
+        LinearLayoutManager layoutManager =
+                new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
+        recyclerView.setLayoutManager(layoutManager);
+        searchUser.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                searchUsers(s.toString().toLowerCase());
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+            }
+        });
+
 
 
         init();
@@ -225,30 +334,35 @@ public class Dashboard extends AppCompatActivity  {
                         fab.setVisibility(View.VISIBLE);
                         fab_addfriend.setVisibility(View.GONE);
                         fabevent.setVisibility(View.GONE);
+//                        addGroup.setVisibility(View.GONE);
                         break;
                     case 1:
                         toolbar.setTitle("Contact");
                         fab.setVisibility(View.GONE);
                         fabevent.setVisibility(View.GONE);
                         fab_addfriend.setVisibility(View.VISIBLE);
+//                        addGroup.setVisibility(View.VISIBLE);
                         break;
                     case 2:
                         toolbar.setTitle("Chat");
                         fab.setVisibility(View.GONE);
                         fabevent.setVisibility(View.GONE);
                         fab_addfriend.setVisibility(View.GONE);
+//                        addGroup.setVisibility(View.GONE);
                         break;
                     case 3:
                         toolbar.setTitle("Event");
                         fab.setVisibility(View.GONE);
                         fab_addfriend.setVisibility(View.GONE);
                         fabevent.setVisibility(View.VISIBLE);
+//                        addGroup.setVisibility(View.GONE);
                         break;
                     case 4:
                         toolbar.setTitle("Profile");
                         fab.setVisibility(View.GONE);
                         fabevent.setVisibility(View.GONE);
                         fab_addfriend.setVisibility(View.GONE);
+//                        addGroup.setVisibility(View.GONE);
                         break;
                 }
             }
@@ -262,16 +376,10 @@ public class Dashboard extends AppCompatActivity  {
             }
         });
 
-        Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
-            public void run() {
-                if (mRequestingLocationUpdates && checkPermissions()) {
-                    startLocationUpdates();
-                }
-                updateLocationUI();
-            }
-        }, "Shutdown-thread"));
+
         setupTabIcons();
     }
+
     private void setupViewPager(ViewPager viewPager) {
         ViewPagerAdapter adapter = new ViewPagerAdapter(getSupportFragmentManager());
         adapter.addFragment(new HomeFragment(), "Home");
@@ -289,6 +397,15 @@ public class Dashboard extends AppCompatActivity  {
         tabLayout.getTabAt(4).setIcon(tabIcons[4]);
     }
 
+
+    @SuppressLint("RestrictedApi")
+    public void fabgone(){
+        fab.setVisibility(View.GONE);
+    }
+    @SuppressLint("RestrictedApi")
+    public void fabvisible(){
+        fab.setVisibility(View.VISIBLE);
+    }
 
     class ViewPagerAdapter extends FragmentPagerAdapter {
         private final List<Fragment> mFragmentList = new ArrayList<>();
@@ -322,25 +439,32 @@ public class Dashboard extends AppCompatActivity  {
 
 
 
-    private void status(String status){
-        reference = FirebaseDatabase.getInstance().getReference("user").child(FirebaseAuth.getInstance().getCurrentUser().getUid());
+    private void status(final String status){
+        mAuth = FirebaseAuth.getInstance();
+        mAuthListener = new FirebaseAuth.AuthStateListener(){
+            @Override
+            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
+                if(firebaseAuth.getCurrentUser()!=null){
+                    reference = FirebaseDatabase.getInstance().getReference("user").child(FirebaseAuth.getInstance().getCurrentUser().getUid());
 
-        HashMap<String, Object> hashMap = new HashMap<>();
-        hashMap.put("status", status);
+                        HashMap<String, Object> hashMap = new HashMap<>();
+                        hashMap.put("status", status);
 
-        reference.updateChildren(hashMap);
+                        reference.updateChildren(hashMap);
+
+                }
+            }
+        };
     }
 
 
 
 
 
-    @SuppressLint("RestrictedApi")
     @Override
     protected void onResume() {
         super.onResume();
         status("online");
-        fab.setVisibility(View.VISIBLE);
         if (mRequestingLocationUpdates && checkPermissions()) {
             startLocationUpdates();
         }
@@ -357,11 +481,9 @@ public class Dashboard extends AppCompatActivity  {
         registerReceiver(broadcastReceiver,new IntentFilter("location_update"));
     }
 
-    @SuppressLint("RestrictedApi")
     @Override
     protected void onPause() {
         super.onPause();
-        fab.setVisibility(View.GONE);
         status("offline");
     }
 
@@ -381,7 +503,7 @@ public class Dashboard extends AppCompatActivity  {
                 mCurrentLocation = locationResult.getLastLocation();
                 mLastUpdateTime = DateFormat.getTimeInstance().format(new Date());
 
-                updateLocationUI();
+//                updateLocationUI();
             }
         };
 
@@ -415,7 +537,6 @@ public class Dashboard extends AppCompatActivity  {
             }
         }
 
-        updateLocationUI();
     }
 
 
@@ -423,22 +544,6 @@ public class Dashboard extends AppCompatActivity  {
      * Update the UI displaying the location data
      * and toggling the buttons
      */
-    private void updateLocationUI() {
-        if (mCurrentLocation != null) {
-            Log.d(TAG, "updateLocationUI: " + "Lat: " + mCurrentLocation.getLatitude() + ", " +
-                    "Lng: " + mCurrentLocation.getLongitude());
-            reference = FirebaseDatabase.getInstance().getReference("user").child(firebaseUser.getUid());
-
-            HashMap<String, Object> hashMap = new HashMap<>();
-            hashMap.put("latitude", mCurrentLocation.getLatitude());
-            hashMap.put("longitude", mCurrentLocation.getLongitude());
-
-            reference.updateChildren(hashMap);
-            // giving a blink animation on TextView
-        }
-
-//        toggleButtons();
-    }
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
@@ -485,7 +590,6 @@ public class Dashboard extends AppCompatActivity  {
                         mFusedLocationClient.requestLocationUpdates(mLocationRequest,
                                 mLocationCallback, Looper.myLooper());
 
-                        updateLocationUI();
                     }
                 })
                 .addOnFailureListener(this, new OnFailureListener() {
@@ -513,7 +617,7 @@ public class Dashboard extends AppCompatActivity  {
                                 Toast.makeText(Dashboard.this, errorMessage, Toast.LENGTH_LONG).show();
                         }
 
-                        updateLocationUI();
+//                        updateLocationUI();
                     }
                 });
     }
@@ -627,6 +731,45 @@ public class Dashboard extends AppCompatActivity  {
             startLocationButtonClick();
         }
     }
+    final Utils utils = new Utils(this);
+    public void getSliding(final String idpostny){
+        idpost = idpostny;
+        Toast.makeText(getApplicationContext(), "thissssss", Toast.LENGTH_SHORT).show();
+        mData.clear();
+        database = FirebaseDatabase.getInstance().getReference("contact").child(currentUser.getUid());
+        database.addChildEventListener(childEventListener);
+        mAdapter = new ShareAdapter(Dashboard.this, mData , mDataId, idpost);
+        recyclerView.setAdapter(mAdapter);
+        utils.animateView(progressOverlay, View.VISIBLE, 0.4f, 200);
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                mLayout.setPanelState(SlidingUpPanelLayout.PanelState.ANCHORED);
+                utils.animateView(progressOverlay, View.GONE, 0, 200);
+            }
+        }, TIME_OUT);
+
+    }
+
+
+
+    private void searchUsers(String s) {
+        mData.clear();
+        final FirebaseUser fuser = FirebaseAuth.getInstance().getCurrentUser();
+        Query query = FirebaseDatabase.getInstance().getReference("contact").child(currentUser.getUid()).orderByChild("search")
+                .startAt(s)
+                .endAt(s+"\uf8ff");
+
+        if(s.equals("")){
+            database = FirebaseDatabase.getInstance().getReference("contact").child(currentUser.getUid());
+            database.addChildEventListener(childEventListener);
+        }else{
+            query.addChildEventListener(childEventListener);
+        }
+        mAdapter = new ShareAdapter(Dashboard.this, mData , mDataId,idpost);
+        recyclerView.setAdapter(mAdapter);
+    }
+
 
     @Override
     protected void onStart() {

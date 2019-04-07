@@ -2,17 +2,27 @@ package com.example.user.isotuapp.Model;
 
 public class Contact {
 
-    String userid,nameuser,imageuser,majoruser,facultyuser;
+    String userid,nameuser,imageuser,majoruser,facultyuser,search;
 
     public Contact() {
     }
 
-    public Contact(String userid, String nameuser, String imageuser, String majoruser, String facultyuser) {
+
+    public Contact(String userid, String nameuser, String imageuser, String majoruser, String facultyuser, String search) {
         this.userid = userid;
         this.nameuser = nameuser;
         this.imageuser = imageuser;
         this.majoruser = majoruser;
         this.facultyuser = facultyuser;
+        this.search = search;
+    }
+
+    public String getSearch() {
+        return search;
+    }
+
+    public void setSearch(String search) {
+        this.search = search;
     }
 
     public String getUserid() {

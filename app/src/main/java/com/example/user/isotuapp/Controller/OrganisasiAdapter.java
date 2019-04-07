@@ -27,6 +27,7 @@ public class OrganisasiAdapter  extends RecyclerView.Adapter<OrganisasiAdapter.V
         mDataId = dataId;
         mClickHandler = handler;
         mSelectedId = new ArrayList<>();
+        setHasStableIds(true);
     }
 
 

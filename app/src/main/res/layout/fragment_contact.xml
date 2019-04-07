@@ -16,12 +16,23 @@
             android:orientation="vertical"
             android:gravity="center">
 
+
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/listGrup"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:scrollbars="vertical"
+                />
+
+
+
             <android.support.v7.widget.RecyclerView
                 android:id="@+id/listContact"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:scrollbars="vertical"
                 />
+
 
         </LinearLayout>
     </ScrollView>

@@ -85,7 +85,7 @@ public class DetailEventActivity extends AppCompatActivity {
             }
         });
 
-        databasehadir = FirebaseDatabase.getInstance().getReference(judul);
+        databasehadir = FirebaseDatabase.getInstance().getReference("list_event_atender").child(judul);
         databasehadir.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -134,7 +134,8 @@ public class DetailEventActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent intentlol = new Intent(DetailEventActivity.this,DetailUserHobi.class);
-                intentlol.putExtra("reference",titleEvent.getText().toString());
+                intentlol.putExtra("reference","list_event_atender");
+                intentlol.putExtra("child",titleEvent.getText().toString());
                 startActivity(intentlol);
             }
         });

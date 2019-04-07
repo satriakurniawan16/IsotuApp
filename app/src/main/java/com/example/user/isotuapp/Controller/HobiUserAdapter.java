@@ -31,6 +31,7 @@ public class HobiUserAdapter  extends RecyclerView.Adapter<HobiUserAdapter.ViewH
         mDataId = dataId;
         mClickHandler = handler;
         mSelectedId = new ArrayList<>();
+        setHasStableIds(true);
     }
 
 

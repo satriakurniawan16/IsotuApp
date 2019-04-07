@@ -127,7 +127,7 @@ public class Register extends AppCompatActivity {
                                         user.put("completeProfile",completeProfile);
                                         user.put("uid",uidString);
                                         user.put("status","offline");
-                                        user.put("search",usernameString);
+                                        user.put("search","");
 
                                         dbf.setValue(user);
                                         Toast.makeText(Register.this, "Register Success", Toast.LENGTH_SHORT).show();

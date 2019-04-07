@@ -11,23 +11,54 @@
         android:id="@+id/profile_image"
         android:src="@mipmap/ic_launcher"/>
 
+    <LinearLayout
+        android:id="@+id/messageLayout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_toRightOf="@id/profile_image"
+        android:layout_marginLeft="5dp"
+        android:background="@drawable/background_left"
+        >
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="5dp"
+            android:id="@+id/status_share"
+            android:text="dibagikan"/>
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_toRightOf="@id/profile_image"
-        android:layout_marginLeft="5dp"
         android:text="hello"
         android:id="@+id/show_message"
         android:textSize="18sp"
         android:padding="8dp"
-        android:background="@drawable/background_left"/>
+        />
 
+    <ImageView
+        android:id="@+id/imageShare"
+        android:layout_width="180dp"
+        android:layout_height="120dp"
+        android:visibility="gone"
+        android:layout_margin="30dp"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Rahmad Satria Kurniawan"
+            android:id="@+id/user_share"
+            android:textSize="18sp"
+            android:padding="8dp"
+            android:visibility="gone"
+            />
+
+    </LinearLayout>
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/txt_seen"
         android:visibility="gone"
-        android:layout_below="@id/show_message"/>
+        android:layout_below="@id/messageLayout"/>
 
 
 </RelativeLayout>

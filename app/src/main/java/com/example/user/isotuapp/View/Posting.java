@@ -144,7 +144,7 @@ public class Posting extends AppCompatActivity {
                                 @Override
                                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                                     User usr = dataSnapshot.getValue(User.class);
-                                    submitPosting(new Post(usr, key, urlGambar, text, "0",0,0,System.currentTimeMillis() ));
+                                    submitPosting(new Post(usr, key, urlGambar, text, "0" ,0,0,0,System.currentTimeMillis() ));
                                 }
 
                                 @Override
@@ -173,7 +173,8 @@ public class Posting extends AppCompatActivity {
             key = dbs.push().getKey();
             final String text = text_posting.getText().toString();
             final FirebaseUser currentUser = mFirebaseAuth.getCurrentUser();
-            final DatabaseReference dbf = FirebaseDatabase.getInstance().getReference("user").child(currentUser.getUid());dbf.addListenerForSingleValueEvent(new ValueEventListener() {
+            final DatabaseReference dbf = FirebaseDatabase.getInstance().getReference("user").child(currentUser.getUid());
+            dbf.addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                     User usr = dataSnapshot.getValue(User.class);
