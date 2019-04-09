@@ -14,6 +14,11 @@ import com.example.user.isotuapp.Model.HobiModel;
 import com.example.user.isotuapp.Model.User;
 import com.example.user.isotuapp.Model.UserHobi;
 import com.example.user.isotuapp.R;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
@@ -24,6 +29,9 @@ public class HobiUserAdapter  extends RecyclerView.Adapter<HobiUserAdapter.ViewH
     private ArrayList<UserHobi> mData;
     private ArrayList<String> mDataId;
     private ArrayList<String> mSelectedId;
+
+
+
     public HobiUserAdapter(Context context, ArrayList<UserHobi> data, ArrayList<String> dataId,
                        ClickHandler handler) {
         mContext = context;
@@ -44,10 +52,23 @@ public class HobiUserAdapter  extends RecyclerView.Adapter<HobiUserAdapter.ViewH
     }
 
     @Override
-    public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull final ViewHolder holder, int position) {
         UserHobi pet = mData.get(position);
         holder.nameTextView.setText(pet.getNamaprofil());
         Picasso.get().load(pet.getFotoprofil()).into(holder.profilImageview);
+        DatabaseReference user = FirebaseDatabase.getInstance().getReference("user").child(pet.getIduser());
+        user.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                User user1 = dataSnapshot.getValue(User.class);
+                holder.jurusanTextView.setText(user1.getFakultas()+", "+user1.getJurusan());
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
         holder.itemView.setSelected(mSelectedId.contains(mDataId.get(position)));
     }
 
@@ -81,12 +102,15 @@ public class HobiUserAdapter  extends RecyclerView.Adapter<HobiUserAdapter.ViewH
             View.OnClickListener,
             View.OnLongClickListener {
         final TextView nameTextView;
+        final TextView jurusanTextView;
         final ImageView profilImageview;
 
         ViewHolder(View itemView) {
             super(itemView);
             nameTextView = itemView.findViewById(R.id.namauser);
             profilImageview = itemView.findViewById(R.id.fotouser);
+            jurusanTextView  = itemView.findViewById(R.id.jurusanuser);
+
             itemView.setFocusable(true);
             itemView.setOnClickListener(this);
             itemView.setOnLongClickListener(this);

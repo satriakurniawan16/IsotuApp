@@ -2,7 +2,7 @@ package com.example.user.isotuapp.Model;
 
 public class User {
     String username,email,image,fullname,nim,fakultas,jurusan,nohp,asal,uid,status,search;
-    int completeProfile;
+    int completeProfile,positionfakultas,positionjurusan,positionprovinsi;
     Double latitude,longitude;
 
     public User (){}
@@ -83,6 +83,30 @@ public class User {
 
     public String getEmail() {
         return email;
+    }
+
+    public int getPositionfakultas() {
+        return positionfakultas;
+    }
+
+    public void setPositionfakultas(int positionfakultas) {
+        this.positionfakultas = positionfakultas;
+    }
+
+    public int getPositionjurusan() {
+        return positionjurusan;
+    }
+
+    public void setPositionjurusan(int positionjurusan) {
+        this.positionjurusan = positionjurusan;
+    }
+
+    public int getPositionprovinsi() {
+        return positionprovinsi;
+    }
+
+    public void setPositionprovinsi(int positionprovinsi) {
+        this.positionprovinsi = positionprovinsi;
     }
 
     public void setEmail(String email) {

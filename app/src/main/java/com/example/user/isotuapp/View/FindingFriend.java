@@ -13,6 +13,9 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.ActionMode;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.Spinner;
 import android.widget.Toast;
 
 import com.example.user.isotuapp.Controller.ContactAdapter;
@@ -46,14 +49,22 @@ public class FindingFriend extends AppCompatActivity {
     FloatingActionButton fab;
     private FindingNearbyAdapter mAdapter;
     private ArrayList<User> mData;
+    Spinner spinnerText;
     private ArrayList<String> mDataId;
     private Double CurrentLatitude,CurrentLongitude,latitude,longitude;
     FirebaseUser fuser;
     String myid;
     DatabaseReference reference,myreference;
     private ActionMode mActionMode;
-
     private List<User> usersList;
+
+
+    private String[] distance = {
+            "+3000 meter",
+            "1500 - 3000 meter",
+            "500 - 1500 meter",
+            "< 500 meter"
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,6 +79,41 @@ public class FindingFriend extends AppCompatActivity {
             public void onClick(View view) {
                 // and this
                 startActivity(new Intent(FindingFriend.this, SearchFriendActivity.class).setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
+            }
+        });
+
+        spinnerText = (Spinner) findViewById(R.id.distance);
+        final ArrayAdapter<String> adapter = new ArrayAdapter<>(this,
+                android.R.layout.simple_spinner_dropdown_item, distance);
+
+        // mengeset Array Adapter tersebut ke Spinner
+        spinnerText.setAdapter(adapter);
+        spinnerText.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                // memunculkan toast + value Spinner yang dipilih (diambil dari adapter)
+                float dis = 0;
+                switch (i){
+                    case 0:
+                        result(3000f,Float.MAX_VALUE);
+                        break;
+                    case 1:
+                        result(1500f,3000f);
+                        break;
+                    case 2:
+                        result(500f,1500f);
+                        break;
+                    case 3:
+                        result(0f,500f);
+                        break;
+
+                }
+                Toast.makeText(FindingFriend.this, "Selected "+ adapter.getItem(i), Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+
             }
         });
 
@@ -106,12 +152,12 @@ public class FindingFriend extends AppCompatActivity {
             }
         });
 
-    result();
 
     }
 
-    private void result() {
+    private void result(final float mindistance, final float maxdistance) {
         mData = new ArrayList<>();
+        mData.clear();
         reference = FirebaseDatabase.getInstance().getReference("user");
         reference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -123,13 +169,15 @@ public class FindingFriend extends AppCompatActivity {
                     currentLocation.setLatitude(CurrentLatitude);
                     currentLocation.setLongitude(CurrentLongitude);
                     Location compareLoc = new Location("compare");
-                    float minDist = Float.MAX_VALUE;
+                    float minDist = mindistance;
                     float distance = Float.MAX_VALUE;
                         compareLoc.setLatitude(user.getLatitude());
                         compareLoc.setLongitude(user.getLongitude());
                         distance = currentLocation.distanceTo(compareLoc);
-                        if(distance<minDist && user.getUid()!= myid ) {
-                            mData.add(user);
+                        if(user.getUid() != fuser.getUid()) {
+                            if (distance >= minDist && distance<= maxdistance  ) {
+                                mData.add(user);
+                            }
                         }
                 }
                 mAdapter = new FindingNearbyAdapter(getApplicationContext(), mData, mDataId,
@@ -146,7 +194,7 @@ public class FindingFriend extends AppCompatActivity {
                                 }
                                 User pet = mData.get(position);
                                 Intent intent = new Intent(getApplicationContext(), FriendProfile.class);
-
+                                intent.putExtra("iduser",pet.getUid());
                                 startActivity(intent);
                             }
 

@@ -4,13 +4,13 @@ package com.example.user.isotuapp.Model;
 import java.io.Serializable;
 
 public class Event implements Serializable {
-    String eventId, image, judulEvent, tanggal, jamMulai, jamBerakhir, lokasi, deskripsi;
+    String eventId, image, judulEvent, tanggal, jamMulai, jamBerakhir, lokasi, deskripsi,user,iduser;
 
     public Event(){
 
     }
 
-    public Event( String eventId, String image, String judulEvent, String tanggal, String jamMulai, String jamBerakhir, String lokasi, String deskripsi) {
+    public Event(String eventId, String image, String judulEvent, String tanggal, String jamMulai, String jamBerakhir, String lokasi, String deskripsi, String user, String iduser) {
         this.eventId = eventId;
         this.image = image;
         this.judulEvent = judulEvent;
@@ -19,8 +19,26 @@ public class Event implements Serializable {
         this.jamBerakhir = jamBerakhir;
         this.lokasi = lokasi;
         this.deskripsi = deskripsi;
+        this.user = user;
+        this.iduser = iduser;
     }
 
+
+    public String getIduser() {
+        return iduser;
+    }
+
+    public void setIduser(String iduser) {
+        this.iduser = iduser;
+    }
+
+    public String getUser() {
+        return user;
+    }
+
+    public void setUser(String user) {
+        this.user = user;
+    }
 
     public String getEventId() {
         return eventId;

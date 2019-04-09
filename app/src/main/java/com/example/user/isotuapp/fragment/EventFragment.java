@@ -123,6 +123,7 @@ public class EventFragment extends Fragment {
                         intent.putExtra("id",pet.getEventId());
                         intent.putExtra("judul",pet.getJudulEvent());
                         intent.putExtra("uid",currentUser.getUid());
+                        intent.putExtra("uidevent",pet.getIduser());
                         startActivity(intent);
                     }
 

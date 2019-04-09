@@ -97,7 +97,12 @@
             tools:ignore="InnerclassSeparator" />
         <activity android:name=".View.GroupActivity" />
         <activity android:name=".View.ShareActivity" />
-        <activity android:name=".View.ShareDetailActivity"></activity>
+        <activity android:name=".View.ShareDetailActivity" />
+        <activity android:name=".View.FacultyProvince" />
+        <activity android:name=".View.ProdiActivity" />
+        <activity android:name=".View.HobiOrganisasi" />
+        <activity android:name=".View.EditPost" />
+        <activity android:name=".View.EditEventActivity"></activity>
     </application>
 
 </manifest>

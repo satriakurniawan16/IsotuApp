@@ -57,7 +57,6 @@ public class Register extends AppCompatActivity {
         completeProfile = 0 ;
         mFirebaseAuth=FirebaseAuth.getInstance();
 
-        username = (EditText) findViewById(R.id.username);
         password = (EditText) findViewById(R.id.password);
         retype = (EditText) findViewById(R.id.retype_password);
         email = (EditText) findViewById(R.id.email);
@@ -68,15 +67,10 @@ public class Register extends AppCompatActivity {
         buttonRegister.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                final String usernameString = username.getText().toString().trim();
                 String passwordString = password.getText().toString().trim();
                 String confirm_password = retype.getText().toString().trim();
                 final String emailString  = email.getText().toString().trim();
 
-                if (TextUtils.isEmpty(usernameString)){
-                    Toast.makeText(getApplicationContext(), "Enter username!", Toast.LENGTH_SHORT).show();
-                    return;
-                }
                 if (TextUtils.isEmpty(passwordString)){
                     Toast.makeText(getApplicationContext(), "Enter password!", Toast.LENGTH_SHORT).show();
                     return;
@@ -116,7 +110,6 @@ public class Register extends AppCompatActivity {
                                     @Override
                                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                                         User us = dataSnapshot.getValue(User.class);
-                                        user.put("username",usernameString);
                                         user.put("email",emailString);
                                         user.put("image", imageString);
                                         user.put("fullname", fullnameString);

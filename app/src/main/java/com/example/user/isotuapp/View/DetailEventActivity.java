@@ -30,13 +30,13 @@ import java.util.HashMap;
 public class DetailEventActivity extends AppCompatActivity {
 
     ImageView imageEvent;
-    TextView titleEvent,scheduleEvent,locationEvent,descriptionEvent;
-    Button seeAttendance,attendent,unAttendant;
+    TextView titleEvent,scheduleEvent,locationEvent,descriptionEvent,userEvent;
+    Button seeAttendance,attendent,unAttendant,editButton,deleteButton;
     String id,uid,judul;
     FirebaseUser currentUser;
     private DatabaseReference database,databasehadir;
     private FirebaseAuth mFirebaseAuth;
-
+    String eventuid;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -57,14 +57,60 @@ public class DetailEventActivity extends AppCompatActivity {
         currentUser = FirebaseAuth.getInstance().getCurrentUser();
 
         imageEvent = (ImageView) findViewById(R.id.image_detail_event);
+        editButton = (Button) findViewById(R.id.edit_event);
+        deleteButton = (Button) findViewById(R.id.delete_event);
         titleEvent = (TextView) findViewById(R.id.title_event);
         scheduleEvent = (TextView) findViewById(R.id.schedule_event);
         locationEvent = (TextView) findViewById(R.id.location_event);
         descriptionEvent = (TextView) findViewById(R.id.event_desc);
+        userEvent = (TextView) findViewById(R.id.user_event);
         attendent = (Button) findViewById(R.id.follow);
         unAttendant = (Button) findViewById(R.id.unfollow);
-        Intent intent = getIntent();
+        final Intent intent = getIntent();
         id =  intent.getStringExtra("id");
+
+        eventuid = intent.getStringExtra("uidevent");
+        if(eventuid.equals(currentUser.getUid())){
+            editButton.setVisibility(View.VISIBLE);
+            deleteButton.setVisibility(View.VISIBLE);
+        }else {
+            editButton.setVisibility(View.GONE);
+            deleteButton.setVisibility(View.GONE);
+        }
+
+        editButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intentedit = new Intent(DetailEventActivity.this,EditEventActivity.class);
+                intentedit.putExtra("idevent",id);
+                startActivity(intentedit);
+            }
+        });
+
+        deleteButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                AlertDialog.Builder builder = new AlertDialog.Builder(DetailEventActivity.this)
+                        .setMessage("Apakah anda yakin untuk menghapus ?")
+                        .setPositiveButton("Delete", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                DatabaseReference dbfpost = FirebaseDatabase.getInstance().getReference("events");
+                                dbfpost.child(id).removeValue();
+                                Intent intent1 = new Intent(DetailEventActivity.this,Dashboard.class);
+                                startActivity(intent1);
+                            }
+                        })
+                        .setNegativeButton("cancel", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                dialog.cancel();
+
+                            }
+                        });
+                builder.create().show();
+            }
+        });
         uid =  intent.getStringExtra("uid");
         judul =  intent.getStringExtra("judul");
         database = FirebaseDatabase.getInstance().getReference("events").child(id);
@@ -76,6 +122,7 @@ public class DetailEventActivity extends AppCompatActivity {
                 titleEvent.setText(event.getJudulEvent());
                 scheduleEvent.setText(event.getTanggal()+"\n"+event.getJamMulai()+" - "+ event.getJamBerakhir());
                 locationEvent.setText(event.getLokasi());
+                userEvent.setText("Ditambahkan Oleh : "+ event.getUser());
                 descriptionEvent.setText(event.getDeskripsi());
             }
 
@@ -84,6 +131,8 @@ public class DetailEventActivity extends AppCompatActivity {
 
             }
         });
+
+
 
         databasehadir = FirebaseDatabase.getInstance().getReference("list_event_atender").child(judul);
         databasehadir.addListenerForSingleValueEvent(new ValueEventListener() {

@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".View.EditPost">
+
+    <android.support.design.widget.AppBarLayout
+        android:id="@+id/bar_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <android.support.v7.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/colorMain"
+            android:theme="@style/Base.ThemeOverlay.AppCompat.Dark.ActionBar"
+            app:popupTheme="@style/MyMaterialTheme"/>
+
+    </android.support.design.widget.AppBarLayout>
+
+
+    <EditText
+        android:id="@+id/edittextPosting"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Tuliskan Sesuatu ..."
+        android:layout_below="@id/bar_layout"
+        android:layout_margin="10dp"
+        android:background="@null"
+        android:inputType="textMultiLine"/>
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/sentPost"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp"
+        android:backgroundTint="@color/colorMain"
+        android:src="@mipmap/sent"
+        android:elevation="20dp"
+        app:borderWidth="0dp"
+        android:background="#00ffffff"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentBottom="true"/>
+
+</RelativeLayout>

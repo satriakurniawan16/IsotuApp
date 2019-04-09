@@ -104,14 +104,13 @@
             android:textSize="14dp"
             android:textStyle="bold" />
 
-        <EditText
+        <Spinner
             android:id="@+id/editfaculty"
             android:layout_marginLeft="10dp"
             android:layout_width="match_parent"
             android:layout_marginRight="10dp"
             android:layout_height="wrap_content"
             android:backgroundTint="@color/colorMain"
-            android:hint="e.g Fakultas Ilmu Terapan"
             android:textColor="@color/colorMain"
             android:textColorHint="@color/colorPrimary" />
 
@@ -127,7 +126,7 @@
             android:textSize="14dp"
             android:textStyle="bold" />
 
-        <EditText
+        <Spinner
             android:id="@+id/editmajor"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -172,6 +171,30 @@
             android:textColor="@color/colorMain"
             android:textSize="14dp"
             android:textStyle="bold" />
+
+
+        <Spinner
+            android:id="@+id/editprovinsi"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:backgroundTint="@color/colorMain"
+            android:hint="e.g D3 RPLA"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:textColor="@color/colorMain"
+            android:textColorHint="@color/colorPrimary" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:text="Asal"
+            android:layout_marginRight="10dp"
+            android:layout_marginLeft="10dp"
+            android:textColor="@color/colorMain"
+            android:textSize="14dp"
+            android:textStyle="bold" />
+
 
         <EditText
             android:id="@+id/editasal"

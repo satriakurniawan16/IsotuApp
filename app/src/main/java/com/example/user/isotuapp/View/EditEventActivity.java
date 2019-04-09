@@ -38,6 +38,7 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.OnProgressListener;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
+import com.squareup.picasso.Picasso;
 import com.theartofdev.edmodo.cropper.CropImage;
 import com.theartofdev.edmodo.cropper.CropImageView;
 
@@ -46,14 +47,14 @@ import java.util.Calendar;
 import java.util.Locale;
 import java.util.UUID;
 
-public class EventActivity extends AppCompatActivity {
+public class EditEventActivity extends AppCompatActivity {
 
     ImageView takePhoto,picture;
     EditText titelField,scheduleField,timeStartField,timeEndField,locationField,descriptionField;
     Calendar myCalendar;
     Button btnPostEvent;
 
-    String key;
+    String key,pictureString;
     private ProgressDialog pDialog;
 
     private static int IMG_CAMERA = 2;
@@ -63,6 +64,7 @@ public class EventActivity extends AppCompatActivity {
     private FirebaseStorage storage;
     private StorageReference storageReference;
     DatabaseReference dbs;
+    String id;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -75,7 +77,8 @@ public class EventActivity extends AppCompatActivity {
         /* takePhoto.setVisibility(View.GONE);*/
         storage = FirebaseStorage.getInstance();
         storageReference = storage.getReference();
-
+        Intent intent = getIntent();
+        id = intent.getStringExtra("idevent");
         dbs = FirebaseDatabase.getInstance().getReference("events");
 
         titelField = (EditText) findViewById(R.id.event_name);
@@ -93,7 +96,7 @@ public class EventActivity extends AppCompatActivity {
             public void onClick(View v) {
                 CropImage.activity()
                         .setGuidelines(CropImageView.Guidelines.ON)
-                        .start(EventActivity.this);
+                        .start(EditEventActivity .this);
             }
         });
 
@@ -102,7 +105,7 @@ public class EventActivity extends AppCompatActivity {
             public void onClick(View v) {
                 CropImage.activity()
                         .setGuidelines(CropImageView.Guidelines.ON)
-                        .start(EventActivity.this);
+                        .start(EditEventActivity .this);
             }
         });
         myCalendar = Calendar.getInstance();
@@ -122,7 +125,7 @@ public class EventActivity extends AppCompatActivity {
         scheduleField.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                new DatePickerDialog(EventActivity.this, date, myCalendar
+                new DatePickerDialog(EditEventActivity .this, date, myCalendar
                         .get(Calendar.YEAR), myCalendar.get(Calendar.MONTH),
                         myCalendar.get(Calendar.DAY_OF_MONTH)).show();
             }
@@ -135,7 +138,7 @@ public class EventActivity extends AppCompatActivity {
                 int hour = mcurrentTime.get(Calendar.HOUR_OF_DAY);
                 int minute = mcurrentTime.get(Calendar.MINUTE);
                 TimePickerDialog mTimePicker;
-                mTimePicker = new TimePickerDialog(EventActivity.this, new TimePickerDialog.OnTimeSetListener() {
+                mTimePicker = new TimePickerDialog(EditEventActivity .this, new TimePickerDialog.OnTimeSetListener() {
 
                     @Override
                     public void onTimeSet(TimePicker timePicker, int selectedHour, int selectedMinute) {
@@ -164,7 +167,7 @@ public class EventActivity extends AppCompatActivity {
                 int hour = mcurrentTime.get(Calendar.HOUR_OF_DAY);
                 int minute = mcurrentTime.get(Calendar.MINUTE);
                 TimePickerDialog mTimePicker;
-                mTimePicker = new TimePickerDialog(EventActivity.this, new TimePickerDialog.OnTimeSetListener() {
+                mTimePicker = new TimePickerDialog(EditEventActivity .this, new TimePickerDialog.OnTimeSetListener() {
                     @Override
                     public void onTimeSet(TimePicker timePicker, int selectedHour, int selectedMinute) {
                         String am_pm;
@@ -181,6 +184,28 @@ public class EventActivity extends AppCompatActivity {
                     }
                 }, hour, minute, true);
                 mTimePicker.show();
+            }
+        });
+
+        DatabaseReference dbfpost = FirebaseDatabase.getInstance().getReference("events").child(id);
+        dbfpost.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                Event event = dataSnapshot.getValue(Event.class);
+                titelField.setText(event.getJudulEvent());
+                scheduleField.setText(event.getTanggal());
+                timeEndField.setText(event.getJamBerakhir());
+                timeStartField.setText(event.getJamMulai());
+                locationField.setText(event.getLokasi());
+                descriptionField.setText(event.getDeskripsi());
+                takePhoto.setVisibility(View.GONE);
+                pictureString = event.getImage();
+                Picasso.get().load(event.getImage()).into(picture);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
             }
         });
 
@@ -214,7 +239,7 @@ public class EventActivity extends AppCompatActivity {
             }
         }catch (Exception e){
             Log.d("ClaimProduct", "onActivityResult: "+e.toString());
-            Toast.makeText(EventActivity.this, "Silahkan coba lagi", Toast.LENGTH_LONG).show();
+            Toast.makeText(EditEventActivity .this, "Silahkan coba lagi", Toast.LENGTH_LONG).show();
         }
     }
 
@@ -238,12 +263,13 @@ public class EventActivity extends AppCompatActivity {
                             final String lokasi   = locationField.getText().toString();
                             final String deskripsi = descriptionField.getText().toString();
                             final FirebaseUser currentUser = mFirebaseAuth.getCurrentUser();
+
                             final DatabaseReference dbf = FirebaseDatabase.getInstance().getReference("user").child(currentUser.getUid());
                             dbf.addListenerForSingleValueEvent(new ValueEventListener() {
                                 @Override
                                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                                     User usr = dataSnapshot.getValue(User.class);
-                                    submitPosting(new Event(key, urlGambar, judulEvent, tanggalEvent,jamMulai,jamAkhir,lokasi, deskripsi,usr.getFullname(),usr.getUid()));
+                                    submitPosting(new Event(id, urlGambar, judulEvent, tanggalEvent,jamMulai,jamAkhir,lokasi, deskripsi,usr.getFullname(),usr.getUid()));
                                 }
 
                                 @Override
@@ -258,7 +284,7 @@ public class EventActivity extends AppCompatActivity {
                 @Override
                 public void onFailure(@NonNull Exception e) {
                     pDialog.dismiss();
-                    Toast.makeText(EventActivity.this, "Failed "+e.getMessage(), Toast.LENGTH_SHORT).show();
+                    Toast.makeText(EditEventActivity .this, "Failed "+e.getMessage(), Toast.LENGTH_SHORT).show();
                 }
             }).addOnProgressListener(new OnProgressListener<UploadTask.TaskSnapshot>() {
                 @Override
@@ -269,14 +295,35 @@ public class EventActivity extends AppCompatActivity {
                 }
             });
         }else{
+            key = dbs.push().getKey();
+            final String judulEvent = titelField.getText().toString();
+            final String tanggalEvent = scheduleField.getText().toString();
+            final String jamMulai = timeStartField.getText().toString();
+            final String jamAkhir = timeEndField.getText().toString();
+            final String lokasi   = locationField.getText().toString();
+            final String deskripsi = descriptionField.getText().toString();
+            final FirebaseUser currentUser = mFirebaseAuth.getCurrentUser();
 
-        }
+            final DatabaseReference dbf = FirebaseDatabase.getInstance().getReference("user").child(currentUser.getUid());
+            dbf.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                    User usr = dataSnapshot.getValue(User.class);
+                    submitPosting(new Event(id, pictureString, judulEvent, tanggalEvent,jamMulai,jamAkhir,lokasi, deskripsi,usr.getFullname(),usr.getUid()));
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                }
+            });
+                 }
     }
 
 
     private void submitPosting(Event event) {
         Log.d("lol", "submitBarang: disini");
-        dbs.child(key).setValue(event).
+        dbs.child(id).setValue(event).
                 addOnSuccessListener(this, new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(Void aVoid) {
@@ -284,7 +331,7 @@ public class EventActivity extends AppCompatActivity {
                         Toast.makeText(getApplicationContext(),
                                 "Berhasil Ditambahkan", Toast.LENGTH_LONG).show();
                         pDialog.dismiss();
-                        Intent intent = new Intent(EventActivity.this, Dashboard.class);
+                        Intent intent = new Intent(EditEventActivity .this, Dashboard.class);
                         startActivity(intent);
                         finish();
                     }

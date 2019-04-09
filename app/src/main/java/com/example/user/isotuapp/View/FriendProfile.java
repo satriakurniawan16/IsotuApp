@@ -300,15 +300,30 @@ public class FriendProfile extends AppCompatActivity {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 Log.d("singlestatus", "onDataChange: " + dataSnapshot);
+                boolean status = false ;
+                boolean mystatus = false ;
                 for(DataSnapshot ds : dataSnapshot.getChildren()){
                     Log.d("Allstatus", "onDataChange: " + ds);
                     if(iduser.equals(ds.getKey())){
-                        addFriend.setText("Sudah Berteman");
-                        hapusContact.setVisibility(View.VISIBLE);
-                    }else{
-                        hapusContact.setVisibility(View.INVISIBLE);
-                        addFriend.setText("Tambahkan sebagai teman +");
+                        status = true;
+                        break;
                     }
+                    if(iduser.equals(currentUser.getUid())){
+                        mystatus = true;
+                        break;
+                    }
+                }
+
+                if(mystatus == true){
+                    hapusContact.setVisibility(View.GONE);
+                    addFriend.setVisibility(View.GONE);
+                }
+                if(status == true){
+                    addFriend.setText("Sudah Berteman");
+                    hapusContact.setVisibility(View.VISIBLE);
+                }else{
+                    hapusContact.setVisibility(View.GONE);
+                    addFriend.setText("Tambahkan sebagai teman +");
                 }
             }
 

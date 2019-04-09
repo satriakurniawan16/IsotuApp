@@ -133,15 +133,11 @@
             android:textSize="14dp"
             android:textStyle="bold" />
 
-        <EditText
+        <Spinner
             android:id="@+id/faculty"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:backgroundTint="@color/colorMain"
-            android:inputType="textCapWords"
-            android:hint="e.g Fakultas Ilmu Terapan"
-            android:textColor="@color/colorMain"
-            android:textColorHint="@color/colorPrimary" />
+            />
 
         <TextView
             android:layout_width="wrap_content"
@@ -152,16 +148,11 @@
             android:textSize="14dp"
             android:textStyle="bold" />
 
-        <EditText
+        <Spinner
             android:id="@+id/major"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:inputType="textCapWords"
-            android:backgroundTint="@color/colorMain"
-            android:hint="e.g D3 RPLA"
-            android:textColor="@color/colorMain"
-            android:textColorHint="@color/colorPrimary" />
-
+            />
 
         <TextView
             android:layout_width="wrap_content"
@@ -178,9 +169,24 @@
             android:layout_height="wrap_content"
             android:inputType="phone"
             android:backgroundTint="@color/colorMain"
-            android:hint="e.g D3 08131231231"
+            android:hint="e.g 08131231231"
             android:textColor="@color/colorMain"
             android:textColorHint="@color/colorPrimary" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:text="Provinsi"
+            android:textColor="@color/colorMain"
+            android:textSize="14dp"
+            android:textStyle="bold" />
+
+        <Spinner
+            android:id="@+id/provinsi"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            />
 
         <TextView
             android:layout_width="wrap_content"
@@ -198,7 +204,7 @@
             android:inputType="textCapWords"
             android:layout_height="wrap_content"
             android:backgroundTint="@color/colorMain"
-            android:hint="e.g D3 Bukittinggi, Sumatra Barat"
+            android:hint="e.g Kota Bukittinggi"
             android:textColor="@color/colorMain"
             android:textColorHint="@color/colorPrimary" />
 

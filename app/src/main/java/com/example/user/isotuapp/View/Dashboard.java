@@ -447,10 +447,10 @@ public class Dashboard extends AppCompatActivity  {
                 if(firebaseAuth.getCurrentUser()!=null){
                     reference = FirebaseDatabase.getInstance().getReference("user").child(FirebaseAuth.getInstance().getCurrentUser().getUid());
 
-                        HashMap<String, Object> hashMap = new HashMap<>();
-                        hashMap.put("status", status);
+                    HashMap<String, Object> hashMap = new HashMap<>();
+                    hashMap.put("status", status);
 
-                        reference.updateChildren(hashMap);
+                    reference.updateChildren(hashMap);
 
                 }
             }
@@ -714,6 +714,7 @@ public class Dashboard extends AppCompatActivity  {
 
 
     public class LongOperation extends AsyncTask<String, Void, String> {
+
 
         @Override
         protected String doInBackground(String... params) {

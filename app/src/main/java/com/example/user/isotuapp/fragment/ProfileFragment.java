@@ -18,10 +18,13 @@ import android.view.ActionMode;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -56,12 +59,13 @@ public class ProfileFragment extends Fragment {
     ImageView fotoProfile;
     TextView namaProfile, emailProfile, nimProfile,FakultasProfile,ProdiProfile,noHpProfile,AsalProfile;
     View mRootView;
-    EditText hobiField;
+    Spinner hobiField;
     LinearLayout edit,addhobibtn,addorganisasibtn,addhobi;
-
+    int posfakultas,postjurusan,posprovinsi;
     private ArrayList<HobiModel> mData;
     private ArrayList<String> mDataId;
     private HobiAdapter mAdapter;
+
 
     private ArrayList<Organiasasi> mDataOrganisasi;
     private ArrayList<String> mDataIdOrganisasi;
@@ -72,10 +76,33 @@ public class ProfileFragment extends Fragment {
     private ActionMode mActionMode;
     FirebaseUser currentUser;
     HobiModel hobi;
+    int poshobi,posorganisasi;
     String key ,keyorganiasasi;
     private DatabaseReference database,databaseuserhobi,databaseorganiasi;
     String Image;
     private FirebaseAuth mFirebaseAuth;
+
+    private String[] daftarhobi = {
+            "Membaca",
+            "Menyanyi",
+            "Menari",
+            "Olahraga",
+            "Futsal",
+            "Sepak bola",
+            "Beladiri",
+            "Menulis",
+            "Programming",
+            "Badminton",
+            "Lari"
+    };
+
+    private String[] organisasispinner = {
+            "BEM Fakultas Ilmu Terapan",
+            "BEM Telkom University",
+            "HIMADIF",
+            "ALfath FIT",
+            "UKM Daerah"
+    };
 
     private ChildEventListener childEventListener = new ChildEventListener() {
         @Override
@@ -220,7 +247,7 @@ public class ProfileFragment extends Fragment {
                     @Override
                     public boolean onItemLongClick(int position) {
                         if (mActionMode != null) return false;
-                        HobiModel pet = mData.get(position);
+                        final HobiModel pet = mData.get(position);
                         final String editKey = pet.getIdHobi();
 
                         AlertDialog.Builder mBuilder = new AlertDialog.Builder(getContext());
@@ -233,18 +260,57 @@ public class ProfileFragment extends Fragment {
                         final AlertDialog dialognya = mBuilder.create();
                         dialognya.show();
 
-                        final EditText textEdit = (EditText) mView.findViewById(R.id.edithobieditext);
+                        final Spinner textEdit = (Spinner) mView.findViewById(R.id.edithobieditext);
+                        final ArrayAdapter<String> adapter= new ArrayAdapter<>(getContext(),
+                                android.R.layout.simple_spinner_dropdown_item, daftarhobi);
+                        textEdit.setAdapter(adapter);
+                        textEdit.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                            @Override
+                            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                                poshobi = position;
+                            }
+
+                            @Override
+                            public void onNothingSelected(AdapterView<?> parent) {
+
+                            }
+                        });
                         LinearLayout edit = (LinearLayout) mView.findViewById(R.id.saveedit);
                         LinearLayout hapus = (LinearLayout) mView.findViewById(R.id.deletehobi);
-                        textEdit.setText(pet.getHobi());
+                        textEdit.setSelection(pet.getPos());
                         edit.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
                                 database.child(editKey).setValue(new HobiModel(
                                                 editKey,
-                                                textEdit.getText().toString()
+                                                textEdit.getSelectedItem().toString(),poshobi
                                         )
                                 );
+
+                                databaseuserhobi = FirebaseDatabase.getInstance().getReference("list_hobi_user").child(pet.getHobi());
+                                final DatabaseReference databaseuserhobinew = FirebaseDatabase.getInstance().getReference("list_hobi_user").child(textEdit.getSelectedItem().toString());
+                                final DatabaseReference dbf = FirebaseDatabase.getInstance().getReference("user").child(currentUser.getUid());
+                                dbf.addListenerForSingleValueEvent(new ValueEventListener() {
+                                    @Override
+                                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                        User usr = dataSnapshot.getValue(User.class);
+                                        final HashMap<String, Object> hobiuser= new HashMap<>();
+                                        hobiuser.put("iduser",currentUser.getUid());
+                                        hobiuser.put("fotoprofil",usr.getImage());
+                                        hobiuser.put("namaprofil", usr.getFullname());
+                                        databaseuserhobinew.child(currentUser.getUid()).setValue(hobiuser);
+                                        if(!textEdit.getSelectedItem().toString().equals(pet.getHobi())) {
+                                            databaseuserhobi.child(currentUser.getUid()).removeValue();
+                                        }
+                                    }
+
+                                    @Override
+                                    public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                                    }
+                                });
+
+
                                 Toast.makeText(getContext(), "Berhasil disimpan", Toast.LENGTH_SHORT).show();
                                 dialognya.hide();
                             }
@@ -259,7 +325,9 @@ public class ProfileFragment extends Fragment {
                                             @Override
                                             public void onClick(DialogInterface dialog, int which) {
                                                     database.child(editKey).removeValue();
-                                                    dialognya.hide();
+                                                final DatabaseReference databaseuserhobinew = FirebaseDatabase.getInstance().getReference("list_hobi_user").child(pet.getHobi());
+                                                databaseuserhobinew.child(currentUser.getUid()).removeValue();
+                                                dialognya.hide();
                                             }
                                         })
                                         .setNegativeButton("cancel", new DialogInterface.OnClickListener() {
@@ -300,10 +368,10 @@ public class ProfileFragment extends Fragment {
                     @Override
                     public boolean onItemLongClick(int position) {
                         if (mActionMode != null) return false;
-                        Organiasasi pet = mDataOrganisasi.get(position);
+                        final Organiasasi pet = mDataOrganisasi.get(position);
                         final String editKey = pet.getId();
                         AlertDialog.Builder mBuilder = new AlertDialog.Builder(getContext());
-                        View mView = getActivity().getLayoutInflater().inflate(R.layout.edithobi_modal,
+                        View mView = getActivity().getLayoutInflater().inflate(R.layout.editorganisasi_modal,
                                 null);
 
 
@@ -311,18 +379,60 @@ public class ProfileFragment extends Fragment {
                         final AlertDialog dialognya = mBuilder.create();
                         dialognya.show();
 
-                        final EditText textEdit = (EditText) mView.findViewById(R.id.edithobieditext);
+                        final Spinner textEdit = (Spinner) mView.findViewById(R.id.edithobieditext);
+                        final ArrayAdapter<String> adapter= new ArrayAdapter<>(getContext(),
+                                android.R.layout.simple_spinner_dropdown_item, organisasispinner);
+                        textEdit.setAdapter(adapter);
+                        textEdit.setSelection(pet.getPos());
+                        textEdit.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                            @Override
+                            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                                posorganisasi = position ;
+                            }
+
+                            @Override
+                            public void onNothingSelected(AdapterView<?> parent) {
+
+                            }
+                        });
+
                         LinearLayout edit = (LinearLayout) mView.findViewById(R.id.saveedit);
                         LinearLayout hapus = (LinearLayout) mView.findViewById(R.id.deletehobi);
-                        textEdit.setText(pet.getNama());
+
+
+                        textEdit.setSelection(pet.getPos());
                         edit.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
                                 databaseorganiasi.child(editKey).setValue(new Organiasasi(
                                                 editKey,
-                                                textEdit.getText().toString()
+                                                textEdit.getSelectedItem().toString(),posorganisasi
                                         )
                                 );
+                                final DatabaseReference databaseuserorganisasi= FirebaseDatabase.getInstance().getReference("organisasi").child(pet.getNama());
+                                final DatabaseReference databaseuserorganisasinew = FirebaseDatabase.getInstance().getReference("organisasi").child(textEdit.getSelectedItem().toString());
+                                final DatabaseReference dbf = FirebaseDatabase.getInstance().getReference("user").child(currentUser.getUid());
+                                dbf.addListenerForSingleValueEvent(new ValueEventListener() {
+                                    @Override
+                                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                        User usr = dataSnapshot.getValue(User.class);
+                                        final HashMap<String, Object> hobiuser= new HashMap<>();
+                                        hobiuser.put("iduser",currentUser.getUid());
+                                        hobiuser.put("fotoprofil",usr.getImage());
+                                        hobiuser.put("namaprofil", usr.getFullname());
+                                        databaseuserorganisasinew.child(currentUser.getUid()).setValue(hobiuser);
+                                        if(!textEdit.getSelectedItem().toString().equals(pet.getNama())) {
+                                            databaseuserorganisasi.child(currentUser.getUid()).removeValue();
+                                        }
+                                    }
+
+                                    @Override
+                                    public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                                    }
+                                });
+
+
                                 Toast.makeText(getContext(), "Berhasil disimpan", Toast.LENGTH_SHORT).show();
                                 dialognya.hide();
                             }
@@ -337,6 +447,8 @@ public class ProfileFragment extends Fragment {
                                             @Override
                                             public void onClick(DialogInterface dialog, int which) {
                                                     databaseorganiasi.child(editKey).removeValue();
+                                                final DatabaseReference databaseuserorganisasinew = FirebaseDatabase.getInstance().getReference("organisasi").child(pet.getNama());
+                                                databaseuserorganisasinew.child(currentUser.getUid()).removeValue();
                                                     dialognya.hide();
                                             }
                                         })
@@ -369,7 +481,12 @@ public class ProfileFragment extends Fragment {
                 intent.putExtra("fakultas",FakultasProfile.getText().toString());
                 intent.putExtra("jurusan",ProdiProfile.getText().toString());
                 intent.putExtra("nohp",noHpProfile.getText().toString());
-                intent.putExtra("asal",AsalProfile.getText().toString());
+                String a = AsalProfile.getText().toString();
+                String output = a.substring(a.indexOf(',') +1);
+                intent.putExtra("asal",output);
+                intent.putExtra("posfakultas",posfakultas);
+                intent.putExtra("posjurusan",postjurusan);
+                intent.putExtra("posprovinsi",posprovinsi);
                 startActivity(intent);
             }
         });
@@ -382,11 +499,25 @@ public class ProfileFragment extends Fragment {
             public void onClick(View v) {
                 AlertDialog.Builder mBuilder = new AlertDialog.Builder(v.getContext());
 
-                View mView = getActivity().getLayoutInflater().inflate(R.layout.hobi_modal,
+                View mView = getActivity().getLayoutInflater().inflate(R.layout.organisasi_modal,
                         null);
-
-                hobiField = (EditText) mView.findViewById(R.id.hobieditext);
+                final Spinner organisasiField = (Spinner) mView.findViewById(R.id.organisasieditext);
                 addhobi = (LinearLayout) mView.findViewById(R.id.addhobi);
+
+                final ArrayAdapter<String> adapterorganisasi = new ArrayAdapter<>(getContext(),
+                        android.R.layout.simple_spinner_dropdown_item, organisasispinner);
+                organisasiField.setAdapter(adapterorganisasi);
+                organisasiField.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                    @Override
+                    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                        posorganisasi = position;
+                    }
+
+                    @Override
+                    public void onNothingSelected(AdapterView<?> parent) {
+
+                    }
+                });
 
                 mBuilder.setView(mView);
                 final AlertDialog dialog = mBuilder.create();
@@ -395,13 +526,7 @@ public class ProfileFragment extends Fragment {
                     @Override
                     public void onClick(View v) {
                         key = databaseorganiasi.push().getKey();
-                        if(!isEmpty(hobiField.getText().toString()) ){
-                            submitOrganisasi(new Organiasasi(key, hobiField.getText().toString()));
-                            dialog.hide();
-                        }else{
-                            Toast.makeText(getContext(),
-                                    "Form tidak boleh kosong", Toast.LENGTH_LONG).show();
-                        }
+                            submitOrganisasi(new Organiasasi(key,organisasiField.getSelectedItem().toString(),posorganisasi));
                     }
                 });
             }
@@ -415,9 +540,24 @@ public class ProfileFragment extends Fragment {
                 View mView = getActivity().getLayoutInflater().inflate(R.layout.hobi_modal,
                         null);
 
-                hobiField = (EditText) mView.findViewById(R.id.hobieditext);
+                hobiField = (Spinner) mView.findViewById(R.id.hobieditext);
                 addhobi = (LinearLayout) mView.findViewById(R.id.addhobi);
 
+
+                final ArrayAdapter<String> adapter = new ArrayAdapter<>(getContext(),
+                        android.R.layout.simple_spinner_dropdown_item, daftarhobi);
+                hobiField.setAdapter(adapter);
+                hobiField.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                    @Override
+                    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                    poshobi = position;
+                    }
+
+                    @Override
+                    public void onNothingSelected(AdapterView<?> parent) {
+
+                    }
+                });
                 mBuilder.setView(mView);
                 final AlertDialog dialog = mBuilder.create();
                 dialog.show();
@@ -425,13 +565,8 @@ public class ProfileFragment extends Fragment {
                     @Override
                     public void onClick(View v) {
                       key = database.push().getKey();
-                        if(!isEmpty(hobiField.getText().toString()) ){
-                            submitHobi(new HobiModel(key, hobiField.getText().toString()));
+                            submitHobi(new HobiModel(key, hobiField.getSelectedItem().toString(),poshobi));
                             dialog.hide();
-                        }else{
-                            Toast.makeText(getContext(),
-                                    "Form tidak boleh kosong", Toast.LENGTH_LONG).show();
-                        }
                     }
                 });
 
@@ -525,11 +660,14 @@ public class ProfileFragment extends Fragment {
                     namaProfile.setText(usr.getFullname());
                     emailProfile.setText(usr.getEmail());
                     nimProfile.setText(usr.getNim());
-                    FakultasProfile.setText(usr.getFakultas());
-                    ProdiProfile.setText(usr.getJurusan());
+                    FakultasProfile.setText(usr.getJurusan());
+                    ProdiProfile.setText(usr.getFakultas());
                     noHpProfile.setText(usr.getNohp());
                     AsalProfile.setText(usr.getAsal());
                     Image = usr.getImage();
+                    posfakultas = usr.getPositionfakultas();
+                    postjurusan = usr.getPositionjurusan();
+                    posprovinsi = usr.getPositionprovinsi();
                 }
 
                 @Override

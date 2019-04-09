@@ -18,171 +18,216 @@
             android:layout_height="wrap_content"
             android:background="@color/colorMain"
             android:theme="@style/Base.ThemeOverlay.AppCompat.Dark.ActionBar"
-            app:popupTheme="@style/MyMaterialTheme"/>
+            app:popupTheme="@style/MyMaterialTheme" />
 
     </android.support.design.widget.AppBarLayout>
 
     <ScrollView
-        android:layout_below="@+id/bar_layout"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:layout_below="@+id/bar_layout">
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="vertical"
-            android:padding="15dp">
+            android:layout_height="match_parent">
 
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="300dp"
-                android:orientation="horizontal">
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                android:padding="15dp">
 
                 <LinearLayout
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_weight="1"
-                    android:orientation="vertical">
+                    android:layout_width="match_parent"
+                    android:layout_height="320dp"
+                    android:orientation="horizontal">
 
-                    <ImageView
-                        android:id="@+id/image_detail_event"
-                        android:layout_width="match_parent"
+                    <LinearLayout
+                        android:layout_width="0dp"
                         android:layout_height="match_parent"
-                        android:scaleType="centerCrop" />
+                        android:layout_weight="1"
+                        android:orientation="vertical">
 
+                        <ImageView
+                            android:id="@+id/image_detail_event"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:scaleType="centerCrop" />
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_marginLeft="5dp"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:id="@+id/title_event"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginLeft="5dp"
+                            android:text="SUMBER DAYA MANUSIA"
+                            android:textColor="#000"
+                            android:textSize="22dp"
+                            android:textStyle="bold" />
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginLeft="5dp"
+                            android:layout_marginTop="10dp"
+                            android:orientation="horizontal">
+
+
+                            <ImageView
+                                android:layout_width="30dp"
+                                android:layout_height="30dp"
+                                android:src="@mipmap/clock" />
+
+                            <TextView
+                                android:id="@+id/schedule_event"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginLeft="10dp"
+                                android:text="17 desember" />
+
+
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginLeft="5dp"
+                            android:layout_marginTop="10dp"
+                            android:orientation="horizontal">
+
+                            <ImageView
+                                android:layout_width="30dp"
+                                android:layout_height="30dp"
+                                android:src="@mipmap/placeholder" />
+
+                            <TextView
+                                android:id="@+id/location_event"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginLeft="10dp"
+                                android:text="mantul" />
+
+
+                        </LinearLayout>
+
+                        <TextView
+                            android:id="@+id/user_event"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginLeft="10dp"
+                            android:layout_marginTop="10dp"
+                            android:text="mantul" />
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="10dp"
+                            android:orientation="horizontal"
+                            android:padding="10dp">
+
+                            <Button
+                                android:id="@+id/see_attendance"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:background="@color/colorMain"
+                                android:text="Lihat Peserta"
+                                android:textColor="@color/colorWhite" />
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:padding="5dp"
+                            android:orientation="horizontal">
+
+                            <LinearLayout
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1">
+
+                                <Button
+                                    android:id="@+id/edit_event"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_margin="2dp"
+                                    android:background="@color/colorMain"
+                                    android:text="Edit"
+                                    android:textColor="#fff" />
+
+                            </LinearLayout>
+
+                            <LinearLayout
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_margin="2dp"
+                                android:layout_weight="1">
+
+                                <Button
+                                    android:id="@+id/delete_event"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:background="@color/colorMain"
+                                    android:text="Hapus"
+                                    android:textColor="#fff" />
+
+                            </LinearLayout>
+                        </LinearLayout>
+                    </LinearLayout>
                 </LinearLayout>
 
                 <LinearLayout
-                    android:layout_width="0dp"
-                    android:layout_marginLeft="5dp"
-                    android:layout_height="match_parent"
-                    android:layout_weight="1"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
                     android:orientation="vertical">
 
                     <TextView
-                        android:id="@+id/title_event"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="SUMBER DAYA MANUSIA"
-                        android:layout_marginLeft="5dp"
+                        android:text="Deskripsi"
                         android:textColor="#000"
-                        android:textSize="22dp"
+                        android:textSize="18dp"
                         android:textStyle="bold" />
 
-                    <LinearLayout
-                        android:layout_marginLeft="5dp"
-                        android:layout_width="match_parent"
+                    <TextView
+                        android:id="@+id/event_desc"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="10dp"
-                        android:orientation="horizontal">
-
-
-                        <ImageView
-                            android:layout_width="30dp"
-                            android:layout_height="30dp"
-                            android:src="@mipmap/clock" />
-
-                        <TextView
-                            android:id="@+id/schedule_event"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginLeft="10dp"
-                            android:text="17 desember" />
-
-
-                    </LinearLayout>
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginLeft="5dp"
-                        android:layout_marginTop="10dp"
-                        android:orientation="horizontal">
-
-                        <ImageView
-                            android:layout_width="30dp"
-                            android:layout_height="30dp"
-                            android:src="@mipmap/placeholder" />
-
-                        <TextView
-                            android:id="@+id/location_event"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginLeft="10dp"
-                            android:text="mantul" />
-
-
-                    </LinearLayout>
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="10dp"
-                        android:padding="10dp"
-                        android:orientation="horizontal">
-
-                        <Button
-                            android:id="@+id/see_attendance"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:background="@color/colorMain"
-                            android:text="Lihat Peserta"
-                            android:textColor="@color/colorWhite" />
-                    </LinearLayout>
+                        android:text="lorem ipsum"
+                        android:textColor="#000"
+                        android:textSize="14dp" />
 
                 </LinearLayout>
-
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Deskripsi"
-                    android:textColor="#000"
-                    android:textSize="18dp"
-                    android:textStyle="bold" />
-
-                <TextView
-                    android:id="@+id/event_desc"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp"
-                    android:textColor="#000"
-                    android:textSize="14dp"
-                    android:text="lorem ipsum"/>
-
             </LinearLayout>
         </LinearLayout>
-    </LinearLayout>
     </ScrollView>
 
     <Button
         android:id="@+id/follow"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Hadiri Acara"
-        android:textColor="@color/colorWhite"
-        android:background="@color/colorMain"
         android:layout_alignParentBottom="true"
-        android:layout_margin="10dp"/>
+        android:layout_margin="10dp"
+        android:background="@color/colorMain"
+        android:text="Hadiri Acara"
+        android:textColor="@color/colorWhite" />
 
     <Button
         android:id="@+id/unfollow"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Batalkan"
-        android:visibility="gone"
-        android:textColor="@color/colorWhite"
-        android:background="@color/colorMain"
         android:layout_alignParentBottom="true"
-        android:layout_margin="10dp"/>
+        android:layout_margin="10dp"
+        android:background="@color/colorMain"
+        android:text="Batalkan"
+        android:textColor="@color/colorWhite"
+        android:visibility="gone" />
 </RelativeLayout>

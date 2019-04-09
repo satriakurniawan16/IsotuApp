@@ -44,7 +44,8 @@ public class EventAdapter  extends RecyclerView.Adapter<EventAdapter.ViewHolder>
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         Event pet = mData.get(position);
         holder.nameTextView.setText(pet.getJudulEvent());
-        holder.timeTextView.setText(pet.getTanggal());
+        holder.timeTextView.setText("Jadwal : "+pet.getTanggal());
+        holder.userTextView.setText("by :"+pet.getUser());
         Picasso.get().load(pet.getImage()).into(holder.eventImageview);
         holder.itemView.setSelected(mSelectedId.contains(mDataId.get(position)));
     }
@@ -80,12 +81,14 @@ public class EventAdapter  extends RecyclerView.Adapter<EventAdapter.ViewHolder>
             View.OnLongClickListener {
         final TextView nameTextView;
         final TextView timeTextView;
+        final TextView userTextView;
         final ImageView eventImageview;
 
         ViewHolder(View itemView) {
             super(itemView);
             nameTextView = itemView.findViewById(R.id.title_event);
             timeTextView = itemView.findViewById(R.id.time_event);
+            userTextView = itemView.findViewById(R.id.user_event);
             eventImageview = itemView.findViewById(R.id.image_event);
             itemView.setFocusable(true);
             itemView.setOnClickListener(this);

@@ -31,9 +31,19 @@
             android:id="@+id/namauser"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:textColor="#000"
             android:text="Rahmad Satria Kurniawan"
             android:textSize="16dp"
             android:textStyle="bold"
+            />
+
+        <TextView
+            android:id="@+id/jurusanuser"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="#000"
+            android:text="Rahmad Satria Kurniawan"
+            android:textSize="12dp"
             />
     </LinearLayout>
 </LinearLayout>

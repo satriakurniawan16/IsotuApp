@@ -11,15 +11,16 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-    <android.support.v7.widget.Toolbar
-        android:id="@+id/toolbar"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@color/colorMain"
-        android:theme="@style/Base.ThemeOverlay.AppCompat.Dark.ActionBar"
-        app:popupTheme="@style/MyMaterialTheme"/>
+        <android.support.v7.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/colorMain"
+            android:theme="@style/Base.ThemeOverlay.AppCompat.Dark.ActionBar"
+            app:popupTheme="@style/MyMaterialTheme" />
 
     </android.support.design.widget.AppBarLayout>
+
 
     <LinearLayout
         android:id="@+id/navbar"
@@ -27,73 +28,211 @@
         android:layout_height="70dp"
         android:layout_below="@+id/bar_layout"
         android:background="@color/colorMain"
-        >
+        android:gravity="center|left"
+        android:orientation="horizontal">
 
+        <HorizontalScrollView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
 
         <LinearLayout
-            android:id="@+id/to_findingnearby"
-            android:layout_width="70dp"
-            android:layout_height="70dp"
-            android:orientation="vertical"
-            android:gravity="center">
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+            <LinearLayout
+                android:id="@+id/to_findingnearby"
+                android:layout_width="70dp"
+                android:layout_height="70dp"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:padding="4dp">
 
-            <ImageView
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:src="@mipmap/nearby"/>
+                <ImageView
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:src="@mipmap/nearby" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:gravity="center"
+                    android:text="Proximity"
+                    android:textAlignment="center"
+                    android:textColor="#fff"
+                    android:textSize="14dp"
+                    tools:ignore="RtlCompat" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/to_findingmajor"
+                android:layout_width="70dp"
+                android:layout_height="70dp"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:padding="4dp">
+
+                <ImageView
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:src="@mipmap/majoricon" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:text="Prodi"
+                    android:textAlignment="center"
+                    android:textColor="#fff"
+                    android:textSize="14dp"
+
+                    tools:ignore="RtlCompat" />
+
+            </LinearLayout>
 
 
+            <LinearLayout
+                android:id="@+id/to_findingfaculty"
+                android:layout_width="70dp"
+                android:layout_height="70dp"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:padding="4dp">
+
+                <ImageView
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:src="@mipmap/dacultyicon" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:text="Fakultas"
+                    android:textAlignment="center"
+                    android:textColor="#fff"
+                    android:textSize="14dp"
+
+                    tools:ignore="RtlCompat" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/to_findingaddress"
+                android:layout_width="70dp"
+                android:layout_height="70dp"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:padding="4dp">
+
+                <ImageView
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:src="@mipmap/homeaddress" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:text="Provinsi"
+                    android:textAlignment="center"
+                    android:textColor="#fff"
+                    android:textSize="14dp"
+
+                    tools:ignore="RtlCompat" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/to_findinghobbies"
+                android:layout_width="70dp"
+                android:layout_height="70dp"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:padding="4dp">
+
+                <ImageView
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:src="@mipmap/puzzle" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:text="Hobi"
+                    android:textAlignment="center"
+                    android:textColor="#fff"
+                    android:textSize="14dp"
+
+                    tools:ignore="RtlCompat" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/to_findingorganization"
+                android:layout_width="70dp"
+                android:layout_height="70dp"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:padding="4dp">
+
+                <ImageView
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:src="@mipmap/collaboration" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:text="Organisasi"
+                    android:textAlignment="center"
+                    android:textColor="#fff"
+                    android:textSize="14dp"
+
+                    tools:ignore="RtlCompat" />
+
+            </LinearLayout>
         </LinearLayout>
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:textColor="#fff"
-            android:gravity="center"
-            android:textAlignment="textStart"
-            android:textSize="18dp"
-            android:text="Cari teman terdekat"
-            tools:ignore="RtlCompat" />
-
+        </HorizontalScrollView>
     </LinearLayout>
 
     <LinearLayout
         android:id="@+id/rootlol"
         android:layout_width="match_parent"
         android:layout_height="70dp"
-        android:background="@color/colorWhite"
         android:layout_below="@+id/navbar"
-        android:padding="10dp"
-        >
+        android:background="@color/colorWhite"
+        android:padding="10dp">
 
         <EditText
             android:id="@+id/searchuser"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:backgroundTint="#eeeeee"
-            android:hint="Cari berdasarkan username..."/>
+            android:hint="Cari berdasarkan username..." />
 
 
     </LinearLayout>
 
     <ScrollView
-        android:layout_below="@id/rootlol"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_below="@id/rootlol"
         android:nestedScrollingEnabled="true">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:gravity="center">
+            android:gravity="center"
+            android:orientation="vertical">
 
             <android.support.v7.widget.RecyclerView
                 android:id="@+id/listSearch"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:scrollbars="vertical"
-                />
+                android:scrollbars="vertical" />
 
         </LinearLayout>
     </ScrollView>

@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".View.FindingFriend">
+    tools:context=".View.HobiOrganisasi">
 
     <android.support.design.widget.AppBarLayout
         android:id="@+id/bar_layout"
@@ -36,11 +36,10 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Pilih Jarak"/>
+                android:text="Pilih Kategori"/>
 
             <Spinner
                 android:id="@+id/distance"
-                android:padding="20dp"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 >
@@ -57,16 +56,5 @@
         </LinearLayout>
     </ScrollView>
 
-    <android.support.design.widget.FloatingActionButton
-        android:id="@+id/toMap"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentRight="true"
-        android:src="@mipmap/gmap"
-        app:borderWidth="0dp"
-        android:background="#00ffffff"
-        android:layout_alignParentBottom="true"
-        android:backgroundTint="@color/colorMain"
-        android:layout_margin="10dp"/>
 
 </RelativeLayout>

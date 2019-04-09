@@ -3,6 +3,7 @@ package com.example.user.isotuapp.fragment;
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -36,6 +37,7 @@ import com.example.user.isotuapp.R;
 import com.example.user.isotuapp.View.CompleteProfile;
 import com.example.user.isotuapp.View.Dashboard;
 import com.example.user.isotuapp.View.DetailUserHobi;
+import com.example.user.isotuapp.View.EditPost;
 import com.example.user.isotuapp.View.FriendProfile;
 import com.example.user.isotuapp.View.MessageActivity;
 import com.example.user.isotuapp.View.PostActivity;
@@ -78,6 +80,7 @@ public class HomeFragment extends Fragment implements Serializable {
     private Parcelable recyclerViewState;
     FirebaseUser currentUser;
     private DatabaseReference database;
+    LinearLayout emptyview;
     private FirebaseAuth mFirebaseAuth;
     FloatingActionButton fab;
 
@@ -94,6 +97,10 @@ public class HomeFragment extends Fragment implements Serializable {
 
         mRootVIew = inflater.inflate(R.layout.fragment_home, container, false);
 
+        mFirebaseAuth = FirebaseAuth.getInstance();
+        currentUser = mFirebaseAuth.getCurrentUser();
+        emptyview = (LinearLayout) mRootVIew.findViewById(R.id.emptyview);
+        emptyview();
         init();
 
         return mRootVIew;
@@ -106,7 +113,9 @@ public class HomeFragment extends Fragment implements Serializable {
         linearLayoutManager.setStackFromEnd(true);
         mPostRecyclerView.setLayoutManager(linearLayoutManager);
         setupAdapter();
+        emptyview();
         mPostRecyclerView.setAdapter(mPostAdapter);
+
     }
 
     private void setupAdapter() {
@@ -119,8 +128,69 @@ public class HomeFragment extends Fragment implements Serializable {
             @Override
             protected void populateViewHolder(final PostHolder viewHolder, final Post model, int position) {
                 final String id;
+                emptyview();
                 if(model.getType().equals("1")){
                     viewHolder.firstLinear.setVisibility(View.VISIBLE);
+                    if(!model.getIduser().equals(currentUser.getUid())){
+                        viewHolder.moreShareLayout.setVisibility(View.GONE);
+                    }else {
+                        viewHolder.moreShareLayout.setVisibility(View.VISIBLE);
+                    }
+
+                    viewHolder.moreShareLayout.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            View mView = getActivity().getLayoutInflater().inflate(R.layout.popup_more,
+                                    null);
+                            AlertDialog.Builder mBuilder = new AlertDialog.Builder(getContext());
+                            final TextView shareFriend = (TextView) mView.findViewById(R.id.moreedit);
+
+                            TextView shareHome = (TextView) mView.findViewById(R.id.moredelete);
+                            mBuilder.setView(mView);
+
+                            final AlertDialog dialoglol = mBuilder.create();
+                            dialoglol.show();
+
+                            shareFriend.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+                                    Intent intent = new Intent(getContext(),EditPost.class);
+                                    intent.putExtra("idpost",model.getPostId());
+                                    intent.putExtra("type","1");
+                                    intent.putExtra("textpost",model.getText());
+                                    intent.putExtra("textshare",model.getCaptionshare());
+                                    startActivity(intent);
+
+                                }
+                            });
+
+                            shareHome.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+                                    AlertDialog.Builder builder = new AlertDialog.Builder(getContext())
+                                            .setMessage("Apakah anda yakin untuk menghapus ?")
+                                            .setPositiveButton("Delete", new DialogInterface.OnClickListener() {
+                                                @Override
+                                                public void onClick(DialogInterface dialog, int which) {
+                                                    DatabaseReference dbfpost = FirebaseDatabase.getInstance().getReference("posting");
+                                                    dbfpost.child(model.getPostId()).removeValue();
+                                                    dialoglol.dismiss();
+                                                }
+                                            })
+                                            .setNegativeButton("cancel", new DialogInterface.OnClickListener() {
+                                                @Override
+                                                public void onClick(DialogInterface dialog, int which) {
+                                                    dialog.cancel();
+
+                                                }
+                                            });
+                                    builder.create().show();
+                                }
+                            });
+                        }
+                    });
+
+
                     viewHolder.secondLinear.setPadding(10,10,10,10);
                     viewHolder.thirdLinear.setPadding(10,10,10,10);
                     viewHolder.thirdLinear.setBackgroundResource(R.drawable.custom_border);
@@ -144,8 +214,7 @@ public class HomeFragment extends Fragment implements Serializable {
                         }
                     });
 
-
-
+                    viewHolder.moreLayout.setVisibility(View.GONE);
                     viewHolder.ShareDirection.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
@@ -163,7 +232,6 @@ public class HomeFragment extends Fragment implements Serializable {
                             startActivity(intent);
                         }
                     });
-
 
 
                     viewHolder.nameSharedTextView.setOnClickListener(new View.OnClickListener() {
@@ -211,6 +279,7 @@ public class HomeFragment extends Fragment implements Serializable {
                 viewHolder.setPostText(model.getText());
                 viewHolder.setNumShare(String.valueOf(model.getNumshare()));
 
+
                 FirebaseAuth mAuth = FirebaseAuth.getInstance();
                 DatabaseReference dblike = FirebaseDatabase.getInstance().
                         getReference().child("post_liked").child(mAuth.getUid());
@@ -236,6 +305,67 @@ public class HomeFragment extends Fragment implements Serializable {
                     @Override
                     public void onCancelled(@NonNull DatabaseError databaseError) {
 
+                    }
+                });
+
+                if(model.getUser().getUid().equals(currentUser.getUid())) {
+                    if (!model.getType().equals("1")){
+                        viewHolder.moreLayout.setVisibility(View.VISIBLE);
+                        }
+                }else {
+                    viewHolder.moreLayout.setVisibility(View.GONE);
+                }
+
+                viewHolder.moreLayout.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        View mView = getActivity().getLayoutInflater().inflate(R.layout.popup_more,
+                                null);
+                        AlertDialog.Builder mBuilder = new AlertDialog.Builder(getContext());
+                        final TextView shareFriend = (TextView) mView.findViewById(R.id.moreedit);
+
+                        TextView shareHome = (TextView) mView.findViewById(R.id.moredelete);
+                        mBuilder.setView(mView);
+
+                        final AlertDialog dialoglol = mBuilder.create();
+                        dialoglol.show();
+
+                        shareFriend.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                Intent intent = new Intent(getContext(),EditPost.class);
+                                intent.putExtra("idpost",model.getPostId());
+                                intent.putExtra("type","0");
+                                intent.putExtra("textpost",model.getText());
+                                intent.putExtra("textshare","");
+                                startActivity(intent);
+
+                            }
+                        });
+
+                        shareHome.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                AlertDialog.Builder builder = new AlertDialog.Builder(getContext())
+                                        .setMessage("Apakah anda yakin untuk menghapus ?")
+                                        .setPositiveButton("Delete", new DialogInterface.OnClickListener() {
+                                            @Override
+                                            public void onClick(DialogInterface dialog, int which) {
+                                                DatabaseReference dbfpost = FirebaseDatabase.getInstance().getReference("posting");
+                                                dbfpost.child(model.getPostId()).removeValue();
+                                                dialoglol.dismiss();
+                                            }
+                                        })
+                                        .setNegativeButton("cancel", new DialogInterface.OnClickListener() {
+                                            @Override
+                                            public void onClick(DialogInterface dialog, int which) {
+                                                dialog.cancel();
+
+                                            }
+                                        });
+                                builder.create().show();
+                            }
+                        });
                     }
                 });
 
@@ -365,6 +495,26 @@ public class HomeFragment extends Fragment implements Serializable {
         };
     }
 
+    private void emptyview(){
+        DatabaseReference dbpost = FirebaseDatabase.getInstance().getReference("posting");
+        dbpost.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                if(dataSnapshot.exists()){
+                    emptyview.setVisibility(View.GONE);
+                }else{
+                    emptyview.setVisibility(View.VISIBLE);
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+
+    }
+
 
     //During the tutorial I think I messed up this code. Make sure your's aligns to this, or just
     //check out the github code
@@ -473,7 +623,8 @@ public class HomeFragment extends Fragment implements Serializable {
         LinearLayout ShareDirection;
         TextView textShare;
         TextView seeComment;
-
+        LinearLayout moreLayout;
+        LinearLayout moreShareLayout;
 
         public PostHolder(View itemView) {
             super(itemView);
@@ -504,6 +655,8 @@ public class HomeFragment extends Fragment implements Serializable {
             ShareDirection = (LinearLayout) itemView.findViewById(R.id.detail_post_direction);
             textShare = (TextView) itemView.findViewById(R.id.textShare);
             seeComment = (TextView) itemView.findViewById(R.id.seeComment);
+            moreLayout = (LinearLayout) itemView.findViewById(R.id.more);
+            moreShareLayout = (LinearLayout) itemView.findViewById(R.id.moreshare);
         }
 
 
