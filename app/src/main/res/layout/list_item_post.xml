@@ -106,13 +106,14 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+
+                android:id="@+id/second_child_post_item"
                 android:orientation="vertical">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="60dp"
                     android:gravity="left|center"
-                    android:id="@+id/second_child_post_item"
                     android:orientation="horizontal">
 
                     <de.hdodenhof.circleimageview.CircleImageView
