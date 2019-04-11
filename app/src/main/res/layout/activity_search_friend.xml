@@ -6,6 +6,29 @@
     android:layout_height="match_parent"
     tools:context=".View.SearchFriendActivity">
 
+
+
+    <LinearLayout
+        android:id="@+id/emptyview"
+        android:layout_width="match_parent"
+        android:orientation="vertical"
+        android:layout_height="match_parent"
+        android:visibility="visible"
+        android:gravity="center">
+
+        <ImageView
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:layout_marginBottom="10dp"
+            android:src="@mipmap/empty_search"/>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Belum ada pengguna"
+            android:textSize="20dp"
+            />
+    </LinearLayout>
+
     <android.support.design.widget.AppBarLayout
         android:id="@+id/bar_layout"
         android:layout_width="match_parent"
@@ -211,7 +234,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:backgroundTint="#eeeeee"
-            android:hint="Cari berdasarkan username..." />
+            android:hint="Cari berdasarkan nama" />
 
 
     </LinearLayout>
@@ -222,19 +245,29 @@
         android:layout_below="@id/rootlol"
         android:nestedScrollingEnabled="true">
 
-        <LinearLayout
+        <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:orientation="vertical">
+            android:layout_height="match_parent">
 
-            <android.support.v7.widget.RecyclerView
-                android:id="@+id/listSearch"
+
+
+            <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:scrollbars="vertical" />
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:orientation="vertical">
 
-        </LinearLayout>
+                <android.support.v7.widget.RecyclerView
+                    android:id="@+id/listSearch"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:scrollbars="vertical" />
+
+            </LinearLayout>
+
+        </RelativeLayout>
+
+
     </ScrollView>
 
 </RelativeLayout>

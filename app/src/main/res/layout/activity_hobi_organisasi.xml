@@ -6,6 +6,27 @@
     android:layout_height="match_parent"
     tools:context=".View.HobiOrganisasi">
 
+    <LinearLayout
+        android:id="@+id/emptyview"
+        android:layout_width="match_parent"
+        android:orientation="vertical"
+        android:layout_height="match_parent"
+        android:visibility="visible"
+        android:gravity="center">
+
+        <ImageView
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:layout_marginBottom="10dp"
+            android:src="@mipmap/empty_search"/>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Tidak ditemukan"
+            android:textSize="20dp"
+            />
+    </LinearLayout>
+
     <android.support.design.widget.AppBarLayout
         android:id="@+id/bar_layout"
         android:layout_width="match_parent"

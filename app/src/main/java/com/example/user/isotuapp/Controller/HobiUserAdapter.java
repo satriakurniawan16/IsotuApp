@@ -29,19 +29,27 @@ public class HobiUserAdapter  extends RecyclerView.Adapter<HobiUserAdapter.ViewH
     private ArrayList<UserHobi> mData;
     private ArrayList<String> mDataId;
     private ArrayList<String> mSelectedId;
+    private View mEmptyView;
 
 
 
-    public HobiUserAdapter(Context context, ArrayList<UserHobi> data, ArrayList<String> dataId,
+    public HobiUserAdapter(Context context, ArrayList<UserHobi> data, ArrayList<String> dataId,View emptyView,
                        ClickHandler handler) {
         mContext = context;
         mData = data;
         mDataId = dataId;
         mClickHandler = handler;
         mSelectedId = new ArrayList<>();
+        mEmptyView = emptyView;
         setHasStableIds(true);
     }
 
+    public void updateEmptyView() {
+        if (mData.size() == 0)
+            mEmptyView.setVisibility(View.VISIBLE);
+        else
+            mEmptyView.setVisibility(View.GONE);
+    }
 
     @NonNull
     @Override

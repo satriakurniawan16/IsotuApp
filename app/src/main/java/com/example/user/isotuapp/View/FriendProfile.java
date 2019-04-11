@@ -237,7 +237,8 @@ public class FriendProfile extends AppCompatActivity {
                         }
                         HobiModel pet = mData.get(position);
                         Intent intent = new Intent(getApplicationContext(), DetailUserHobi.class);
-                        intent.putExtra("reference",pet.getHobi());
+                        intent.putExtra("reference","list_hobi_user");
+                        intent.putExtra("child",pet.getHobi());
                         startActivity(intent);
                     }
 

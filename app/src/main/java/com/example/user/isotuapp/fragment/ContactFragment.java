@@ -50,6 +50,9 @@ public class ContactFragment extends Fragment {
     private DatabaseReference database;
     private FirebaseAuth mFirebaseAuth;
 
+
+    LinearLayout emptyView;
+
     public ContactFragment() {
         // Required empty public constructor
     }
@@ -61,6 +64,7 @@ public class ContactFragment extends Fragment {
             mData.add(dataSnapshot.getValue(Contact.class));
             mDataId.add(dataSnapshot.getKey());
             mAdapter.notifyDataSetChanged();
+            mAdapter.updateEmptyView();
         }
 
         @Override
@@ -76,6 +80,7 @@ public class ContactFragment extends Fragment {
             mDataId.remove(pos);
             mData.remove(pos);
             mAdapter.notifyDataSetChanged();
+            mAdapter.updateEmptyView();
         }
 
         @Override
@@ -99,7 +104,7 @@ public class ContactFragment extends Fragment {
 
         mData = new ArrayList<>();
         mDataId = new ArrayList<>();
-
+        emptyView = (LinearLayout) rootView.findViewById(R.id.emptyview);
         RecyclerView recyclerView = rootView.findViewById(R.id.listContact);
         recyclerView.setHasFixedSize(true);
         LinearLayoutManager layoutManager =
@@ -109,7 +114,7 @@ public class ContactFragment extends Fragment {
         database = FirebaseDatabase.getInstance().getReference("contact").child(currentUser.getUid());
         database.addChildEventListener(childEventListener);
 
-        mAdapter = new ContactAdapter(getContext(), mData, mDataId,
+        mAdapter = new ContactAdapter(getContext(), mData, mDataId,emptyView,
                 new ContactAdapter.ClickHandler() {
                     @Override
                     public void onItemClick(int position) {

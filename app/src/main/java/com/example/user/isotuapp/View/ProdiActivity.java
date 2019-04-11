@@ -11,6 +11,7 @@ import android.view.ActionMode;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.Toast;
 
@@ -41,7 +42,7 @@ public class ProdiActivity extends AppCompatActivity {
     String myid;
     DatabaseReference reference,myreference;
     private ActionMode mActionMode;
-
+    LinearLayout emptyView;
 
 
     private String[] fakultas = {
@@ -135,8 +136,10 @@ public class ProdiActivity extends AppCompatActivity {
         spinnerText = (Spinner) findViewById(R.id.distance);
         spinnerProdi = (Spinner) findViewById(R.id.prodi);
 
+
         mData = new ArrayList<>();
         mDataId = new ArrayList<>();
+        emptyView = (LinearLayout) findViewById(R.id.emptyview);
         
         spinnerText = (Spinner) findViewById(R.id.distance);
         final ArrayAdapter<String> adapter = new ArrayAdapter<>(this,
@@ -156,10 +159,15 @@ public class ProdiActivity extends AppCompatActivity {
 
                 for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                     User user = snapshot.getValue(User.class);
-
                     mData.add(user);
-
                 }
+
+                if(mData !=  null ) {
+                    emptyView.setVisibility(View.GONE);
+                }else {
+                    emptyView.setVisibility(View.VISIBLE);
+                }
+
                 mAdapter = new SearchUserAdapter(getApplicationContext(), mData, mDataId,
                         new SearchUserAdapter.ClickHandler() {
                             @Override
@@ -270,6 +278,15 @@ public class ProdiActivity extends AppCompatActivity {
                     mData.add(user);
 
                 }
+
+
+                if(mData !=  null ) {
+                    emptyView.setVisibility(View.GONE);
+                }else {
+                    emptyView.setVisibility(View.VISIBLE);
+                }
+
+
                 mAdapter = new SearchUserAdapter(getApplicationContext(), mData, mDataId,
                         new SearchUserAdapter.ClickHandler() {
                             @Override

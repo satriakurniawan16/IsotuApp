@@ -22,15 +22,23 @@ public class EventAdapter  extends RecyclerView.Adapter<EventAdapter.ViewHolder>
     private ArrayList<Event> mData;
     private ArrayList<String> mDataId;
     private ArrayList<String> mSelectedId;
-    public EventAdapter(Context context, ArrayList<Event> data, ArrayList<String> dataId,
+    private View mEmptyView;
+    public EventAdapter(Context context, ArrayList<Event> data, ArrayList<String> dataId,View emptyView,
                           ClickHandler handler) {
         mContext = context;
         mData = data;
         mDataId = dataId;
         mClickHandler = handler;
         mSelectedId = new ArrayList<>();
+        mEmptyView = emptyView;
     }
 
+    public void updateEmptyView() {
+        if (mData.size() == 0)
+            mEmptyView.setVisibility(View.VISIBLE);
+        else
+            mEmptyView.setVisibility(View.GONE);
+    }
 
     @NonNull
     @Override

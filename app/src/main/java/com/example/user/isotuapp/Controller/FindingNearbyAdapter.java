@@ -73,7 +73,7 @@ public class FindingNearbyAdapter  extends RecyclerView.Adapter<FindingNearbyAda
         double distance = CalculationByDistance(locationStart,locationEnd);
         String tes = String.valueOf(distance);
         String lol = tes.substring(0,5);
-        holder.distanceTextView.setText(lol + "meter");
+        holder.distanceTextView.setText(lol + " meter");
 
 //        holder.itemView.setSelected(mSelectedId.contains(mDataId.get(position)));
     }
@@ -156,12 +156,12 @@ public class FindingNearbyAdapter  extends RecyclerView.Adapter<FindingNearbyAda
         double km = valueResult / 1;
         DecimalFormat newFormat = new DecimalFormat("####");
         int kmInDec = Integer.valueOf(newFormat.format(km));
-        double meter = valueResult % 1000;
+        double meter = valueResult;
         int meterInDec = Integer.valueOf(newFormat.format(meter));
         Log.i("Radius Value", "" + valueResult + "   KM  " + kmInDec
                 + " Meter   " + meterInDec);
 
-        return Radius * c;
+        return Radius * c *1000;
     }
 
     public static boolean isLocationEnabled(Context context) {

@@ -72,6 +72,8 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     List<Target> targets;
     HashMap<Marker, MarkerData> mMarkersHashMap;
     private SlidingUpPanelLayout mLayout;
+    FirebaseAuth aut;
+    FirebaseUser  cuser;
     private static int TIME_OUT = 2000;
     public View rootView, progressOverlay;
 
@@ -158,6 +160,8 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         mMarkersHashMap = new HashMap<>();
         targets = new ArrayList<>();
 
+        aut = FirebaseAuth.getInstance();
+        cuser = aut.getCurrentUser();
         fab = (FloatingActionButton) findViewById(R.id.getmy);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -269,8 +273,11 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                     User user = snapshot.getValue(User.class);
                     ArrayList<MarkerData> markers = new ArrayList<MarkerData>();
                     markers.clear();
-                    markers.add(new MarkerData(user.getUid(),user.getImage(),user.getLatitude(),user.getLongitude(),user.getFullname()));
-                    plotMarkers(markers);
+                    Log.d("lolllluser", "onDataChange: " + cuser.getUid());
+                    if(user.getLongitude() != null && user.getLongitude() != null && user.getUid() != cuser.getUid()) {
+                        markers.add(new MarkerData(user.getUid(), user.getImage(), user.getLatitude(), user.getLongitude(), user.getFullname()));
+                        plotMarkers(markers);
+                    }
                     }
                 }
 
@@ -403,7 +410,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         });
 
 
-        DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("user").child(FirebaseAuth.getInstance().getCurrentUser().getUid());
+        DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("user").child(id);
         databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {

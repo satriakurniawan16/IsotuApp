@@ -426,6 +426,7 @@ public class HomeFragment extends Fragment implements Serializable {
                         Intent intent = new Intent(getContext(), DetailUserHobi.class);
                         intent.putExtra("reference","userpostliked");
                         intent.putExtra("child",model.getPostId());
+                        intent.putExtra("title","Teman yang menyukai ini");
                         startActivity(intent);
                     }
                 });

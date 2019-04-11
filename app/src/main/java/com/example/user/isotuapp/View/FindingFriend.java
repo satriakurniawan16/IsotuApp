@@ -15,7 +15,9 @@ import android.view.ActionMode;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.LinearLayout;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.user.isotuapp.Controller.ContactAdapter;
@@ -53,6 +55,7 @@ public class FindingFriend extends AppCompatActivity {
     private ArrayList<String> mDataId;
     private Double CurrentLatitude,CurrentLongitude,latitude,longitude;
     FirebaseUser fuser;
+    LinearLayout emptyView;
     String myid;
     DatabaseReference reference,myreference;
     private ActionMode mActionMode;
@@ -82,6 +85,7 @@ public class FindingFriend extends AppCompatActivity {
             }
         });
 
+        emptyView = (LinearLayout) findViewById(R.id.emptyview);
         spinnerText = (Spinner) findViewById(R.id.distance);
         final ArrayAdapter<String> adapter = new ArrayAdapter<>(this,
                 android.R.layout.simple_spinner_dropdown_item, distance);
@@ -141,8 +145,13 @@ public class FindingFriend extends AppCompatActivity {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 User user = dataSnapshot.getValue(User.class);
-                CurrentLatitude = user.getLatitude();
-                CurrentLongitude = user.getLongitude();
+                if(user.getLongitude() != null && user.getLongitude() != null) {
+                    CurrentLatitude = user.getLatitude();
+                    CurrentLongitude = user.getLongitude();
+                }else {
+                    CurrentLatitude = -6.9733085;
+                    CurrentLongitude = 107.6328139;
+                }
                 myid = user.getUid();
             }
 
@@ -171,13 +180,21 @@ public class FindingFriend extends AppCompatActivity {
                     Location compareLoc = new Location("compare");
                     float minDist = mindistance;
                     float distance = Float.MAX_VALUE;
+
+                    if(user.getLatitude() != null && user.getLongitude() != null) {
                         compareLoc.setLatitude(user.getLatitude());
                         compareLoc.setLongitude(user.getLongitude());
                         distance = currentLocation.distanceTo(compareLoc);
-                        if(user.getUid() != fuser.getUid()) {
-                            if (distance >= minDist && distance<= maxdistance  ) {
-                                mData.add(user);
+                            if (user.getUid() != fuser.getUid()) {
+                                if (distance >= minDist && distance <= maxdistance && user.getUid() != fuser.getUid()) {
+                                    mData.add(user);
+                                }
                             }
+                        }
+                        if(mData == null) {
+                            emptyView.setVisibility(View.VISIBLE);
+                        }else {
+                            emptyView.setVisibility(View.GONE);
                         }
                 }
                 mAdapter = new FindingNearbyAdapter(getApplicationContext(), mData, mDataId,

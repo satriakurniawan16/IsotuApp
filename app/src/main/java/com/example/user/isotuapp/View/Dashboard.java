@@ -444,15 +444,11 @@ public class Dashboard extends AppCompatActivity  {
         mAuthListener = new FirebaseAuth.AuthStateListener(){
             @Override
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
-                if(firebaseAuth.getCurrentUser()!=null){
-                    reference = FirebaseDatabase.getInstance().getReference("user").child(FirebaseAuth.getInstance().getCurrentUser().getUid());
 
+                    reference = FirebaseDatabase.getInstance().getReference("user").child(FirebaseAuth.getInstance().getCurrentUser().getUid());
                     HashMap<String, Object> hashMap = new HashMap<>();
                     hashMap.put("status", status);
-
                     reference.updateChildren(hashMap);
-
-                }
             }
         };
     }

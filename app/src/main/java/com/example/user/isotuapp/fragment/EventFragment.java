@@ -14,6 +14,7 @@ import android.view.ActionMode;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import com.example.user.isotuapp.Controller.ContactAdapter;
@@ -45,6 +46,7 @@ public class EventFragment extends Fragment {
     FirebaseUser currentUser;
     Event event;
     private DatabaseReference database;
+    LinearLayout emptyview;
     private FirebaseAuth mFirebaseAuth;
 
     private ChildEventListener childEventListener = new ChildEventListener() {
@@ -53,6 +55,7 @@ public class EventFragment extends Fragment {
             mData.add(dataSnapshot.getValue(Event.class));
             mDataId.add(dataSnapshot.getKey());
             mAdapter.notifyDataSetChanged();
+            mAdapter.updateEmptyView();
         }
 
         @Override
@@ -67,6 +70,7 @@ public class EventFragment extends Fragment {
             int pos = mDataId.indexOf(dataSnapshot.getKey());
             mDataId.remove(pos);
             mData.remove(pos);
+            mAdapter.updateEmptyView();
             mAdapter.notifyDataSetChanged();
         }
 
@@ -99,6 +103,7 @@ public class EventFragment extends Fragment {
         mData = new ArrayList<>();
         mDataId = new ArrayList<>();
 
+        emptyview = rootView.findViewById(R.id.emptyview);
         RecyclerView recyclerView = rootView.findViewById(R.id.listEvent);
         LinearLayoutManager layoutManager = new GridLayoutManager(getContext(), 2);
         recyclerView.setLayoutManager(layoutManager);
@@ -106,7 +111,7 @@ public class EventFragment extends Fragment {
         database = FirebaseDatabase.getInstance().getReference("events");
         database.addChildEventListener(childEventListener);
 
-        mAdapter = new EventAdapter(getContext(), mData, mDataId,
+        mAdapter = new EventAdapter(getContext(), mData, mDataId,emptyview,
                 new EventAdapter.ClickHandler() {
                     @Override
                     public void onItemClick(int position) {

@@ -241,6 +241,7 @@ public class ProfileFragment extends Fragment {
                         Intent intent = new Intent(getContext(), DetailUserHobi.class);
                         intent.putExtra("reference","list_hobi_user");
                         intent.putExtra("child",pet.getHobi());
+                        intent.putExtra("title","Pengguna dengan hobi yang sama");
                         startActivity(intent);
                     }
 
@@ -362,6 +363,7 @@ public class ProfileFragment extends Fragment {
                         Intent intent = new Intent(getContext(), DetailUserHobi.class);
                         intent.putExtra("reference","list_user_organisasi");
                         intent.putExtra("child",pet.getNama());
+                        intent.putExtra("title","Pengguna dengan organisasi yang sama");
                         startActivity(intent);
                     }
 

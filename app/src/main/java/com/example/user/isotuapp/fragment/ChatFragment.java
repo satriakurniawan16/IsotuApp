@@ -11,12 +11,14 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 
 import com.example.user.isotuapp.Controller.UserAdapter;
 import com.example.user.isotuapp.Model.Chatlist;
 import com.example.user.isotuapp.Model.User;
 import com.example.user.isotuapp.Notification.Token;
 import com.example.user.isotuapp.R;
+import com.google.android.gms.vision.text.Line;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -40,7 +42,7 @@ public class ChatFragment extends Fragment {
 
     FirebaseUser fuser;
     DatabaseReference reference;
-
+    LinearLayout emptyview;
     private List<Chatlist> usersList;
 
     @Override
@@ -56,10 +58,10 @@ public class ChatFragment extends Fragment {
 
         usersList = new ArrayList<>();
 
+        emptyview = (LinearLayout) view.findViewById(R.id.emptyview);
         reference = FirebaseDatabase.getInstance().getReference("Chatlist").child(fuser.getUid());
         reference.addValueEventListener(new ValueEventListener() {
             final String TAG = ChatFragment.class.getSimpleName() ;
-
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 usersList.clear();
@@ -105,14 +107,21 @@ public class ChatFragment extends Fragment {
                     for (Chatlist chatlist : usersList){
                         String idchat = "";
                         String chatlistid = "";
-                        idchat = user.getUid();
-                        chatlistid = chatlist.getId();
-                        Log.d("tolol1", "onDataChange: " + chatlistid);
-                        Log.d("tolol2", "onDataChange: " + idchat);
-                        Log.d(TAG, "data tolol"+user);
-                        if (idchat.equalsIgnoreCase(chatlistid)){
-                        mUsers.add(user);
+                        if(user.getUid() != null) {
+                            idchat = user.getUid();
+                            chatlistid = chatlist.getId();
+                            Log.d("tolol1", "onDataChange: " + chatlistid);
+                            Log.d("tolol2", "onDataChange: " + idchat);
+                            Log.d(TAG, "data tolol" + user);
+                            if (idchat.equalsIgnoreCase(chatlistid)) {
+                                mUsers.add(user);
+                            }
                         }
+                    }
+                    if(mUsers.size() == 0) {
+                        emptyview.setVisibility(View.VISIBLE);
+                    }else {
+                        emptyview.setVisibility(View.GONE);
                     }
                 }
                 userAdapter = new UserAdapter(getContext(), mUsers, true);

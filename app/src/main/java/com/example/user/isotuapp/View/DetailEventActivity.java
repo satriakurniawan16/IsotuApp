@@ -185,6 +185,7 @@ public class DetailEventActivity extends AppCompatActivity {
                 Intent intentlol = new Intent(DetailEventActivity.this,DetailUserHobi.class);
                 intentlol.putExtra("reference","list_event_atender");
                 intentlol.putExtra("child",titleEvent.getText().toString());
+                intent.putExtra("title","Calon peserta");
                 startActivity(intentlol);
             }
         });

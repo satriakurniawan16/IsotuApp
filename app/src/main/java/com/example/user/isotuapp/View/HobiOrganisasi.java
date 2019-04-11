@@ -12,6 +12,7 @@ import android.view.ActionMode;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.Toast;
 
@@ -70,6 +71,7 @@ public class HobiOrganisasi extends AppCompatActivity {
     String myid;
     DatabaseReference reference,myreference;
     private ActionMode mActionMode;
+    LinearLayout emptyView;
 
     private ChildEventListener childEventListener = new ChildEventListener() {
         @Override
@@ -77,12 +79,14 @@ public class HobiOrganisasi extends AppCompatActivity {
             mData.add(dataSnapshot.getValue(UserHobi.class));
             mDataId.add(dataSnapshot.getKey());
             mAdapter.notifyDataSetChanged();
+            mAdapter.updateEmptyView();
         }
 
         @Override
         public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
             int pos = mDataId.indexOf(dataSnapshot.getKey());
             mData.set(pos, dataSnapshot.getValue(UserHobi.class));
+            mAdapter.updateEmptyView();
             mAdapter.notifyDataSetChanged();
         }
 
@@ -91,6 +95,7 @@ public class HobiOrganisasi extends AppCompatActivity {
             int pos = mDataId.indexOf(dataSnapshot.getKey());
             mDataId.remove(pos);
             mData.remove(pos);
+            mAdapter.updateEmptyView();
             mAdapter.notifyDataSetChanged();
         }
 
@@ -122,7 +127,7 @@ public class HobiOrganisasi extends AppCompatActivity {
         type = intent.getStringExtra("type");
         mData = new ArrayList<>();
         mDataId = new ArrayList<>();
-
+        emptyView = (LinearLayout) findViewById(R.id.emptyview);
 
         spinnerText = (Spinner) findViewById(R.id.distance);
         final ArrayAdapter<String> adapter = new ArrayAdapter<>(this,
@@ -170,7 +175,7 @@ public class HobiOrganisasi extends AppCompatActivity {
         final FirebaseUser fuser = FirebaseAuth.getInstance().getCurrentUser();
         DatabaseReference query = FirebaseDatabase.getInstance().getReference(ref).child(s);
         query.addChildEventListener(childEventListener);
-        mAdapter = new HobiUserAdapter(getApplicationContext(), mData, mDataId,
+        mAdapter = new HobiUserAdapter(getApplicationContext(), mData, mDataId,emptyView,
                 new HobiUserAdapter.ClickHandler() {
                     @Override
                     public void onItemClick(int position) {

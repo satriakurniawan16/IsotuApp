@@ -14,6 +14,7 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.user.isotuapp.Controller.HobiAdapter;
@@ -41,9 +42,12 @@ public class DetailUserHobi extends AppCompatActivity {
     private HobiUserAdapter mAdapter;
     private String link;
     private String child;
+    TextView titleTextView;
+    String title;
     FirebaseUser currentUser;
     private DatabaseReference database;
     private ActionMode mActionMode;
+    LinearLayout emptyView;
 
     private ChildEventListener childEventListener = new ChildEventListener() {
         @Override
@@ -51,12 +55,14 @@ public class DetailUserHobi extends AppCompatActivity {
             mData.add(dataSnapshot.getValue(UserHobi.class));
             mDataId.add(dataSnapshot.getKey());
             mAdapter.notifyDataSetChanged();
+            mAdapter.updateEmptyView();
         }
 
         @Override
         public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
             int pos = mDataId.indexOf(dataSnapshot.getKey());
             mData.set(pos, dataSnapshot.getValue(UserHobi.class));
+            mAdapter.updateEmptyView();
             mAdapter.notifyDataSetChanged();
         }
 
@@ -65,6 +71,7 @@ public class DetailUserHobi extends AppCompatActivity {
             int pos = mDataId.indexOf(dataSnapshot.getKey());
             mDataId.remove(pos);
             mData.remove(pos);
+            mAdapter.updateEmptyView();
             mAdapter.notifyDataSetChanged();
         }
 
@@ -89,9 +96,14 @@ public class DetailUserHobi extends AppCompatActivity {
         mDataId = new ArrayList<>();
 
         Intent intent = getIntent();
+
         link = intent.getStringExtra("reference");
         child = intent.getStringExtra("child");
+        title = intent.getStringExtra("title");
+        titleTextView = (TextView) findViewById(R.id.titleTexttoolbar);
+        titleTextView.setText(title);
         database = FirebaseDatabase.getInstance().getReference(link).child(child);
+        emptyView = (LinearLayout) findViewById(R.id.emptyview);
 
         RecyclerView recyclerView = (RecyclerView) findViewById(R.id.listUser);
         recyclerView.setHasFixedSize(true);
@@ -101,7 +113,7 @@ public class DetailUserHobi extends AppCompatActivity {
 
         database.addChildEventListener(childEventListener);
 
-        mAdapter = new HobiUserAdapter(getApplicationContext(), mData, mDataId,
+        mAdapter = new HobiUserAdapter(getApplicationContext(), mData, mDataId,emptyView,
                 new HobiUserAdapter.ClickHandler() {
                     @Override
                     public void onItemClick(int position) {

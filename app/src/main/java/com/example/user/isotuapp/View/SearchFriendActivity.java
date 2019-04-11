@@ -48,6 +48,7 @@ public class SearchFriendActivity extends AppCompatActivity {
     FirebaseUser currentUser;
     private DatabaseReference database;
     private FirebaseAuth mFirebaseAuth;
+    LinearLayout emptyView;
     LinearLayout toFindingFriend, tofindingFaculty, tofindingProvince, ToFindingMajor, toFindingHobi, toFindingOrganisasi;
     private BroadcastReceiver broadcastReceiver;
     private static final long MIN_DISTANCE_CHANGE_FOR_UPDATES = 10; // 10 meters
@@ -80,6 +81,7 @@ public class SearchFriendActivity extends AppCompatActivity {
         mData = new ArrayList<>();
         mDataId = new ArrayList<>();
 
+        emptyView = (LinearLayout) findViewById(R.id.emptyview);
         toFindingFriend = (LinearLayout) findViewById(R.id.to_findingnearby);
         toFindingFriend.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -174,6 +176,12 @@ public class SearchFriendActivity extends AppCompatActivity {
                             mData.add(user);
                         }
 
+                        if(mData !=  null ) {
+                            emptyView.setVisibility(View.GONE);
+                        }else {
+                            emptyView.setVisibility(View.VISIBLE);
+                        }
+
                     }
                     mAdapter = new SearchUserAdapter(getApplicationContext(), mData, mDataId,
                             new SearchUserAdapter.ClickHandler() {
@@ -231,6 +239,7 @@ public class SearchFriendActivity extends AppCompatActivity {
                     if (!user.getUid().equals(fuser.getUid())) {
                         mData.add(user);
                     }
+
                 }
                 mAdapter = new SearchUserAdapter(getApplicationContext(), mData, mDataId,
                         new SearchUserAdapter.ClickHandler() {
@@ -256,6 +265,12 @@ public class SearchFriendActivity extends AppCompatActivity {
                                 return true;
                             }
                         });
+
+                if(mData !=  null ) {
+                    emptyView.setVisibility(View.GONE);
+                }else {
+                    emptyView.setVisibility(View.VISIBLE);
+                }
                 recyclerView.setAdapter(mAdapter);
 
             }
