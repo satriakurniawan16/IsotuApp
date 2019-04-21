@@ -193,7 +193,7 @@ public class FriendProfile extends AppCompatActivity {
 
         database = FirebaseDatabase.getInstance().getReference("hobi").child(iduser);
         databaseorganiasi = FirebaseDatabase.getInstance().getReference("organisasi").child(iduser);
-        databasecontact = FirebaseDatabase.getInstance().getReference("contact").child(currentUser.getUid());
+        databasecontact = FirebaseDatabase.getInstance().getReference("contact").child(currentUser.getUid()).child("contactadded");
         hapusContact.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -296,7 +296,7 @@ public class FriendProfile extends AppCompatActivity {
     }
 
     private void loaddata() {
-        databasecontact = FirebaseDatabase.getInstance().getReference("contact").child(currentUser.getUid());
+        databasecontact = FirebaseDatabase.getInstance().getReference("contact").child(currentUser.getUid()).child("contactadded");
         databasecontact.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {

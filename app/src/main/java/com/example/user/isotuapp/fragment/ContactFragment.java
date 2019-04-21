@@ -111,7 +111,7 @@ public class ContactFragment extends Fragment {
                 new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false);
         recyclerView.setLayoutManager(layoutManager);
 
-        database = FirebaseDatabase.getInstance().getReference("contact").child(currentUser.getUid());
+        database = FirebaseDatabase.getInstance().getReference("contact").child(currentUser.getUid()).child("contactadded");
         database.addChildEventListener(childEventListener);
 
         mAdapter = new ContactAdapter(getContext(), mData, mDataId,emptyView,

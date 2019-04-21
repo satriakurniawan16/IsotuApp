@@ -20,7 +20,7 @@ public class HobiAdapter  extends RecyclerView.Adapter<HobiAdapter.ViewHolder> {
     private ArrayList<String> mDataId;
     private ArrayList<String> mSelectedId;
     public HobiAdapter(Context context, ArrayList<HobiModel> data, ArrayList<String> dataId,
-                              ClickHandler handler) {
+                       ClickHandler handler) {
         mContext = context;
         mData = data;
         mDataId = dataId;

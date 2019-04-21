@@ -43,7 +43,6 @@ import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
-import com.example.user.isotuapp.BuildConfig;
 import com.example.user.isotuapp.Controller.SearchUserAdapter;
 import com.example.user.isotuapp.Controller.ShareAdapter;
 import com.example.user.isotuapp.Model.Contact;
@@ -96,6 +95,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
+import butterknife.BuildConfig;
 import butterknife.OnClick;
 
 public class Dashboard extends AppCompatActivity  {
@@ -108,6 +108,7 @@ public class Dashboard extends AppCompatActivity  {
     View progressOverlay;
     String idpost= "";
     Context context;
+    DatabaseReference databasecontact;
     RecyclerView recyclerView;
     private BroadcastReceiver broadcastReceiver;
     FloatingActionButton fab,fabevent,fab_addfriend;
@@ -733,7 +734,7 @@ public class Dashboard extends AppCompatActivity  {
         idpost = idpostny;
         Toast.makeText(getApplicationContext(), "thissssss", Toast.LENGTH_SHORT).show();
         mData.clear();
-        database = FirebaseDatabase.getInstance().getReference("contact").child(currentUser.getUid());
+        database = FirebaseDatabase.getInstance().getReference("contact").child(currentUser.getUid()).child("contactadded");
         database.addChildEventListener(childEventListener);
         mAdapter = new ShareAdapter(Dashboard.this, mData , mDataId, idpost);
         recyclerView.setAdapter(mAdapter);
@@ -771,7 +772,39 @@ public class Dashboard extends AppCompatActivity  {
     @Override
     protected void onStart() {
         super.onStart();
+        addfirst();
         Intent intent = new Intent(this, LocationService.class);
         bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
+    }
+
+    private void addfirst() {
+        databasecontact = FirebaseDatabase.getInstance().getReference("contact").child(currentUser.getUid()).child("contactadded");
+
+            DatabaseReference dbuser = FirebaseDatabase.getInstance().getReference("user").child(currentUser.getUid());
+            dbuser.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                    User user = dataSnapshot.getValue(User.class);
+                    addContact(new Contact(user.getUid(),user.getFullname(),user.getImage(),user.getJurusan(),user.getJurusan(),user.getSearch()));
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                }
+            });
+
+
+    }
+
+    private void addContact(Contact contact) {
+        databasecontact.child(currentUser.getUid()).setValue(contact).
+                addOnSuccessListener(this, new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                        Toast.makeText(getApplicationContext(),
+                                "Berhasil Ditambahkan", Toast.LENGTH_LONG).show();
+                    }
+                });
     }
 }

@@ -3,15 +3,19 @@ package com.example.user.isotuapp.Controller;
 import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.example.user.isotuapp.Model.Contact;
 import com.example.user.isotuapp.Model.UserHobi;
 import com.example.user.isotuapp.R;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
@@ -23,6 +27,7 @@ public class ContactAdapter  extends RecyclerView.Adapter<ContactAdapter.ViewHol
     private ArrayList<String> mDataId;
     private ArrayList<String> mSelectedId;
     private View mEmptyView;
+
     public ContactAdapter(Context context, ArrayList<Contact> data, ArrayList<String> dataId,View emptyView,
                            ClickHandler handler) {
         mContext = context;
@@ -55,6 +60,14 @@ public class ContactAdapter  extends RecyclerView.Adapter<ContactAdapter.ViewHol
         holder.keteranganTextView.setText(pet.getMajoruser()+", "+pet.getFacultyuser());
         Picasso.get().load(pet.getImageuser()).into(holder.profilImageview);
         holder.itemView.setSelected(mSelectedId.contains(mDataId.get(position)));
+        FirebaseAuth auth = FirebaseAuth.getInstance();
+        FirebaseUser currentUser = auth.getCurrentUser();
+        if(!pet.getUserid().equals(currentUser.getUid())){
+            holder.rootLayout.setVisibility(View.VISIBLE);
+            Log.d("adapterlol", "onBindViewHolder: " + pet.getUserid() +" = "+ currentUser.getUid());
+        }
+
+
     }
 
     @Override
@@ -89,12 +102,14 @@ public class ContactAdapter  extends RecyclerView.Adapter<ContactAdapter.ViewHol
         final TextView nameTextView;
         final TextView keteranganTextView;
         final ImageView profilImageview;
+        final LinearLayout rootLayout;
 
         ViewHolder(View itemView) {
             super(itemView);
             nameTextView = itemView.findViewById(R.id.nama_contact);
             keteranganTextView = itemView.findViewById(R.id.keterangan_contact);
             profilImageview = itemView.findViewById(R.id.image_contact);
+            rootLayout = itemView.findViewById(R.id.rootlayout);
             itemView.setFocusable(true);
             itemView.setOnClickListener(this);
             itemView.setOnLongClickListener(this);

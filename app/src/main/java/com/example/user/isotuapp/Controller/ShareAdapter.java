@@ -14,6 +14,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -138,6 +139,13 @@ public class ShareAdapter  extends RecyclerView.Adapter<ShareAdapter.ViewHolder>
             }
         });
         holder.itemView.setSelected(mSelectedId.contains(mDataId.get(position)));
+
+        FirebaseAuth auth = FirebaseAuth.getInstance();
+        FirebaseUser currentUser = auth.getCurrentUser();
+        if(!pet.getUserid().equals(currentUser.getUid())){
+            holder.rootLayout.setVisibility(View.VISIBLE);
+        }
+
     }
 
     @Override
@@ -171,6 +179,7 @@ public class ShareAdapter  extends RecyclerView.Adapter<ShareAdapter.ViewHolder>
         final TextView keteranganTextView;
         final ImageView profilImageview;
         final Button shareButton;
+        final LinearLayout rootLayout;
 
         ViewHolder(View itemView) {
             super(itemView);
@@ -178,6 +187,7 @@ public class ShareAdapter  extends RecyclerView.Adapter<ShareAdapter.ViewHolder>
             keteranganTextView = itemView.findViewById(R.id.keterangan_contact_share);
             profilImageview = itemView.findViewById(R.id.image_contact_share);
             shareButton = itemView.findViewById(R.id.button_share_post);
+            rootLayout = itemView.findViewById(R.id.rootlayout);
             itemView.setFocusable(true);
         }
     }

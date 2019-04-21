@@ -21,7 +21,7 @@ public class OrganisasiAdapter  extends RecyclerView.Adapter<OrganisasiAdapter.V
     private ArrayList<String> mDataId;
     private ArrayList<String> mSelectedId;
     public OrganisasiAdapter(Context context, ArrayList<Organiasasi> data, ArrayList<String> dataId,
-                       ClickHandler handler) {
+                             ClickHandler handler) {
         mContext = context;
         mData = data;
         mDataId = dataId;
