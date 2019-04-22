@@ -27,17 +27,26 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.example.user.isotuapp.Model.Post;
 import com.example.user.isotuapp.Model.User;
+import com.example.user.isotuapp.Notification.Client;
+import com.example.user.isotuapp.Notification.Data;
+import com.example.user.isotuapp.Notification.MyResponse;
+import com.example.user.isotuapp.Notification.Sender;
+import com.example.user.isotuapp.Notification.Token;
 import com.example.user.isotuapp.R;
 import com.example.user.isotuapp.View.Dashboard;
 import com.example.user.isotuapp.View.DetailUserHobi;
 import com.example.user.isotuapp.View.EditPost;
 import com.example.user.isotuapp.View.FriendProfile;
+import com.example.user.isotuapp.View.MessageActivity;
 import com.example.user.isotuapp.View.PostActivity;
 import com.example.user.isotuapp.View.ShareActivity;
 import com.example.user.isotuapp.View.ShareDetailActivity;
+import com.example.user.isotuapp.fragment.APIService;
 import com.example.user.isotuapp.utils.Constants;
 import com.example.user.isotuapp.utils.FirebaseUtils;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -46,6 +55,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.MutableData;
+import com.google.firebase.database.Query;
 import com.google.firebase.database.Transaction;
 import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Picasso;
@@ -53,6 +63,10 @@ import com.squareup.picasso.Picasso;
 
 import java.util.HashMap;
 import java.util.List;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 import static android.content.Context.MODE_PRIVATE;
 
@@ -62,11 +76,10 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ImageViewHolde
     private List<Post> mPosts;
     boolean statuslike = false ;
     private FirebaseUser firebaseUser;
-
+    APIService apiService;
     public PostAdapter(Context context, List<Post> posts){
         mContext = context;
         mPosts = posts;
-        setHasStableIds(true);
     }
 
     @NonNull
@@ -345,7 +358,12 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ImageViewHolde
                         holder.postLikeLayout.setEnabled(true);
                     }
                 },3000);
-                onLikeClick(model.getPostId());
+                if(model.getType().equals("0")){
+                    onLikeClick(model.getPostId(),model.getUser().getUid());
+                }else if(model.getType().equals("1")){
+                    onLikeClick(model.getPostId(),model.getIduser());
+                }
+
             }
         });
 
@@ -520,14 +538,28 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ImageViewHolde
 
     private void addNotification(String userid, String postid){
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Notifications").child(userid);
-
         HashMap<String, Object> hashMap = new HashMap<>();
-        hashMap.put("userid", firebaseUser.getUid());
-        hashMap.put("text", "liked your post");
+        FirebaseAuth authuser = FirebaseAuth.getInstance();
+        FirebaseUser mUser = authuser.getCurrentUser();
+        String key;
+        key = reference.push().getKey();
+        hashMap.put("id",key);
+        hashMap.put("userid", mUser.getUid());
+        hashMap.put("text", "menyukai unggahan anda");
         hashMap.put("postid", postid);
         hashMap.put("ispost", true);
-
-        reference.push().setValue(hashMap);
+        hashMap.put("type", "0");
+        reference.child(key).setValue(hashMap).addOnSuccessListener(new OnSuccessListener<Void>() {
+            @Override
+            public void onSuccess(Void aVoid) {
+                Toast.makeText(mContext, "Berhasil terimpan", Toast.LENGTH_SHORT).show();
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                Toast.makeText(mContext, "errorpak " , Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     private void deleteNotifications(final String postid, String userid){
@@ -610,9 +642,8 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ImageViewHolde
         });
     }
 
-    private void onLikeClick(final String postId) {
+    private void onLikeClick(final String postId,final String idUser) {
         Log.d("tesketololan", "onLikeClick: " + postId);
-        Toast.makeText(mContext , "terclick", Toast.LENGTH_SHORT).show();
         final DatabaseReference dbuserliked = FirebaseDatabase.getInstance().getReference("userpostliked").child(postId);
         final FirebaseAuth mAuth = FirebaseAuth.getInstance();
         FirebaseUtils.getPostLikedRef(postId)
@@ -638,6 +669,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ImageViewHolde
                                             FirebaseUtils.getPostLikedRef(postId)
                                                     .setValue(null);
                                             dbuserliked.child(mAuth.getUid()).removeValue();
+                                            deleteNotifications(postId,idUser);
                                         }
                                     });
                         } else {
@@ -668,6 +700,8 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ImageViewHolde
                                                     hobiuser.put("fotoprofil",usr.getImage());
                                                     hobiuser.put("namaprofil", usr.getFullname());
                                                     dbuserliked.child(mAuth.getUid()).setValue(hobiuser);
+                                                    addNotification(idUser,postId);
+                                                    sendNotifiaction(idUser,usr.getFullname(),"",idUser);
                                                 }
 
                                                 @Override
@@ -685,6 +719,48 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ImageViewHolde
 
                     }
                 });
+    }
+
+    private void sendNotifiaction(String receiver, final String username, final String message,final String userid){
+        apiService = Client.getClient("https://fcm.googleapis.com/").create(APIService.class);
+        FirebaseAuth mauth = FirebaseAuth.getInstance();
+        final FirebaseUser fuser = mauth.getCurrentUser();
+        DatabaseReference tokens = FirebaseDatabase.getInstance().getReference("Tokens");
+        Query query = tokens.orderByKey().equalTo(receiver);
+        query.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                for (DataSnapshot snapshot : dataSnapshot.getChildren()){
+                    Token token = snapshot.getValue(Token.class);
+                    Data data = new Data(fuser.getUid(), R.mipmap.ic_launcher, username+" menyukai postingan anda"+message, username,
+                            userid);
+
+                    Sender sender = new Sender(data, token.getToken());
+
+                    apiService.sendNotification(sender)
+                            .enqueue(new Callback<MyResponse>() {
+                                @Override
+                                public void onResponse(Call<MyResponse> call, Response<MyResponse> response) {
+                                    if (response.code() == 200){
+                                        if (response.body().success != 1){
+                                            Toast.makeText(mContext, "Failed!", Toast.LENGTH_SHORT).show();
+                                        }
+                                    }
+                                }
+
+                                @Override
+                                public void onFailure(Call<MyResponse> call, Throwable t) {
+
+                                }
+                            });
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
     }
 
 }

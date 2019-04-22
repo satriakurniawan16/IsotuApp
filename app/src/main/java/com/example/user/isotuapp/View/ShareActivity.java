@@ -128,6 +128,8 @@ public class ShareActivity extends AppCompatActivity {
                         Toast.makeText(getApplicationContext(),
                                 "Berhasil Ditambahkan", Toast.LENGTH_LONG).show();
                         pDialog.dismiss();
+                        Intent intent = new Intent(ShareActivity.this,Dashboard.class);
+                        startActivity(intent);
                         finish();
                     }
                 });

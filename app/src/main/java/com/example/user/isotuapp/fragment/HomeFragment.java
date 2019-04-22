@@ -110,8 +110,14 @@ public class HomeFragment extends Fragment {
                 for (DataSnapshot snapshot : dataSnapshot.getChildren()){
                     Post post = snapshot.getValue(Post.class);
                     for (String id : followingList){
-                        if (post.getUser().getUid().equals(id) ){
-                            postList.add(post);
+                        if(post.getType().equals("1")){
+                            if (post.getIduser().equals(id) ) {
+                                postList.add(post);
+                            }
+                        }else if(post.getType().equals("0")){
+                            if (post.getUser().getUid().equals(id) ) {
+                                postList.add(post);
+                            }
                         }
                     }
                 }

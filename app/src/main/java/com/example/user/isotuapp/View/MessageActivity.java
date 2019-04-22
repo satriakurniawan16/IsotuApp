@@ -168,7 +168,7 @@ public class MessageActivity extends AppCompatActivity implements IMethodCaller 
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 for (DataSnapshot snapshot : dataSnapshot.getChildren()){
                     Token token = snapshot.getValue(Token.class);
-                    Data data = new Data(fuser.getUid(), R.mipmap.ic_launcher, username+": "+message, "New Message",
+                    Data data = new Data(fuser.getUid(), R.mipmap.ic_launcher, username+": "+message, "Pesan baru",
                             userid);
 
                     Sender sender = new Sender(data, token.getToken());

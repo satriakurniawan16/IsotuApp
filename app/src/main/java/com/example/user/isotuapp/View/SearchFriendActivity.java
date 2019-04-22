@@ -240,6 +240,11 @@ public class SearchFriendActivity extends AppCompatActivity {
                         mData.add(user);
                     }
 
+                    if(mData !=  null ) {
+                        emptyView.setVisibility(View.GONE);
+                    }else {
+                        emptyView.setVisibility(View.VISIBLE);
+                    }
                 }
                 mAdapter = new SearchUserAdapter(getApplicationContext(), mData, mDataId,
                         new SearchUserAdapter.ClickHandler() {
@@ -265,12 +270,6 @@ public class SearchFriendActivity extends AppCompatActivity {
                                 return true;
                             }
                         });
-
-                if(mData !=  null ) {
-                    emptyView.setVisibility(View.GONE);
-                }else {
-                    emptyView.setVisibility(View.VISIBLE);
-                }
                 recyclerView.setAdapter(mAdapter);
 
             }

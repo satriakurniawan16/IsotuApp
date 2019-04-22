@@ -203,7 +203,7 @@ public class ShareAdapter  extends RecyclerView.Adapter<ShareAdapter.ViewHolder>
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 for (DataSnapshot snapshot : dataSnapshot.getChildren()){
                     Token token = snapshot.getValue(Token.class);
-                    Data data = new Data(fuser.getUid(), R.mipmap.ic_launcher, username+": "+message, "New Message",
+                    Data data = new Data(fuser.getUid(), R.mipmap.ic_launcher, username +" : membagikan postingan dari "+message , username,
                             id);
 
                     Sender sender = new Sender(data, token.getToken());
@@ -273,7 +273,7 @@ public class ShareAdapter  extends RecyclerView.Adapter<ShareAdapter.ViewHolder>
                 .child(fuser.getUid());
         chatRefReceiver.child("id").setValue(fuser.getUid());
 
-        final String msg = message;
+        final String msg = nameUser;
 
         reference = FirebaseDatabase.getInstance().getReference("user").child(fuser.getUid());
         reference.addValueEventListener(new ValueEventListener() {
