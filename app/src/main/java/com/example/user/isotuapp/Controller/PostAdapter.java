@@ -701,8 +701,10 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ImageViewHolde
                                                     hobiuser.put("namaprofil", usr.getFullname());
                                                     dbuserliked.child(mAuth.getUid()).setValue(hobiuser);
                                                     addNotification(idUser,postId);
-                                                    sendNotifiaction(idUser,usr.getFullname(),"",idUser);
-                                                }
+                                                    if(!idUser.equals(mAuth.getUid())){
+                                                        sendNotifiaction(idUser,usr.getFullname(),"",idUser,postId);
+                                                    }
+                                                    }
 
                                                 @Override
                                                 public void onCancelled(@NonNull DatabaseError databaseError) {
@@ -721,7 +723,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ImageViewHolde
                 });
     }
 
-    private void sendNotifiaction(String receiver, final String username, final String message,final String userid){
+    private void sendNotifiaction(String receiver, final String username, final String message,final String userid,final String idpost){
         apiService = Client.getClient("https://fcm.googleapis.com/").create(APIService.class);
         FirebaseAuth mauth = FirebaseAuth.getInstance();
         final FirebaseUser fuser = mauth.getCurrentUser();
@@ -733,7 +735,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ImageViewHolde
                 for (DataSnapshot snapshot : dataSnapshot.getChildren()){
                     Token token = snapshot.getValue(Token.class);
                     Data data = new Data(fuser.getUid(), R.mipmap.ic_launcher, username+" menyukai postingan anda"+message, username,
-                            userid);
+                            userid,"post", idpost);
 
                     Sender sender = new Sender(data, token.getToken());
 

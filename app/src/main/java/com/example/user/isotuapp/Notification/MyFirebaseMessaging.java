@@ -12,7 +12,9 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.NotificationCompat;
 
+import com.example.user.isotuapp.View.FriendProfile;
 import com.example.user.isotuapp.View.MessageActivity;
+import com.example.user.isotuapp.View.PostActivity;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.messaging.FirebaseMessagingService;
@@ -48,12 +50,21 @@ public class MyFirebaseMessaging extends FirebaseMessagingService {
         String icon = remoteMessage.getData().get("icon");
         String title = remoteMessage.getData().get("title");
         String body = remoteMessage.getData().get("body");
+        String type = remoteMessage.getData().get("type");
+        String idnotif = remoteMessage.getData().get("idnotif");
 
         RemoteMessage.Notification notification = remoteMessage.getNotification();
         int j = Integer.parseInt(user.replaceAll("[\\D]", ""));
-        Intent intent = new Intent(this, MessageActivity.class);
+        Intent intent = null;
+        if(type.equals("message")){
+            intent = new Intent(this, MessageActivity.class);
+        }else if(type.equals("post")){
+            intent = new Intent(this,PostActivity.class);
+        }else if(type.equals("profile")){
+            intent = new Intent(this,FriendProfile.class);
+        }
         Bundle bundle = new Bundle();
-        bundle.putString("id", user);
+        bundle.putString("id", idnotif);
         intent.putExtras(bundle);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         PendingIntent pendingIntent = PendingIntent.getActivity(this, j, intent, PendingIntent.FLAG_ONE_SHOT);
@@ -73,15 +84,24 @@ public class MyFirebaseMessaging extends FirebaseMessagingService {
     }
 
     private void sendNotification(RemoteMessage remoteMessage) {
-
         String user = remoteMessage.getData().get("user");
         String icon = remoteMessage.getData().get("icon");
         String title = remoteMessage.getData().get("title");
         String body = remoteMessage.getData().get("body");
+        String type = remoteMessage.getData().get("type");
+        String idnotif = remoteMessage.getData().get("idnotif");
+
 
         RemoteMessage.Notification notification = remoteMessage.getNotification();
         int j = Integer.parseInt(user.replaceAll("[\\D]", ""));
-        Intent intent = new Intent(this, MessageActivity.class);
+        Intent intent = null;
+        if(type.equals("message")){
+            intent = new Intent(this, MessageActivity.class);
+        }else if(type.equals("post")){
+            intent = new Intent(this,PostActivity.class);
+        }else if(type.equals("profile")){
+            intent = new Intent(this,FriendProfile.class);
+        }
         Bundle bundle = new Bundle();
         bundle.putString("id", user);
         intent.putExtras(bundle);

@@ -6,16 +6,37 @@ public class Data {
     private String body;
     private String title;
     private String sented;
+    private String type;
+    private String idnotif;
 
-    public Data(String user, int icon, String body, String title, String sented) {
+
+    public Data(String user, int icon, String body, String title, String sented, String type, String idnotif) {
         this.user = user;
         this.icon = icon;
         this.body = body;
         this.title = title;
         this.sented = sented;
+        this.type = type;
+        this.idnotif = idnotif;
+    }
+
+    public String getIdnotif() {
+        return idnotif;
+    }
+
+    public void setIdnotif(String idnotif) {
+        this.idnotif = idnotif;
     }
 
     public Data() {
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
     }
 
     public String getUser() {

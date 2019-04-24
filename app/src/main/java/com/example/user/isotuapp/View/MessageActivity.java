@@ -169,7 +169,7 @@ public class MessageActivity extends AppCompatActivity implements IMethodCaller 
                 for (DataSnapshot snapshot : dataSnapshot.getChildren()){
                     Token token = snapshot.getValue(Token.class);
                     Data data = new Data(fuser.getUid(), R.mipmap.ic_launcher, username+": "+message, "Pesan baru",
-                            userid);
+                            userid,"message",fuser.getUid());
 
                     Sender sender = new Sender(data, token.getToken());
 

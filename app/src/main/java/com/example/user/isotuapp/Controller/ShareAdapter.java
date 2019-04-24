@@ -142,8 +142,8 @@ public class ShareAdapter  extends RecyclerView.Adapter<ShareAdapter.ViewHolder>
 
         FirebaseAuth auth = FirebaseAuth.getInstance();
         FirebaseUser currentUser = auth.getCurrentUser();
-        if(!pet.getUserid().equals(currentUser.getUid())){
-            holder.rootLayout.setVisibility(View.VISIBLE);
+        if(pet.getUserid().equals(currentUser.getUid())){
+            holder.rootLayout.setVisibility(View.GONE);
         }
 
     }
@@ -204,7 +204,7 @@ public class ShareAdapter  extends RecyclerView.Adapter<ShareAdapter.ViewHolder>
                 for (DataSnapshot snapshot : dataSnapshot.getChildren()){
                     Token token = snapshot.getValue(Token.class);
                     Data data = new Data(fuser.getUid(), R.mipmap.ic_launcher, username +" : membagikan postingan dari "+message , username,
-                            id);
+                            id,"message",fuser.getUid());
 
                     Sender sender = new Sender(data, token.getToken());
 

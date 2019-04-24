@@ -16,7 +16,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.user.isotuapp.Controller.ContactAdapter;
@@ -25,6 +27,7 @@ import com.example.user.isotuapp.Model.Contact;
 import com.example.user.isotuapp.Model.HobiModel;
 import com.example.user.isotuapp.R;
 import com.example.user.isotuapp.View.DetailUserHobi;
+import com.example.user.isotuapp.View.FriendProfile;
 import com.example.user.isotuapp.View.MessageActivity;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -33,6 +36,7 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.squareup.picasso.Picasso;
 
 import java.security.MessageDigest;
 import java.util.ArrayList;
@@ -126,12 +130,44 @@ public class ContactFragment extends Fragment {
                                 mActionMode.invalidate();
                             return;
                         }
-                        Contact pet = mData.get(position);
-                        Intent intent = new Intent(getContext(), MessageActivity.class);
-                        intent.putExtra("image",pet.getImageuser());
-                        intent.putExtra("name",pet.getNameuser());
-                        intent.putExtra("id",pet.getUserid());
-                        startActivity(intent);
+                        final Contact pet = mData.get(position);
+                        AlertDialog.Builder mBuilder = new AlertDialog.Builder(getContext());
+                        View mView = getActivity().getLayoutInflater().inflate(R.layout.modal_user,
+                                null);
+                        ImageView profileImageView = (ImageView) mView.findViewById(R.id.profilepopup);
+                        TextView nameTextView = (TextView) mView.findViewById(R.id.nameuserpopup);
+                        TextView jurusanTextView = (TextView) mView.findViewById(R.id.jurusanpopup);
+                        LinearLayout profileLayout = (LinearLayout) mView.findViewById(R.id.profilebutton);
+                        LinearLayout chatLayout = (LinearLayout) mView.findViewById(R.id.chatbutton);
+                        LinearLayout addLayout = (LinearLayout) mView.findViewById(R.id.addbutton);
+
+                        addLayout.setVisibility(View.GONE);
+                        Picasso.get().load(pet.getImageuser()).into(profileImageView);
+                        nameTextView.setText(pet.getNameuser());
+                        jurusanTextView.setText(pet.getMajoruser());
+                        profileLayout.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                Intent intent = new Intent(getContext(),FriendProfile.class);
+                                intent.putExtra("iduser",pet.getUserid());
+                                startActivity(intent);
+                            }
+                        });
+
+                        chatLayout.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                Intent intent = new Intent(getContext(), MessageActivity.class);
+                                intent.putExtra("image",pet.getImageuser());
+                                intent.putExtra("name",pet.getNameuser());
+                                intent.putExtra("id",pet.getUserid());
+                                startActivity(intent);
+                            }
+                        });
+
+                        mBuilder.setView(mView);
+                        final AlertDialog dialognya = mBuilder.create();
+                        dialognya.show();
                     }
 
                     @Override

@@ -62,8 +62,8 @@ public class ContactAdapter  extends RecyclerView.Adapter<ContactAdapter.ViewHol
         holder.itemView.setSelected(mSelectedId.contains(mDataId.get(position)));
         FirebaseAuth auth = FirebaseAuth.getInstance();
         FirebaseUser currentUser = auth.getCurrentUser();
-        if(!pet.getUserid().equals(currentUser.getUid())){
-            holder.rootLayout.setVisibility(View.VISIBLE);
+        if(pet.getUserid().equals(currentUser.getUid())){
+            holder.rootLayout.setVisibility(View.GONE);
             Log.d("adapterlol", "onBindViewHolder: " + pet.getUserid() +" = "+ currentUser.getUid());
         }
 

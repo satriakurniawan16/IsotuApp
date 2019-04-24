@@ -102,7 +102,8 @@
         <activity android:name=".View.ProdiActivity" />
         <activity android:name=".View.HobiOrganisasi" />
         <activity android:name=".View.EditPost" />
-        <activity android:name=".View.EditEventActivity"></activity>
+        <activity android:name=".View.EditEventActivity" />
+        <activity android:name=".View.NotificationActivity"></activity>
     </application>
 
 </manifest>

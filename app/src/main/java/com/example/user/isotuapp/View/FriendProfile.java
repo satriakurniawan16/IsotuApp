@@ -25,8 +25,17 @@ import com.example.user.isotuapp.Model.Contact;
 import com.example.user.isotuapp.Model.HobiModel;
 import com.example.user.isotuapp.Model.Organiasasi;
 import com.example.user.isotuapp.Model.User;
+import com.example.user.isotuapp.Notification.Client;
+import com.example.user.isotuapp.Notification.Data;
+import com.example.user.isotuapp.Notification.MyResponse;
+import com.example.user.isotuapp.Notification.Sender;
+import com.example.user.isotuapp.Notification.Token;
 import com.example.user.isotuapp.R;
+import com.example.user.isotuapp.fragment.APIService;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.ChildEventListener;
@@ -34,10 +43,16 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class FriendProfile extends AppCompatActivity {
 
@@ -46,6 +61,7 @@ public class FriendProfile extends AppCompatActivity {
     View mRootView;
     private ActionMode mActionMode;
     FirebaseUser currentUser;
+    APIService apiService;
     HobiModel hobi;
     String key ,keyorganiasasi;
     private DatabaseReference database,databaseorganiasi,databasecontact;
@@ -203,6 +219,7 @@ public class FriendProfile extends AppCompatActivity {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
                                 databasecontact.child(iduser).removeValue();
+                                deleteNotifications(iduser,iduser);
                                 addFriend.setText("Tambakan sebagai teman +");
                                 hapusContact.setVisibility(View.GONE);
                             }
@@ -282,13 +299,15 @@ public class FriendProfile extends AppCompatActivity {
     }
 
 
-    private void addContact(Contact contact) {
+    private void addContact(final Contact contact) {
         databasecontact.child(iduser).setValue(contact).
                 addOnSuccessListener(this, new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(Void aVoid) {
                         Toast.makeText(getApplicationContext(),
                                 "Berhasil Ditambahkan", Toast.LENGTH_LONG).show();
+                        addNotification(contact.getUserid(),contact.getUserid(),"Menambahkan anda sebagai teman");
+                        sendNotifiaction(iduser,contact.getNameuser(),"Menambahkan anda ke kontak",iduser,iduser);
                     }
                 });
         addFriend.setText("Sudah berteman");
@@ -355,6 +374,99 @@ public class FriendProfile extends AppCompatActivity {
 
             }
         });
-
     }
+
+    private void addNotification(String userid, String postid,String text){
+        DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Notifications").child(userid);
+        HashMap<String, Object> hashMap = new HashMap<>();
+        FirebaseAuth authuser = FirebaseAuth.getInstance();
+        FirebaseUser mUser = authuser.getCurrentUser();
+        String key;
+        key = reference.push().getKey();
+        hashMap.put("id",key);
+        hashMap.put("userid", mUser.getUid());
+        hashMap.put("text", text);
+        hashMap.put("postid", postid);
+        hashMap.put("ispost", true);
+        hashMap.put("type", "0");
+        reference.child(key).setValue(hashMap).addOnSuccessListener(new OnSuccessListener<Void>() {
+            @Override
+            public void onSuccess(Void aVoid) {
+                Toast.makeText(FriendProfile.this, "Berhasil terimpan", Toast.LENGTH_SHORT).show();
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                Toast.makeText(FriendProfile.this, "errorpak " , Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private void deleteNotifications(final String postid, final String userid){
+        DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Notifications").child(userid);
+        reference.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                for (DataSnapshot snapshot : dataSnapshot.getChildren()){
+                    if (snapshot.child("postid").getValue().equals(postid)){
+                        snapshot.getRef().removeValue()
+                                .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                    @Override
+                                    public void onComplete(@NonNull Task<Void> task) {
+                                        Toast.makeText(FriendProfile.this, "Deleted!", Toast.LENGTH_SHORT).show();
+                                    }
+                                });
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+    }
+
+    private void sendNotifiaction(String receiver, final String username, final String message,final String userid,final String idpost){
+        apiService = Client.getClient("https://fcm.googleapis.com/").create(APIService.class);
+        FirebaseAuth mauth = FirebaseAuth.getInstance();
+        final FirebaseUser fuser = mauth.getCurrentUser();
+        DatabaseReference tokens = FirebaseDatabase.getInstance().getReference("Tokens");
+        Query query = tokens.orderByKey().equalTo(receiver);
+        query.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                for (DataSnapshot snapshot : dataSnapshot.getChildren()){
+                    Token token = snapshot.getValue(Token.class);
+                    Data data = new Data(fuser.getUid(), R.mipmap.ic_launcher, username+" "+message, username,
+                            userid,"profile", idpost);
+
+                    Sender sender = new Sender(data, token.getToken());
+
+                    apiService.sendNotification(sender)
+                            .enqueue(new Callback<MyResponse>() {
+                                @Override
+                                public void onResponse(Call<MyResponse> call, Response<MyResponse> response) {
+                                    if (response.code() == 200){
+                                        if (response.body().success != 1){
+                                            Toast.makeText(FriendProfile.this, "Failed!", Toast.LENGTH_SHORT).show();
+                                        }
+                                    }
+                                }
+
+                                @Override
+                                public void onFailure(Call<MyResponse> call, Throwable t) {
+
+                                }
+                            });
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+    }
+
 }
