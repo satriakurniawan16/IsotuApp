@@ -1,9 +1,18 @@
 package com.example.user.isotuapp.Model;
 
 public class NotifModel {
-    String id,userid,text,postid,ispost,type;
+    String id,userid,text,postid,type;
+    boolean ispost;
 
     public NotifModel() {
+    }
+
+    public boolean isIspost() {
+        return ispost;
+    }
+
+    public void setIspost(boolean ispost) {
+        this.ispost = ispost;
     }
 
     public String getId() {
@@ -36,14 +45,6 @@ public class NotifModel {
 
     public void setPostid(String postid) {
         this.postid = postid;
-    }
-
-    public String getIspost() {
-        return ispost;
-    }
-
-    public void setIspost(String ispost) {
-        this.ispost = ispost;
     }
 
     public String getType() {

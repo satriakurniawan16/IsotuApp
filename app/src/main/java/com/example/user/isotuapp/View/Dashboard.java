@@ -41,11 +41,14 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.user.isotuapp.Controller.SearchUserAdapter;
 import com.example.user.isotuapp.Controller.ShareAdapter;
 import com.example.user.isotuapp.Model.Contact;
+import com.example.user.isotuapp.Model.NotifModel;
 import com.example.user.isotuapp.Model.User;
 import com.example.user.isotuapp.R;
 import com.example.user.isotuapp.fragment.ChatFragment;
@@ -103,12 +106,16 @@ public class Dashboard extends AppCompatActivity  {
     private Toolbar toolbar;
     double latitudeDouble,longitudeDouble;
     private TabLayout tabLayout;
-    FrameLayout addGroup,notification;
+    RelativeLayout addGroup,notification;
+    TextView numberNotif;
     private ViewPager viewPager;
+
+    RelativeLayout numberLayout;
     View progressOverlay;
     String idpost= "";
     Context context;
     DatabaseReference databasecontact;
+    Query databasenotification;
     RecyclerView recyclerView;
     private BroadcastReceiver broadcastReceiver;
     FloatingActionButton fab,fabevent,fab_addfriend;
@@ -220,10 +227,20 @@ public class Dashboard extends AppCompatActivity  {
         getSupportActionBar().setDisplayShowHomeEnabled(true);
 
 //
-//        notification = (FrameLayout) findViewById(R.id.notif);
+        notification = (RelativeLayout) findViewById(R.id.notification_direct);
 //        addGroup = (FrameLayout)findViewById(R.id.grupadd);
 //        addGroup.setVisibility(View.GONE);
 
+        notification.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(Dashboard.this,NotificationActivity.class);
+                startActivity(intent);
+            }
+        });
+
+        numberNotif = (TextView) findViewById(R.id.numberNotification);
+        numberLayout = (RelativeLayout)findViewById(R.id.numberLayout);
         mLayout = (SlidingUpPanelLayout ) findViewById(R.id.sliding_layout_share);
         progressOverlay = (FrameLayout) findViewById(R.id.progress_overlay);
 
@@ -461,6 +478,7 @@ public class Dashboard extends AppCompatActivity  {
     @Override
     protected void onResume() {
         super.onResume();
+        countNotif();
         status("online");
         if (mRequestingLocationUpdates && checkPermissions()) {
             startLocationUpdates();
@@ -707,6 +725,33 @@ public class Dashboard extends AppCompatActivity  {
         int permissionState = ActivityCompat.checkSelfPermission(this,
                 Manifest.permission.ACCESS_FINE_LOCATION);
         return permissionState == PackageManager.PERMISSION_GRANTED;
+    }
+
+    private void countNotif(){
+        databasenotification = FirebaseDatabase.getInstance().getReference("Notifications").child(currentUser.getUid());
+        databasenotification.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                int counter = 0;
+                NotifModel notif = dataSnapshot.getValue(NotifModel.class);
+                for (DataSnapshot snap: dataSnapshot.getChildren()) {
+                    if( snap.child("ispost").getValue(boolean.class) == true){
+                        counter ++ ;
+                    }
+                    Log.d(TAG, "ocountDataNotif: " + snap.child("ispost").getValue(boolean.class) + counter);
+                }
+
+                numberNotif.setText(String.valueOf(counter));
+                if(counter == 0 ){
+                    numberLayout.setVisibility(View.GONE);
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
     }
 
 

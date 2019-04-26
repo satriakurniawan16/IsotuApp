@@ -500,9 +500,9 @@ public class ProdiActivity extends AppCompatActivity {
         hashMap.put("id",key);
         hashMap.put("userid", mUser.getUid());
         hashMap.put("text", text);
-        hashMap.put("postid", postid);
+        hashMap.put("postid", mUser.getUid());
         hashMap.put("ispost", true);
-        hashMap.put("type", "0");
+        hashMap.put("type", "1");
         reference.child(key).setValue(hashMap).addOnSuccessListener(new OnSuccessListener<Void>() {
             @Override
             public void onSuccess(Void aVoid) {

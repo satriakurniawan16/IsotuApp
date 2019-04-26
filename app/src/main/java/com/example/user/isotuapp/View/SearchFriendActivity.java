@@ -18,6 +18,7 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -84,7 +85,7 @@ public class SearchFriendActivity extends AppCompatActivity {
 
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        getSupportActionBar().setTitle("Cari Teman");
+        getSupportActionBar().setTitle("Daftar pengguna");
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         toolbar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
@@ -440,9 +441,9 @@ public class SearchFriendActivity extends AppCompatActivity {
         hashMap.put("id",key);
         hashMap.put("userid", mUser.getUid());
         hashMap.put("text", text);
-        hashMap.put("postid", postid);
+        hashMap.put("postid", mUser.getUid());
         hashMap.put("ispost", true);
-        hashMap.put("type", "0");
+        hashMap.put("type", "1");
         reference.child(key).setValue(hashMap).addOnSuccessListener(new OnSuccessListener<Void>() {
             @Override
             public void onSuccess(Void aVoid) {
