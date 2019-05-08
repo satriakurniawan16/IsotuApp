@@ -3,27 +3,36 @@ package com.example.user.isotuapp.View;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Color;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.ActionMode;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.user.isotuapp.Controller.HobiAdapter;
 import com.example.user.isotuapp.Controller.OrganisasiAdapter;
+import com.example.user.isotuapp.Controller.PostAdapter;
+import com.example.user.isotuapp.Controller.ProfilePostAdapter;
+import com.example.user.isotuapp.Controller.ShareAdapter;
 import com.example.user.isotuapp.Model.Contact;
 import com.example.user.isotuapp.Model.HobiModel;
 import com.example.user.isotuapp.Model.Organiasasi;
+import com.example.user.isotuapp.Model.Post;
 import com.example.user.isotuapp.Model.User;
 import com.example.user.isotuapp.Notification.Client;
 import com.example.user.isotuapp.Notification.Data;
@@ -45,10 +54,12 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
+import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -61,22 +72,75 @@ public class FriendProfile extends AppCompatActivity {
     View mRootView;
     private ActionMode mActionMode;
     FirebaseUser currentUser;
+    String idpost;
     APIService apiService;
     HobiModel hobi;
     String key ,keyorganiasasi;
+    EditText searchUser;
+    boolean statusButt = false;
     private DatabaseReference database,databaseorganiasi,databasecontact;
     String Image;
     Button addFriend;
+    private LinearLayout see_detai_profile;
     private FirebaseAuth mFirebaseAuth;
     LinearLayout hapusContact;
     private ArrayList<HobiModel> mData;
     private ArrayList<String> mDataId;
     private HobiAdapter mAdapter;
 
+    private RecyclerView recyclerView;
+    private ProfilePostAdapter postAdapter;
+    private List<Post> postList;
+    ProgressBar progress_circular;
+    LinearLayout emptyview;
+
+
+    private SlidingUpPanelLayout mLayout;
+
     private ArrayList<Organiasasi> mDataOrganisasi;
     private ArrayList<String> mDataIdOrganisasi;
     private OrganisasiAdapter mAdapterOrganisasi;
     String iduser;
+    View progressOverlay;
+
+
+    private ArrayList<Contact> mDataShare;
+    private ArrayList<String> mDataIdShare;
+    private ShareAdapter mAdapterShare;
+    private ChildEventListener childEventListenerShare = new ChildEventListener() {
+        @Override
+        public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+            mDataShare.add(dataSnapshot.getValue(Contact.class));
+            mDataIdShare.add(dataSnapshot.getKey());
+            mAdapterShare.notifyDataSetChanged();
+        }
+
+        @Override
+        public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+            int pos = mDataId.indexOf(dataSnapshot.getKey());
+            mDataShare.set(pos, dataSnapshot.getValue(Contact.class));
+            mAdapterShare.notifyDataSetChanged();
+        }
+
+        @Override
+        public void onChildRemoved(@NonNull DataSnapshot dataSnapshot) {
+            int pos = mDataId.indexOf(dataSnapshot.getKey());
+            mDataIdShare.remove(pos);
+            mDataShare.remove(pos);
+            mAdapterShare.notifyDataSetChanged();
+        }
+
+        @Override
+        public void onChildMoved(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+        }
+
+        @Override
+        public void onCancelled(@NonNull DatabaseError databaseError) {
+            Toast.makeText(getApplicationContext(), "Tidak Ada Koneksi Internet", Toast.LENGTH_SHORT).show();
+        }
+    };
+
+
 
     private ChildEventListener childEventListener = new ChildEventListener() {
         @Override
@@ -171,6 +235,74 @@ public class FriendProfile extends AppCompatActivity {
         addFriend = (Button) findViewById(R.id.addfriend);
         hapusContact = (LinearLayout) findViewById(R.id.deleteContact);
 
+        recyclerView = findViewById(R.id.listPosting);
+        recyclerView.setHasFixedSize(true);
+        LinearLayoutManager mLayoutManager = new LinearLayoutManager(this);
+        mLayoutManager.setReverseLayout(true);
+        mLayoutManager.setStackFromEnd(true);
+        recyclerView.setLayoutManager(mLayoutManager);
+        postList = new ArrayList<>();
+        postAdapter = new ProfilePostAdapter(FriendProfile.this, postList);
+        recyclerView.setAdapter(postAdapter);
+        emptyview = findViewById(R.id.emptyview);
+
+        progress_circular = findViewById(R.id.progress_circular);
+
+        final LinearLayout profile_detail = findViewById(R.id.profile_detail);
+        see_detai_profile = findViewById(R.id.see_detail_prfile);
+        see_detai_profile.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(statusButt == false){
+                    profile_detail.setVisibility(View.VISIBLE);
+                    ImageView image = findViewById(R.id.imagearrow);
+                    image.setImageResource(R.mipmap.downarrow);
+                    LinearLayout background = findViewById(R.id.background);
+                    background.setBackgroundColor(Color.parseColor("#EEEEEE"));
+                    statusButt = true;
+                }else{
+                    profile_detail.setVisibility(View.GONE);
+                    ImageView image = findViewById(R.id.imagearrow);
+                    image.setImageResource(R.mipmap.rightarrow);
+                    LinearLayout background = findViewById(R.id.background);
+                    background.setBackgroundColor(Color.parseColor("#FFFFFF"));
+                    statusButt = false;
+                }
+            }
+        });
+
+        readPosts();
+
+        mLayout = (SlidingUpPanelLayout) findViewById(R.id.sliding_layout_share);
+        progressOverlay = (FrameLayout) findViewById(R.id.progress_overlay);
+
+        mData = new ArrayList<>();
+        mDataId = new ArrayList<>();
+        searchUser = (EditText) findViewById(R.id.searchuser_topost);
+
+
+        recyclerView = findViewById(R.id.listusertoshare);
+        recyclerView.setHasFixedSize(true);
+        LinearLayoutManager layoutManager =
+                new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
+        recyclerView.setLayoutManager(layoutManager);
+        searchUser.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                searchUsers(s.toString().toLowerCase());
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+            }
+        });
+
 
         addFriend.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -193,9 +325,9 @@ public class FriendProfile extends AppCompatActivity {
 
         RecyclerView recyclerView = findViewById(R.id.friendlisthobi);
         recyclerView.setHasFixedSize(true);
-        LinearLayoutManager layoutManager =
+        LinearLayoutManager mlayoutManager =
                 new LinearLayoutManager(getApplicationContext(), LinearLayoutManager.VERTICAL, false);
-        recyclerView.setLayoutManager(layoutManager);
+        recyclerView.setLayoutManager(mlayoutManager);
 
 
         RecyclerView recyclerViewOrganisasi = findViewById(R.id.friendlistorganisasi);
@@ -468,5 +600,58 @@ public class FriendProfile extends AppCompatActivity {
             }
         });
     }
+
+    private void readPosts(){
+        DatabaseReference reference = FirebaseDatabase.getInstance().getReference("posting");
+        reference.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                postList.clear();
+                for (DataSnapshot snapshot : dataSnapshot.getChildren()){
+                    Post post = snapshot.getValue(Post.class);
+                    if(post.getType().equals("1")){
+                        if (post.getIduser().equals(iduser) ) {
+                            postList.add(post);
+                        }
+                    }else if(post.getType().equals("0")){
+                        if (post.getUser().getUid().equals(iduser) ) {
+                            postList.add(post);
+                        }
+                    }
+                }
+                Log.d("duplicatedata", "onDataChange: " + postList);
+                if(postList.size() == 0 ){
+                    emptyview.setVisibility(View.VISIBLE);
+                }else {
+                    emptyview.setVisibility(View.GONE);
+                }
+                postAdapter.notifyDataSetChanged();
+                progress_circular.setVisibility(View.GONE);
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+    }
+
+    private void searchUsers(String s) {
+        mData.clear();
+        final FirebaseUser fuser = FirebaseAuth.getInstance().getCurrentUser();
+        Query query = FirebaseDatabase.getInstance().getReference("contact").child(currentUser.getUid()).orderByChild("search")
+                .startAt(s)
+                .endAt(s + "\uf8ff");
+
+        if (s.equals("")) {
+            database = FirebaseDatabase.getInstance().getReference("contact").child(currentUser.getUid());
+            database.addChildEventListener(childEventListener);
+        } else {
+            query.addChildEventListener(childEventListener);
+        }
+        mAdapterShare = new ShareAdapter(FriendProfile.this, mDataShare, mDataIdShare, "");
+        recyclerView.setAdapter(mAdapter);
+    }
+
 
 }

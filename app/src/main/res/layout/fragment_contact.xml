@@ -1,36 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".fragment.ContactFragment">
 
-    <LinearLayout
-        android:id="@+id/emptyview"
-        android:layout_width="match_parent"
-        android:orientation="vertical"
-        android:layout_height="match_parent"
-        android:visibility="visible"
-        android:gravity="center">
 
-        <ImageView
-            android:layout_width="100dp"
-            android:layout_height="100dp"
-            android:layout_marginBottom="10dp"
-            android:src="@mipmap/emptycontact"/>
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Belum ada kontak"
-            android:textSize="20dp"
-            />
-
-
-    </LinearLayout>
     <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:nestedScrollingEnabled="true">
+        android:layout_height="wrap_content">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -38,25 +16,67 @@
             android:orientation="vertical"
             android:gravity="center">
 
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Grup"
+                android:layout_margin="5dp"/>
+
+            <LinearLayout
+                android:id="@+id/emptyviewgrup"
+                android:layout_width="match_parent"
+                android:orientation="vertical"
+                android:layout_height="match_parent"
+                android:visibility="visible"
+                android:gravity="center">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="5dp"
+                    android:text="Belum ada grup"
+                    />
+            </LinearLayout>
 
             <android.support.v7.widget.RecyclerView
                 android:id="@+id/listGrup"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:scrollbars="vertical"
                 />
 
+
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Kontak"
+                android:layout_margin="5dp"/>
+
+            <LinearLayout
+                android:id="@+id/emptyview"
+                android:layout_width="match_parent"
+                android:orientation="vertical"
+                android:layout_height="match_parent"
+                android:visibility="visible"
+                android:gravity="center">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="5dp"
+                    android:text="Belum ada kontak"
+                    />
+            </LinearLayout>
 
 
             <android.support.v7.widget.RecyclerView
                 android:id="@+id/listContact"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:scrollbars="vertical"
                 />
 
 
         </LinearLayout>
     </ScrollView>
 
-</RelativeLayout>
+</LinearLayout>

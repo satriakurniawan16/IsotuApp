@@ -1,19 +1,23 @@
 package com.example.user.isotuapp.Controller;
 
+import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.user.isotuapp.Model.Grup;
 import com.example.user.isotuapp.Model.NotifModel;
 import com.example.user.isotuapp.Model.Organiasasi;
 import com.example.user.isotuapp.Model.User;
@@ -29,6 +33,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.messaging.FirebaseMessaging;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
@@ -41,7 +46,7 @@ public class NotificationAdapter  extends RecyclerView.Adapter<NotificationAdapt
     private ArrayList<String> mDataId;
     private ArrayList<String> mSelectedId;
     LinearLayout emptyView;
-
+    boolean join = false;
 
     public NotificationAdapter(Context context, ArrayList<NotifModel> data, ArrayList<String> dataId,
                              ClickHandler handler) {
@@ -91,6 +96,72 @@ public class NotificationAdapter  extends RecyclerView.Adapter<NotificationAdapt
                     Intent intent =  new Intent(mContext,FriendProfile.class);
                     intent.putExtra("iduser",pet.getPostid());
                     mContext.startActivity(intent);
+                }else if(pet.getType().equals("2")){
+
+                    View mView = LayoutInflater.from(mContext).inflate(R.layout.confirmation_grup, null);
+                    AlertDialog.Builder mBuilder = new AlertDialog.Builder(mContext);
+                    mBuilder.setView(mView);
+
+                    final ImageView imageGrup = mView.findViewById(R.id.group_image);
+                    final TextView nameGrup = mView.findViewById(R.id.group_name);
+                    final Button joinButton = (Button) mView.findViewById(R.id.join_grup);
+
+                    final DatabaseReference mygrup = FirebaseDatabase.getInstance().getReference("group").child(FirebaseAuth.getInstance().getCurrentUser().getUid());
+                    mygrup.addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                            for(DataSnapshot ds : dataSnapshot.getChildren()){
+                                Log.d("grupexist", "onDataChange: " + ds);
+                                if(pet.getPostid().equals(ds.getKey())){
+                                    Drawable d = mContext.getResources().getDrawable(R.drawable.button_white);
+                                    joinButton.setBackground(d);
+                                    joinButton.setText("Telah bergabung");
+                                    joinButton.setTextColor(Color.parseColor("#000000"));
+                                    join = true;
+                                }
+                            }
+                        }
+
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                        }
+                    });
+
+
+
+                    DatabaseReference dbgroup = FirebaseDatabase.getInstance().getReference("group").child(pet.getUserid()).child(pet.getPostid());
+                    dbgroup.addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                            final Grup grup = dataSnapshot.getValue(Grup.class);
+                            Picasso.get().load(grup.getImagegrup()).into(imageGrup);
+                            nameGrup.setText(grup.getNamagrup());
+
+                            joinButton.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+                                    if(join == false){
+                                        Drawable d = mContext.getResources().getDrawable(R.drawable.button_white);
+                                        joinButton.setBackground(d);
+                                        joinButton.setText("Telah bergabung");
+                                        joinButton.setTextColor(Color.parseColor("#000000"));
+                                        join = true;
+                                        mygrup.child(pet.getPostid()).setValue(grup);
+                                        FirebaseMessaging.getInstance().subscribeToTopic(pet.getPostid());
+                                    }
+                                }
+                            });
+                        }
+
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                        }
+                    });
+
+                    final AlertDialog dialoglol = mBuilder.create();
+                    dialoglol.show();
                 }
             }
         });

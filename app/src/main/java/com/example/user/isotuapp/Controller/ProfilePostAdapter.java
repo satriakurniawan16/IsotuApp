@@ -5,26 +5,21 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Handler;
 import android.support.annotation.NonNull;
-import android.support.v4.app.FragmentActivity;
 import android.support.v7.widget.RecyclerView;
 import android.text.format.DateUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.PopupMenu;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
-import com.bumptech.glide.request.RequestOptions;
 import com.example.user.isotuapp.Model.Post;
 import com.example.user.isotuapp.Model.User;
 import com.example.user.isotuapp.Notification.Client;
@@ -37,7 +32,6 @@ import com.example.user.isotuapp.View.Dashboard;
 import com.example.user.isotuapp.View.DetailUserHobi;
 import com.example.user.isotuapp.View.EditPost;
 import com.example.user.isotuapp.View.FriendProfile;
-import com.example.user.isotuapp.View.MessageActivity;
 import com.example.user.isotuapp.View.PostActivity;
 import com.example.user.isotuapp.View.ShareActivity;
 import com.example.user.isotuapp.View.ShareDetailActivity;
@@ -60,7 +54,6 @@ import com.google.firebase.database.Transaction;
 import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Picasso;
 
-
 import java.util.HashMap;
 import java.util.List;
 
@@ -68,9 +61,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-import static android.content.Context.MODE_PRIVATE;
-
-public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ImageViewHolder> {
+public class ProfilePostAdapter extends RecyclerView.Adapter<ProfilePostAdapter.ImageViewHolder> {
 
     private Context mContext;
     private List<Post> mPosts;
@@ -78,20 +69,20 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ImageViewHolde
     private FirebaseUser firebaseUser;
     APIService apiService;
 
-    public PostAdapter(Context context, List<Post> posts) {
+    public ProfilePostAdapter(Context context, List<Post> posts) {
         mContext = context;
         mPosts = posts;
     }
 
     @NonNull
     @Override
-    public PostAdapter.ImageViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+    public ProfilePostAdapter.ImageViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(mContext).inflate(R.layout.list_item_post, parent, false);
-        return new PostAdapter.ImageViewHolder(view);
+        return new ProfilePostAdapter.ImageViewHolder(view);
     }
 
     @Override
-    public void onBindViewHolder(@NonNull final PostAdapter.ImageViewHolder holder, final int position) {
+    public void onBindViewHolder(@NonNull final ProfilePostAdapter.ImageViewHolder holder, final int position) {
         final String id;
         final Post model = mPosts.get(position);
         FirebaseAuth auth = FirebaseAuth.getInstance();
@@ -425,7 +416,10 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ImageViewHolde
                     @Override
                     public void onClick(View v) {
                         dialog.dismiss();
-                        ((Dashboard) mContext).getSliding(model.getPostId());
+                        Intent intent = new Intent(mContext, PostActivity.class);
+                        intent.putExtra(Constants.EXTRA_POST, model.getPostId());
+                        intent.putExtra("share", "true");
+                        mContext.startActivity(intent);
                     }
                 });
                 shareHome.setOnClickListener(new View.OnClickListener() {

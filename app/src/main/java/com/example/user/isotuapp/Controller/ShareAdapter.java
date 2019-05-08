@@ -19,6 +19,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.user.isotuapp.Model.Contact;
+import com.example.user.isotuapp.Model.HobiModel;
 import com.example.user.isotuapp.Model.Post;
 import com.example.user.isotuapp.Model.User;
 import com.example.user.isotuapp.Notification.Client;
@@ -28,6 +29,7 @@ import com.example.user.isotuapp.Notification.Sender;
 import com.example.user.isotuapp.Notification.Token;
 import com.example.user.isotuapp.R;
 import com.example.user.isotuapp.View.Dashboard;
+import com.example.user.isotuapp.View.FriendProfile;
 import com.example.user.isotuapp.View.MessageActivity;
 import com.example.user.isotuapp.fragment.APIService;
 import com.example.user.isotuapp.utils.IMethodCaller;
@@ -69,6 +71,7 @@ public class ShareAdapter  extends RecyclerView.Adapter<ShareAdapter.ViewHolder>
         mSelectedId = new ArrayList<>();
         mIdpost = idpost;
     }
+
 
     @NonNull
     @Override

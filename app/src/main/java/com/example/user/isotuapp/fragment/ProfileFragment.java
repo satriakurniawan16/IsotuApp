@@ -5,6 +5,7 @@ import android.content.ContentUris;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -24,14 +25,18 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.user.isotuapp.Controller.HobiAdapter;
 import com.example.user.isotuapp.Controller.OrganisasiAdapter;
+import com.example.user.isotuapp.Controller.PostAdapter;
 import com.example.user.isotuapp.Model.HobiModel;
 import com.example.user.isotuapp.Model.Organiasasi;
+import com.example.user.isotuapp.Model.Post;
 import com.example.user.isotuapp.Model.User;
 import com.example.user.isotuapp.Model.UserHobi;
 import com.example.user.isotuapp.R;
@@ -39,6 +44,7 @@ import com.example.user.isotuapp.View.DetailUserHobi;
 import com.example.user.isotuapp.View.EditProfil;
 import com.example.user.isotuapp.View.LoginScreen;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.vision.text.Line;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.ChildEventListener;
@@ -51,6 +57,7 @@ import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 import static android.text.TextUtils.isEmpty;
 
@@ -65,7 +72,8 @@ public class ProfileFragment extends Fragment {
     private ArrayList<HobiModel> mData;
     private ArrayList<String> mDataId;
     private HobiAdapter mAdapter;
-
+    boolean status = false ;
+    private LinearLayout see_detai_profile;
 
     private ArrayList<Organiasasi> mDataOrganisasi;
     private ArrayList<String> mDataIdOrganisasi;
@@ -81,6 +89,19 @@ public class ProfileFragment extends Fragment {
     private DatabaseReference database,databaseuserhobi,databaseorganiasi;
     String Image;
     private FirebaseAuth mFirebaseAuth;
+
+    private RecyclerView recyclerView;
+    private PostAdapter postAdapter;
+    private List<Post> postList;
+
+    private RecyclerView recyclerView_story;
+
+    private List<String> followingList;
+
+
+    ProgressBar progress_circular;
+    LinearLayout emptyview;
+
 
     private String[] daftarhobi = {
             "Membaca",
@@ -177,6 +198,19 @@ public class ProfileFragment extends Fragment {
         mFirebaseAuth=FirebaseAuth.getInstance();
         currentUser = FirebaseAuth.getInstance().getCurrentUser();
 
+        recyclerView = mRootView.findViewById(R.id.listPosting);
+        recyclerView.setHasFixedSize(true);
+        LinearLayoutManager mLayoutManager = new LinearLayoutManager(getContext());
+        mLayoutManager.setReverseLayout(true);
+        mLayoutManager.setStackFromEnd(true);
+        recyclerView.setLayoutManager(mLayoutManager);
+        postList = new ArrayList<>();
+        postAdapter = new PostAdapter(getContext(), postList);
+        recyclerView.setAdapter(postAdapter);
+        emptyview = mRootView.findViewById(R.id.emptyview);
+
+        progress_circular = mRootView.findViewById(R.id.progress_circular);
+
         mData = new ArrayList<>();
         mDataId = new ArrayList<>();
         mDataOrganisasi = new ArrayList<>();
@@ -201,6 +235,7 @@ public class ProfileFragment extends Fragment {
                 logOut();
             }
         });
+
         RecyclerView recyclerView = mRootView.findViewById(R.id.listhobi);
         recyclerView.setHasFixedSize(true);
         LinearLayoutManager layoutManager =
@@ -216,7 +251,30 @@ public class ProfileFragment extends Fragment {
 
 
         loadProfile();
+        final LinearLayout profile_detail = mRootView.findViewById(R.id.profile_detail);
+        see_detai_profile = mRootView.findViewById(R.id.see_detail_prfile);
+        see_detai_profile.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(status == false){
+                    profile_detail.setVisibility(View.VISIBLE);
+                    ImageView image = mRootView.findViewById(R.id.imagearrow);
+                    image.setImageResource(R.mipmap.downarrow);
+                    LinearLayout background = mRootView.findViewById(R.id.background);
+                    background.setBackgroundColor(Color.parseColor("#EEEEEE"));
+                    status = true;
+                }else{
+                    profile_detail.setVisibility(View.GONE);
+                    ImageView image = mRootView.findViewById(R.id.imagearrow);
+                    image.setImageResource(R.mipmap.rightarrow);
+                    LinearLayout background = mRootView.findViewById(R.id.background);
+                    background.setBackgroundColor(Color.parseColor("#FFFFFF"));
+                    status = false;
+                }
+            }
+        });
 
+        readPosts();
 
         database = FirebaseDatabase.getInstance().getReference("hobi").child(currentUser.getUid());
         databaseorganiasi = FirebaseDatabase.getInstance().getReference("organisasi").child(currentUser.getUid());
@@ -679,5 +737,39 @@ public class ProfileFragment extends Fragment {
             });
     }
 
+    private void readPosts(){
+        DatabaseReference reference = FirebaseDatabase.getInstance().getReference("posting");
+        reference.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                postList.clear();
+                for (DataSnapshot snapshot : dataSnapshot.getChildren()){
+                    Post post = snapshot.getValue(Post.class);
+                        if(post.getType().equals("1")){
+                            if (post.getIduser().equals(currentUser.getUid()) ) {
+                                postList.add(post);
+                            }
+                        }else if(post.getType().equals("0")){
+                            if (post.getUser().getUid().equals(currentUser.getUid()) ) {
+                                postList.add(post);
+                            }
+                        }
+                }
+                Log.d("duplicatedata", "onDataChange: " + postList);
+                if(postList.size() == 0 ){
+                    emptyview.setVisibility(View.VISIBLE);
+                }else {
+                    emptyview.setVisibility(View.GONE);
+                }
+                postAdapter.notifyDataSetChanged();
+                progress_circular.setVisibility(View.GONE);
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+    }
 
 }

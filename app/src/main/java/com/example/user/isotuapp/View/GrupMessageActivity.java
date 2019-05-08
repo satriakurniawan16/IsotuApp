@@ -12,13 +12,16 @@ import android.support.v7.widget.Toolbar;
 import android.view.ActionMode;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.example.user.isotuapp.Controller.GrupMessageAdapter;
 import com.example.user.isotuapp.Controller.MessageAdapter;
 import com.example.user.isotuapp.Model.Chat;
+import com.example.user.isotuapp.Model.Grup;
 import com.example.user.isotuapp.Model.Post;
 import com.example.user.isotuapp.Model.User;
 import com.example.user.isotuapp.Notification.Client;
@@ -38,6 +41,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.messaging.FirebaseMessaging;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
@@ -49,18 +53,19 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class MessageActivity extends AppCompatActivity implements IMethodCaller {
+public class GrupMessageActivity extends AppCompatActivity implements IMethodCaller {
 
     CircleImageView profile_image;
     TextView username;
 
+    ImageView setting;
     FirebaseUser fuser;
     DatabaseReference reference;
 
     LinearLayout btn_send;
     EditText text_send;
 
-    MessageAdapter messageAdapter;
+    GrupMessageAdapter messageAdapter;
     List<Chat> mchat;
 
     RecyclerView recyclerView;
@@ -82,7 +87,7 @@ public class MessageActivity extends AppCompatActivity implements IMethodCaller 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_message);
+        setContentView(R.layout.activity_grup_message);
 
         Toolbar toolbar = findViewById(R.id.toolbar);
         toolbar.setTitle("Cari Teman");
@@ -93,7 +98,7 @@ public class MessageActivity extends AppCompatActivity implements IMethodCaller 
             @Override
             public void onClick(View view) {
                 // and this
-                startActivity(new Intent(MessageActivity.this, Dashboard.class).setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
+                startActivity(new Intent(GrupMessageActivity .this, Dashboard.class).setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
             }
         });
 
@@ -110,26 +115,46 @@ public class MessageActivity extends AppCompatActivity implements IMethodCaller 
         btn_send = findViewById(R.id.btn_send);
         text_send = findViewById(R.id.text_send);
 
+        setting = findViewById(R.id.setting);
+        setting.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                AlertDialog.Builder mBuilder = new AlertDialog.Builder(GrupMessageActivity.this);
+
+                View mView = getLayoutInflater().inflate(R.layout.modal_setting_grup,
+                        null);
+
+                TextView settingEdit = mView.findViewById(R.id.settingedit);
+                TextView settingMember = mView.findViewById(R.id.settingmember);
+                TextView settingInvite = mView.findViewById(R.id.settinginvite);
+                TextView settingExit = mView.findViewById(R.id.settingexit);
+
+                
+
+                mBuilder.setView(mView);
+                final AlertDialog dialognya = mBuilder.create();
+                dialognya.show();
+            }
+        });
+
         intent = getIntent();
         userid = intent.getStringExtra("id");
 
         fuser = FirebaseAuth.getInstance().getCurrentUser();
 
-        reference = FirebaseDatabase.getInstance().getReference("user").child(userid);
+        reference = FirebaseDatabase.getInstance().getReference("group").child(fuser.getUid()).child(userid);
 
         reference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                User user = dataSnapshot.getValue(User.class);
-                username.setText(user.getFullname());
-                if (user.getImage().equals("default")){
+                Grup user = dataSnapshot.getValue(Grup.class);
+                username.setText(user.getNamagrup());
+                if (user.getImagegrup().equals("default")){
                     profile_image.setImageResource(R.mipmap.ic_launcher);
                 } else {
                     //and this
-                    Glide.with(getApplicationContext()).load(user.getImage()).into(profile_image);
+                    Glide.with(getApplicationContext()).load(user.getImagegrup()).into(profile_image);
                 }
-
-                readMesagges(fuser.getUid(), userid, user.getImage());
             }
 
             @Override
@@ -138,6 +163,8 @@ public class MessageActivity extends AppCompatActivity implements IMethodCaller 
             }
         });
 
+
+        readMesagges(fuser.getUid(), userid, "");
         seenMessage(userid);
 
 
@@ -150,7 +177,7 @@ public class MessageActivity extends AppCompatActivity implements IMethodCaller 
                 if (!msg.equals("")){
                     sendMessage(fuser.getUid(), userid, msg,"","","");
                 } else {
-                    Toast.makeText(MessageActivity.this, "You can't send empty message", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(GrupMessageActivity.this, "You can't send empty message", Toast.LENGTH_SHORT).show();
                 }
                 text_send.setText("");
             }
@@ -169,9 +196,9 @@ public class MessageActivity extends AppCompatActivity implements IMethodCaller 
                 for (DataSnapshot snapshot : dataSnapshot.getChildren()){
                     Token token = snapshot.getValue(Token.class);
                     Data data = new Data(fuser.getUid(), R.mipmap.ic_launcher, username+": "+message, "Pesan baru",
-                            userid,"message",fuser.getUid());
+                            userid,"newgrup",fuser.getUid());
 
-                    Sender sender = new Sender(data, token.getToken());
+                    Sender sender = new Sender(data, "topics/"+userid);
 
                     apiService.sendNotification(sender)
                             .enqueue(new Callback<MyResponse>() {
@@ -179,7 +206,7 @@ public class MessageActivity extends AppCompatActivity implements IMethodCaller 
                                 public void onResponse(Call<MyResponse> call, Response<MyResponse> response) {
                                     if (response.code() == 200){
                                         if (response.body().success != 1){
-                                            Toast.makeText(MessageActivity.this, "Failed!", Toast.LENGTH_SHORT).show();
+                                            Toast.makeText(GrupMessageActivity.this, "Failed!", Toast.LENGTH_SHORT).show();
                                         }
                                     }
                                 }
@@ -231,17 +258,16 @@ public class MessageActivity extends AppCompatActivity implements IMethodCaller 
                 mchat.clear();
                 for (DataSnapshot snapshot : dataSnapshot.getChildren()){
                     final Chat chat = snapshot.getValue(Chat.class);
-                    if (chat.getReceiver().equals(myid) && chat.getSender().equals(userid) ||
-                            chat.getReceiver().equals(userid) && chat.getSender().equals(myid)){
+                    if (chat.getReceiver().equals(userid)){
                         mchat.add(chat);
                     }
 
-                    messageAdapter = new MessageAdapter(MessageActivity.this, mchat, imageurl, new MessageAdapter.ClickHandler() {
+                    messageAdapter = new GrupMessageAdapter(GrupMessageActivity.this, mchat, new GrupMessageAdapter.ClickHandler() {
                         @Override
                         public void onItemClick(int position) {
                             Chat chat1 = mchat.get(position);
                             if(!chat1.getIdpost().equals("")){
-                                Intent intent = new Intent(MessageActivity.this,PostActivity.class);
+                                Intent intent = new Intent(GrupMessageActivity.this,PostActivity.class);
                                 intent.putExtra(Constants.EXTRA_POST,chat1.getIdpost());
                                 startActivity(intent);
                             }
@@ -250,7 +276,7 @@ public class MessageActivity extends AppCompatActivity implements IMethodCaller 
                         @Override
                         public boolean onItemLongClick(int position) {
                             if (mActionMode != null) return false;
-                            AlertDialog.Builder mBuilder = new AlertDialog.Builder(MessageActivity.this);
+                            AlertDialog.Builder mBuilder = new AlertDialog.Builder(GrupMessageActivity.this);
 
                             View mView = getLayoutInflater().inflate(R.layout.popup_message,
                                     null);
@@ -301,6 +327,10 @@ public class MessageActivity extends AppCompatActivity implements IMethodCaller 
         currentUser("none");
     }
 
+    @Override
+    protected void onStart() {
+        super.onStart();
+    }
 
     @Override
     public void sendMessage(String sender, final String receiver, String message, String imagePost,String nameUser,String idpost) {
@@ -328,7 +358,7 @@ public class MessageActivity extends AppCompatActivity implements IMethodCaller 
                 if (!dataSnapshot.exists()){
                     final HashMap<String, Object> user= new HashMap<>();
                     user.put("id",userid);
-                    user.put("type","message");
+                    user.put("type","grup");
                     chatRef.setValue(user);
                 }
             }

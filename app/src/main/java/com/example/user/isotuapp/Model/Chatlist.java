@@ -4,8 +4,17 @@ import java.io.Serializable;
 
 public class Chatlist implements Serializable {
     public String id;
+    public String type;
 
     public Chatlist() {
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
     }
 
     public Chatlist(String id) {

@@ -5,11 +5,22 @@
     android:padding="8dp"
     android:layout_height="wrap_content">
 
+
     <de.hdodenhof.circleimageview.CircleImageView
         android:layout_width="40dp"
         android:layout_height="40dp"
         android:id="@+id/profile_image"
         android:src="@mipmap/ic_launcher"/>
+
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="5dp"
+        android:id="@+id/name_user"
+        android:text="Rahmad"
+        android:layout_toRightOf="@id/profile_image"
+        android:textColor="#000"/>
 
     <LinearLayout
         android:id="@+id/messageLayout"
@@ -17,13 +28,16 @@
         android:layout_height="wrap_content"
         android:orientation="vertical"
         android:layout_toRightOf="@id/profile_image"
+        android:layout_below="@+id/name_user"
         android:layout_marginLeft="5dp"
         android:background="@drawable/background_left"
         >
+
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_margin="5dp"
+            android:visibility="gone"
             android:id="@+id/status_share"
             android:text="dibagikan"/>
     <TextView

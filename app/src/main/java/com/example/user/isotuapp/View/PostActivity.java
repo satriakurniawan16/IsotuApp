@@ -144,7 +144,7 @@ public class PostActivity extends AppCompatActivity {
         mDataId = new ArrayList<>();
         searchUser = (EditText) findViewById(R.id.searchuser_topost);
 
-        
+
         recyclerView = findViewById(R.id.listusertoshare);
         recyclerView.setHasFixedSize(true);
         LinearLayoutManager layoutManager =
@@ -540,7 +540,7 @@ public class PostActivity extends AppCompatActivity {
         final Utils utils = new Utils(this);
         Toast.makeText(getApplicationContext(), "thissssss", Toast.LENGTH_SHORT).show();
         mData.clear();
-        database = FirebaseDatabase.getInstance().getReference("contact").child(currentUser.getUid());
+        database = FirebaseDatabase.getInstance().getReference("contact").child(currentUser.getUid()).child("contactadded");
         database.addChildEventListener(childEventListener);
         mAdapter = new ShareAdapter(PostActivity.this, mData, mDataId, idpost);
         recyclerView.setAdapter(mAdapter);
@@ -623,7 +623,16 @@ public class PostActivity extends AppCompatActivity {
         });
     }
 
-    private void sendNotifiaction(String receiver, final String username, final String message,final String userid,final String idpost){
+    @Override
+    protected void onStart() {
+        super.onStart();
+        Intent intent = getIntent();
+        if(intent.getStringExtra("share")!=null){
+            getSliding("");
+        }
+    }
+
+    private void sendNotifiaction(String receiver, final String username, final String message, final String userid, final String idpost){
         apiService = Client.getClient("https://fcm.googleapis.com/").create(APIService.class);
         FirebaseAuth mauth = FirebaseAuth.getInstance();
         final FirebaseUser fuser = mauth.getCurrentUser();

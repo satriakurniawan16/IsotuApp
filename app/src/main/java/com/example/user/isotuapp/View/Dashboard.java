@@ -228,8 +228,16 @@ public class Dashboard extends AppCompatActivity  {
 
 //
         notification = (RelativeLayout) findViewById(R.id.notification_direct);
-//        addGroup = (FrameLayout)findViewById(R.id.grupadd);
-//        addGroup.setVisibility(View.GONE);
+        addGroup = (RelativeLayout) findViewById(R.id.addgrupdirect);
+        addGroup.setVisibility(View.GONE);
+
+        addGroup.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(Dashboard.this,GroupActivity.class);
+                startActivity(intent);
+            }
+        });
 
         notification.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -352,35 +360,35 @@ public class Dashboard extends AppCompatActivity  {
                         fab.setVisibility(View.VISIBLE);
                         fab_addfriend.setVisibility(View.GONE);
                         fabevent.setVisibility(View.GONE);
-//                        addGroup.setVisibility(View.GONE);
+                        addGroup.setVisibility(View.GONE);
                         break;
                     case 1:
                         toolbar.setTitle("Contact");
                         fab.setVisibility(View.GONE);
                         fabevent.setVisibility(View.GONE);
                         fab_addfriend.setVisibility(View.VISIBLE);
-//                        addGroup.setVisibility(View.VISIBLE);
+                        addGroup.setVisibility(View.VISIBLE);
                         break;
                     case 2:
                         toolbar.setTitle("Chat");
                         fab.setVisibility(View.GONE);
                         fabevent.setVisibility(View.GONE);
                         fab_addfriend.setVisibility(View.GONE);
-//                        addGroup.setVisibility(View.GONE);
+                        addGroup.setVisibility(View.GONE);
                         break;
                     case 3:
                         toolbar.setTitle("Event");
                         fab.setVisibility(View.GONE);
                         fab_addfriend.setVisibility(View.GONE);
                         fabevent.setVisibility(View.VISIBLE);
-//                        addGroup.setVisibility(View.GONE);
+                        addGroup.setVisibility(View.GONE);
                         break;
                     case 4:
                         toolbar.setTitle("Profile");
                         fab.setVisibility(View.GONE);
                         fabevent.setVisibility(View.GONE);
                         fab_addfriend.setVisibility(View.GONE);
-//                        addGroup.setVisibility(View.GONE);
+                        addGroup.setVisibility(View.GONE);
                         break;
                 }
             }
@@ -799,12 +807,12 @@ public class Dashboard extends AppCompatActivity  {
     private void searchUsers(String s) {
         mData.clear();
         final FirebaseUser fuser = FirebaseAuth.getInstance().getCurrentUser();
-        Query query = FirebaseDatabase.getInstance().getReference("contact").child(currentUser.getUid()).orderByChild("search")
+        Query query = FirebaseDatabase.getInstance().getReference("contact").child(currentUser.getUid()).child("contactadded").orderByChild("search")
                 .startAt(s)
                 .endAt(s+"\uf8ff");
 
         if(s.equals("")){
-            database = FirebaseDatabase.getInstance().getReference("contact").child(currentUser.getUid());
+            database = FirebaseDatabase.getInstance().getReference("contact").child(currentUser.getUid()).child("contactadded");
             database.addChildEventListener(childEventListener);
         }else{
             query.addChildEventListener(childEventListener);

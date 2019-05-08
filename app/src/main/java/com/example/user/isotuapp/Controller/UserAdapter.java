@@ -13,8 +13,12 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.example.user.isotuapp.Model.Chat;
+import com.example.user.isotuapp.Model.Chatlist;
+import com.example.user.isotuapp.Model.Contact;
+import com.example.user.isotuapp.Model.Grup;
 import com.example.user.isotuapp.Model.User;
 import com.example.user.isotuapp.R;
+import com.example.user.isotuapp.View.GrupMessageActivity;
 import com.example.user.isotuapp.View.MessageActivity;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -24,21 +28,51 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder> {
 
     private Context mContext;
-    private List<User> mUsers;
+    private ClickHandler mClickHandler;
+    private ArrayList<Chatlist> mData;
+    private ArrayList<String> mDataId;
+    private ArrayList<String> mSelectedId;
+    private View mEmptyView;
     private boolean ischat;
 
-    String theLastMessage;
+    String theLastMessage,nameUser,fullname;
 
-    public UserAdapter(Context mContext, List<User> mUsers, boolean ischat){
-        this.mUsers = mUsers;
-        this.mContext = mContext;
+    public UserAdapter(Context context, ArrayList<Chatlist> data, ArrayList<String> dataId,View emptyView,boolean ischat,
+                          UserAdapter.ClickHandler handler) {
+        mContext = context;
+        mData = data;
+        mDataId = dataId;
+        mClickHandler = handler;
+        mSelectedId = new ArrayList<>();
+        mEmptyView = emptyView;
         this.ischat = ischat;
     }
+
+    public void updateEmptyView() {
+        if (mData.size() == 0)
+            mEmptyView.setVisibility(View.VISIBLE);
+        else
+            mEmptyView.setVisibility(View.GONE);
+    }
+
+    public void toggleSelection(String dataId) {
+        if (mSelectedId.contains(dataId))
+            mSelectedId.remove(dataId);
+        else
+            mSelectedId.add(dataId);
+        notifyDataSetChanged();
+    }
+
+    public int selectionCount() {
+        return mSelectedId.size();
+    }
+
 
     @NonNull
     @Override
@@ -48,54 +82,108 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder> {
     }
 
     @Override
-    public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull final ViewHolder holder, int position) {
+        final Chatlist chatlist = mData.get(position);
+        if(chatlist.getType().equals("message")){
+            DatabaseReference dbuser = FirebaseDatabase.getInstance().getReference("user").child(chatlist.getId());
+            dbuser.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                    final User user = dataSnapshot.getValue(User.class);
+                    holder.username.setText(user.getFullname());
+                    Log.d("tolo", "isi"+user.getEmail());
+                    if (user.getImage().equals("default")){
+                        holder.profile_image.setImageResource(R.mipmap.ic_launcher);
+                    } else {
+                        Glide.with(mContext).load(user.getImage()).into(holder.profile_image);
+                    }
 
-        final User user = mUsers.get(position);
-        holder.username.setText(user.getFullname());
-        Log.d("tolo", "isi"+user.getEmail());
-        if (user.getImage().equals("default")){
-            holder.profile_image.setImageResource(R.mipmap.ic_launcher);
-        } else {
-            Glide.with(mContext).load(user.getImage()).into(holder.profile_image);
-        }
+                    if (ischat){
+                        lastMessage(user.getUid(), holder.last_msg,"message");
+                    } else {
+                        holder.last_msg.setVisibility(View.GONE);
+                    }
 
-        if (ischat){
-            lastMessage(user.getUid(), holder.last_msg);
-        } else {
-            holder.last_msg.setVisibility(View.GONE);
-        }
-
-        if (ischat) {
-            if (user.getStatus() != null) {
-                if (user.getStatus().equals("online")) {
-                    holder.img_on.setVisibility(View.VISIBLE);
-                    holder.img_off.setVisibility(View.GONE);
-                } else {
-                    holder.img_on.setVisibility(View.GONE);
-                    holder.img_off.setVisibility(View.VISIBLE);
+                    if (ischat) {
+                        if (user.getStatus() != null) {
+                            if (user.getStatus().equals("online")) {
+                                holder.img_on.setVisibility(View.VISIBLE);
+                                holder.img_off.setVisibility(View.GONE);
+                            } else {
+                                holder.img_on.setVisibility(View.GONE);
+                                holder.img_off.setVisibility(View.VISIBLE);
+                            }
+                        } else {
+                            holder.img_on.setVisibility(View.GONE);
+                            holder.img_off.setVisibility(View.GONE);
+                        }
+                    }
+                    holder.itemView.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+                            Log.d("tolol", "onClick: ");
+                            Intent intent = new Intent(mContext, MessageActivity.class);
+                            intent.putExtra("id",user.getUid());
+                            mContext.startActivity(intent);
+                        }
+                    });
                 }
-            } else {
-                holder.img_on.setVisibility(View.GONE);
-                holder.img_off.setVisibility(View.GONE);
-            }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                }
+            });
+        }else if(chatlist.getType().equals("grup")){
+            final Chatlist grup = mData.get(position);
+            DatabaseReference dbgrup = FirebaseDatabase.getInstance().getReference("group").child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child(grup.getId());
+            holder.img_on.setVisibility(View.GONE);
+            holder.img_off.setVisibility(View.GONE);
+            dbgrup.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                    final Grup newGrup = dataSnapshot.getValue(Grup.class);
+                    holder.username.setText(newGrup.getNamagrup());
+                    if (newGrup.getImagegrup().equals("default")){
+                        holder.profile_image.setImageResource(R.mipmap.ic_launcher);
+                    } else {
+                        Glide.with(mContext).load(newGrup.getImagegrup()).into(holder.profile_image);
+                    }
+
+                    if (ischat){
+                        lastMessage(newGrup.getIdgrup(), holder.last_msg,"grup");
+                    } else {
+                        holder.last_msg.setVisibility(View.GONE);
+                    }
+
+                    holder.itemView.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+                            Log.d("tolol", "onClick: ");
+                            Intent intent = new Intent(mContext, GrupMessageActivity.class);
+                            intent.putExtra("id",newGrup.getIdgrup());
+                            mContext.startActivity(intent);
+                        }
+                    });
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                }
+            });
         }
-        holder.itemView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Log.d("tolol", "onClick: ");
-                Intent intent = new Intent(mContext, MessageActivity.class);
-                intent.putExtra("id",user.getUid());
-                mContext.startActivity(intent);
-            }
-        });
+
     }
 
     @Override
     public int getItemCount() {
-        return mUsers.size();
+        return mData.size();
     }
 
-    public  class ViewHolder extends RecyclerView.ViewHolder{
+    public  class ViewHolder extends RecyclerView.ViewHolder implements
+            View.OnClickListener,
+            View.OnLongClickListener {
 
         public TextView username;
         public ImageView profile_image;
@@ -112,10 +200,19 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder> {
             img_off = itemView.findViewById(R.id.img_off);
             last_msg = itemView.findViewById(R.id.last_msg);
         }
+        @Override
+        public void onClick(View itemView) {
+            mClickHandler.onItemClick(getAdapterPosition());
+        }
+
+        @Override
+        public boolean onLongClick(View v) {
+            return mClickHandler.onItemLongClick(getAdapterPosition());
+        }
     }
 
     //check for last message
-    private void lastMessage(final String userid, final TextView last_msg){
+    private void lastMessage(final String userid, final TextView last_msg,final String type){
         theLastMessage = "default";
         final FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Chats");
@@ -129,6 +226,8 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder> {
                         if (chat.getReceiver().equals(firebaseUser.getUid()) && chat.getSender().equals(userid) ||
                                 chat.getReceiver().equals(userid) && chat.getSender().equals(firebaseUser.getUid())) {
                             theLastMessage = chat.getMessage();
+                            nameUser = chat.getSender();
+
                         }
                     }
                 }
@@ -139,7 +238,25 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder> {
                         break;
 
                     default:
-                        last_msg.setText(theLastMessage);
+                        if(type.equalsIgnoreCase("message")) {
+                            last_msg.setText(theLastMessage);
+                        }else if(type.equalsIgnoreCase("grup")){
+                            final String message = theLastMessage;
+                            DatabaseReference dbuser = FirebaseDatabase.getInstance().getReference("user").child(nameUser);
+                            dbuser.addListenerForSingleValueEvent(new ValueEventListener() {
+                                @Override
+                                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                    User user = dataSnapshot.getValue(User.class);
+                                    last_msg.setText(user.getFullname() +" : "+message);
+                                }
+
+                                @Override
+                                public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                                }
+                            });
+
+                        }
                         break;
                 }
 
@@ -152,4 +269,10 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder> {
             }
         });
     }
+
+    public interface ClickHandler {
+        void onItemClick(int position);
+        boolean onItemLongClick(int position);
+    }
+
 }

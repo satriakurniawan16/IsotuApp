@@ -35,6 +35,19 @@
                 android:textStyle="bold"
                 android:layout_marginStart="25dp" />
 
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <ImageView
+                    android:id="@+id/setting"
+                    android:layout_width="25dp"
+                    android:layout_height="25dp"
+                    android:src="@mipmap/more"
+                    android:tint="@color/colorWhite"
+                    android:layout_alignParentRight="true"
+                    android:layout_margin="3dp"/>
+            </RelativeLayout>
 
         </android.support.v7.widget.Toolbar>
 

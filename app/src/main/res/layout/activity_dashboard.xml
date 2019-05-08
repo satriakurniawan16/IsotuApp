@@ -39,7 +39,7 @@
                     <android.support.v7.widget.Toolbar
                         android:id="@+id/toolbar"
                         android:layout_width="match_parent"
-                        android:layout_height="?attr/actionBarSize"
+                        android:layout_height="wrap_content"
                         android:background="@color/colorMain"
                         app:layout_scrollFlags="scroll|enterAlways"
                         app:titleTextColor="@color/colorWhite" >
@@ -84,7 +84,19 @@
                                         android:text="1"/>
 
                                 </RelativeLayout>
+                            </RelativeLayout>
 
+                            <RelativeLayout
+                                android:id="@+id/addgrupdirect"
+                                android:layout_width="25dp"
+                                android:layout_height="25dp"
+                                android:layout_toLeftOf="@id/notification_direct"
+                                android:layout_margin="5dp">
+
+                                <ImageView
+                                    android:layout_width="25dp"
+                                    android:layout_height="25dp"
+                                    android:src="@drawable/addgroup"/>
 
                             </RelativeLayout>
 

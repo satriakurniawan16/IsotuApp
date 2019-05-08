@@ -1,5 +1,6 @@
 package com.example.user.isotuapp.View;
 
+import android.app.AlertDialog;
 import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
@@ -7,14 +8,19 @@ import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.ActionMode;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.user.isotuapp.Controller.NotificationAdapter;
 import com.example.user.isotuapp.Controller.SearchUserAdapter;
+import com.example.user.isotuapp.Model.Grup;
 import com.example.user.isotuapp.Model.NotifModel;
+import com.example.user.isotuapp.Model.Post;
 import com.example.user.isotuapp.Model.User;
 import com.example.user.isotuapp.R;
 import com.example.user.isotuapp.utils.Constants;
@@ -25,6 +31,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 
@@ -90,7 +97,7 @@ public class NotificationActivity extends AppCompatActivity {
                 NotifModel notifModel = snapshot.getValue(NotifModel.class);
                 mData.add(notifModel);
                 }
-                mAdapter = new NotificationAdapter(getApplicationContext(), mData, mDataId,
+                mAdapter = new NotificationAdapter(NotificationActivity.this, mData, mDataId,
                         new NotificationAdapter.ClickHandler() {
                             @Override
                             public void onItemClick(int position) {
@@ -103,7 +110,6 @@ public class NotificationActivity extends AppCompatActivity {
                                     return;
                                 }
                                 NotifModel pet = mData.get(position);
-                                Toast.makeText(NotificationActivity.this, "LOLLLL", Toast.LENGTH_SHORT).show();
                                 if(pet.getType().equals("0")){
                                     Intent intent =  new Intent(NotificationActivity.this,PostActivity.class);
                                     intent.putExtra(Constants.EXTRA_POST,pet.getPostid());
@@ -112,6 +118,16 @@ public class NotificationActivity extends AppCompatActivity {
                                     Intent intent =  new Intent(NotificationActivity.this,FriendProfile.class);
                                     intent.putExtra("iduser",pet.getPostid());
                                     startActivity(intent);
+                                }else if(pet.getType().equals("2")){
+                                    Toast.makeText(NotificationActivity.this, "ini grup", Toast.LENGTH_SHORT).show();
+                                    AlertDialog.Builder mBuilder = new AlertDialog.Builder(NotificationActivity.this);
+                                    View mView = getLayoutInflater().inflate(R.layout.modal_user,
+                                            null);
+
+
+                                    mBuilder.setView(mView);
+                                    final AlertDialog dialognya = mBuilder.create();
+                                    dialognya.show();
                                 }
                             }
 

@@ -22,13 +22,17 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.user.isotuapp.Controller.ContactAdapter;
+import com.example.user.isotuapp.Controller.GrupAdapter;
 import com.example.user.isotuapp.Controller.HobiAdapter;
 import com.example.user.isotuapp.Model.Contact;
+import com.example.user.isotuapp.Model.Grup;
 import com.example.user.isotuapp.Model.HobiModel;
 import com.example.user.isotuapp.R;
 import com.example.user.isotuapp.View.DetailUserHobi;
 import com.example.user.isotuapp.View.FriendProfile;
+import com.example.user.isotuapp.View.GrupMessageActivity;
 import com.example.user.isotuapp.View.MessageActivity;
+import com.google.android.gms.vision.text.Line;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.ChildEventListener;
@@ -48,14 +52,19 @@ public class ContactFragment extends Fragment {
     private ArrayList<String> mDataId;
     private ContactAdapter mAdapter;
 
+    private ArrayList<Grup> mDatagrup;
+    private ArrayList<String> mDataIdgrup;
+    private GrupAdapter mAdaptergrup;
+
     private ActionMode mActionMode;
+    private ActionMode mActionModeGrup;
     FirebaseUser currentUser;
     HobiModel hobi;
-    private DatabaseReference database;
+    private DatabaseReference database,databaseGrup;
     private FirebaseAuth mFirebaseAuth;
 
 
-    LinearLayout emptyView;
+    LinearLayout emptyView,emptyViewGrup;
 
     public ContactFragment() {
         // Required empty public constructor
@@ -97,6 +106,41 @@ public class ContactFragment extends Fragment {
     };
 
 
+    private ChildEventListener childEventListenerGrup = new ChildEventListener() {
+        @Override
+        public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+            mDatagrup.add(dataSnapshot.getValue(Grup.class));
+            mDataIdgrup.add(dataSnapshot.getKey());
+            mAdaptergrup.notifyDataSetChanged();
+            mAdaptergrup.updateEmptyView();
+        }
+
+        @Override
+        public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+            int pos = mDataIdgrup.indexOf(dataSnapshot.getKey());
+            mDatagrup.set(pos, dataSnapshot.getValue(Grup.class));
+            mAdaptergrup.notifyDataSetChanged();
+        }
+
+        @Override
+        public void onChildRemoved(@NonNull DataSnapshot dataSnapshot) {
+            int pos = mDataIdgrup.indexOf(dataSnapshot.getKey());
+            mDataIdgrup.remove(pos);
+            mDatagrup.remove(pos);
+            mAdaptergrup.notifyDataSetChanged();
+            mAdaptergrup.updateEmptyView();
+        }
+
+        @Override
+        public void onChildMoved(@NonNull DataSnapshot dataSnapshot, @Nullable String s) { }
+
+        @Override
+        public void onCancelled(@NonNull DatabaseError databaseError) {
+            Toast.makeText(getContext(), "Tidak Ada Koneksi Internet", Toast.LENGTH_SHORT).show();
+        }
+    };
+
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -108,7 +152,10 @@ public class ContactFragment extends Fragment {
 
         mData = new ArrayList<>();
         mDataId = new ArrayList<>();
+        mDatagrup = new ArrayList<>();
+        mDataIdgrup = new ArrayList<>();
         emptyView = (LinearLayout) rootView.findViewById(R.id.emptyview);
+        emptyViewGrup = (LinearLayout) rootView.findViewById(R.id.emptyviewgrup);
         RecyclerView recyclerView = rootView.findViewById(R.id.listContact);
         recyclerView.setHasFixedSize(true);
         LinearLayoutManager layoutManager =
@@ -158,6 +205,7 @@ public class ContactFragment extends Fragment {
                             @Override
                             public void onClick(View v) {
                                 Intent intent = new Intent(getContext(), MessageActivity.class);
+                                intent.putExtra("type","0");
                                 intent.putExtra("image",pet.getImageuser());
                                 intent.putExtra("name",pet.getNameuser());
                                 intent.putExtra("id",pet.getUserid());
@@ -173,10 +221,18 @@ public class ContactFragment extends Fragment {
                     @Override
                     public boolean onItemLongClick(int position) {
                         if (mActionMode != null) return false;
+                        final Contact pet = mData.get(position);
                         AlertDialog.Builder mBuilder = new AlertDialog.Builder(getContext());
                         View mView = getActivity().getLayoutInflater().inflate(R.layout.popup_message,
                                 null);
 
+                        LinearLayout hapus = (LinearLayout) mView.findViewById(R.id.hapus);
+                        hapus.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                databaseGrup.child(pet.getUserid()).removeValue();
+                            }
+                        });
 
                         mBuilder.setView(mView);
                         final AlertDialog dialognya = mBuilder.create();
@@ -186,6 +242,64 @@ public class ContactFragment extends Fragment {
                     }
                 });
         recyclerView.setAdapter(mAdapter);
+
+
+        RecyclerView recyclerViewGrup = rootView.findViewById(R.id.listGrup);
+        recyclerViewGrup.setHasFixedSize(true);
+        LinearLayoutManager layoutManagerGrup =
+                new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false);
+        recyclerViewGrup.setLayoutManager(layoutManagerGrup);
+
+        databaseGrup = FirebaseDatabase.getInstance().getReference("group").child(currentUser.getUid());
+        databaseGrup.addChildEventListener(childEventListenerGrup);
+
+        mAdaptergrup = new GrupAdapter(getContext(), mDatagrup, mDataIdgrup,emptyViewGrup,
+                new GrupAdapter.ClickHandler() {
+                    @Override
+                    public void onItemClick(int position) {
+                        if (mActionModeGrup != null) {
+                            mAdapter.toggleSelection(mDataIdgrup.get(position));
+                            if (mAdaptergrup.selectionCount() == 0)
+                                mActionModeGrup.finish();
+                            else
+                                mActionModeGrup.invalidate();
+                            return;
+                        }
+                        Grup grup = mDatagrup.get(position);
+                        Intent intent = new Intent(getContext(), GrupMessageActivity.class);
+                        intent.putExtra("type","1");
+                        intent.putExtra("image",grup.getImagegrup());
+                        intent.putExtra("name",grup.getNamagrup());
+                        intent.putExtra("id",grup.getIdgrup());
+                        startActivity(intent);
+                    }
+
+                    @Override
+                    public boolean onItemLongClick(int position) {
+                        if (mActionModeGrup != null) return false;
+                        final Grup pet = mDatagrup.get(position);
+                        AlertDialog.Builder mBuilder = new AlertDialog.Builder(getContext());
+                        View mView = getActivity().getLayoutInflater().inflate(R.layout.popup_message,
+                                null);
+
+                        LinearLayout hapus = (LinearLayout) mView.findViewById(R.id.hapus);
+                        hapus.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                databaseGrup.child(pet.getIdgrup()).removeValue();
+                            }
+                        });
+
+                        mBuilder.setView(mView);
+                        final AlertDialog dialognya = mBuilder.create();
+                        dialognya.show();
+
+                        return true;
+                    }
+                });
+
+        recyclerViewGrup.setAdapter(mAdaptergrup);
+
         return rootView;
     }
 

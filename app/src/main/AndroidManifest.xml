@@ -12,8 +12,8 @@
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
     <application
-        android:clickable="false"
         android:allowBackup="true"
+        android:clickable="false"
         android:hardwareAccelerated="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
@@ -104,7 +104,10 @@
         <activity android:name=".View.HobiOrganisasi" />
         <activity android:name=".View.EditPost" />
         <activity android:name=".View.EditEventActivity" />
-        <activity android:name=".View.NotificationActivity"></activity>
+        <activity android:name=".View.NotificationActivity" />
+        <activity android:name=".View.InviteGroup" />
+        <activity android:name=".View.InviteFriendActivity" />
+        <activity android:name=".View.GrupMessageActivity"></activity>
     </application>
 
 </manifest>
