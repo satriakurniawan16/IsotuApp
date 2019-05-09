@@ -25,6 +25,7 @@ import com.example.user.isotuapp.Model.User;
 import com.example.user.isotuapp.R;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.FirebaseExceptionMapper;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -32,6 +33,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.OnProgressListener;
 import com.google.firebase.storage.StorageReference;
@@ -39,6 +41,7 @@ import com.google.firebase.storage.UploadTask;
 import com.theartofdev.edmodo.cropper.CropImage;
 import com.theartofdev.edmodo.cropper.CropImageView;
 
+import java.util.HashMap;
 import java.util.UUID;
 
 public class GroupActivity extends AppCompatActivity {
@@ -78,6 +81,12 @@ public class GroupActivity extends AppCompatActivity {
 
         mFirebaseAuth = FirebaseAuth.getInstance();
         currentUser = mFirebaseAuth.getCurrentUser();
+        mFirebaseAuth=FirebaseAuth.getInstance();
+        currentUser = FirebaseAuth.getInstance().getCurrentUser();
+
+        /* takePhoto.setVisibility(View.GONE);*/
+        storage = FirebaseStorage.getInstance();
+        storageReference = storage.getReference();
 
         groupImage = findViewById(R.id.group_image);
         nameGroup = findViewById(R.id.group_name);
@@ -87,7 +96,7 @@ public class GroupActivity extends AppCompatActivity {
         storage = FirebaseStorage.getInstance();
         storageReference = storage.getReference();
 
-        dbs = FirebaseDatabase.getInstance().getReference("group").child(currentUser.getUid());
+        dbs = FirebaseDatabase.getInstance().getReference("group");
 
 
         toInviteFriend.setOnClickListener(new View.OnClickListener() {
@@ -166,12 +175,15 @@ public class GroupActivity extends AppCompatActivity {
                 }
             });
         }else{
-
+            key = dbs.push().getKey();
+            final String namegroupString = nameGroup.getText().toString();
+            submitGrup(new Grup(key,"https://firebasestorage.googleapis.com/v0/b/isocialfinal.appspot.com/o/walpaper.jpg?alt=media&token=bdbe37e3-cff6-4f80-a3c8-baf75e6e9465", namegroupString));
         }
     }
 
     private void submitGrup(final Grup barang) {
         Log.d("lol", "submitBarang: disini");
+        dbs.child(currentUser.getUid()).child(key).setValue(barang);
         dbs.child(key).setValue(barang).
                 addOnSuccessListener(this, new OnSuccessListener<Void>() {
                     @Override
@@ -180,6 +192,25 @@ public class GroupActivity extends AppCompatActivity {
                         Toast.makeText(getApplicationContext(),
                                 "Berhasil Ditambahkan", Toast.LENGTH_LONG).show();
                         pDialog.dismiss();
+                        DatabaseReference dbuser = FirebaseDatabase.getInstance().getReference("user").child(FirebaseAuth.getInstance().getCurrentUser().getUid());
+                        dbuser.addListenerForSingleValueEvent(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                User user = dataSnapshot.getValue(User.class);
+                                DatabaseReference dbmember = FirebaseDatabase.getInstance().getReference("groupmember").child(barang.getIdgrup());
+                                final HashMap<String, Object> member= new HashMap<>();
+                                member.put("iduser",user.getUid());
+                                member.put("fotoprofil",user.getImage());
+                                member.put("namaprofil", user.getFullname());
+                                dbmember.child(FirebaseAuth.getInstance().getCurrentUser().getUid()).setValue(member);
+                            }
+
+                            @Override
+                            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                            }
+                        });
+                        FirebaseMessaging.getInstance().subscribeToTopic(barang.getIdgrup());
                         Intent intent=new Intent(GroupActivity.this,InviteFriendActivity.class);
                         intent.putExtra("idgrup",barang.getIdgrup());
                         intent.putExtra("namagrup",barang.getNamagrup());

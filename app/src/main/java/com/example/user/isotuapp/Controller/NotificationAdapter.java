@@ -149,6 +149,24 @@ public class NotificationAdapter  extends RecyclerView.Adapter<NotificationAdapt
                                         join = true;
                                         mygrup.child(pet.getPostid()).setValue(grup);
                                         FirebaseMessaging.getInstance().subscribeToTopic(pet.getPostid());
+                                        DatabaseReference dbuser = FirebaseDatabase.getInstance().getReference("user").child(FirebaseAuth.getInstance().getCurrentUser().getUid());
+                                        dbuser.addListenerForSingleValueEvent(new ValueEventListener() {
+                                            @Override
+                                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                                User user = dataSnapshot.getValue(User.class);
+                                                DatabaseReference dbmember = FirebaseDatabase.getInstance().getReference("groupmember").child(pet.getPostid());
+                                                final HashMap<String, Object> member= new HashMap<>();
+                                                member.put("iduser",user.getUid());
+                                                member.put("fotoprofil",user.getImage());
+                                                member.put("namaprofil", user.getFullname());
+                                                dbmember.child(FirebaseAuth.getInstance().getCurrentUser().getUid()).setValue(member);
+                                            }
+
+                                            @Override
+                                            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                                            }
+                                        });
                                     }
                                 }
                             });
@@ -159,6 +177,7 @@ public class NotificationAdapter  extends RecyclerView.Adapter<NotificationAdapt
 
                         }
                     });
+
 
                     final AlertDialog dialoglol = mBuilder.create();
                     dialoglol.show();

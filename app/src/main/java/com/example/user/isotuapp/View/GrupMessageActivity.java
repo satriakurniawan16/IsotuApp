@@ -83,6 +83,7 @@ public class GrupMessageActivity extends AppCompatActivity implements IMethodCal
     private ArrayList<String> mDataId;
 
     boolean notify = false;
+    String namegrup;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -129,7 +130,49 @@ public class GrupMessageActivity extends AppCompatActivity implements IMethodCal
                 TextView settingInvite = mView.findViewById(R.id.settinginvite);
                 TextView settingExit = mView.findViewById(R.id.settingexit);
 
-                
+
+                settingInvite.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Intent intent = new Intent(GrupMessageActivity.this,InviteFriendActivity.class);
+                        intent.putExtra("idgrup",userid);
+                        startActivity(intent);
+                    }
+                });
+
+                settingExit.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        DatabaseReference db = FirebaseDatabase.getInstance().getReference("group").child(fuser.getUid());
+                        db.child(userid).removeValue();
+                        DatabaseReference member = FirebaseDatabase.getInstance().getReference("groupmember").child(userid);
+                        member.child(fuser.getUid()).removeValue();
+                        Intent intent = new Intent(GrupMessageActivity.this,Dashboard.class);
+                        startActivity(intent);
+                    }
+                });
+
+                settingMember.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Intent intent = new Intent(GrupMessageActivity.this,DetailUserHobi.class);
+                        intent.putExtra("reference", "groupmember");
+                        intent.putExtra("child", userid);
+                        intent.putExtra("title", "Daftar Anggota");
+                        startActivity(intent);
+                    }
+                });
+
+                settingEdit.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Intent intent = new Intent(GrupMessageActivity.this,EditGroupActivity.class);
+                        intent.putExtra("id",userid);
+                        startActivity(intent);
+                    }
+                });
+
+
 
                 mBuilder.setView(mView);
                 final AlertDialog dialognya = mBuilder.create();
@@ -142,13 +185,14 @@ public class GrupMessageActivity extends AppCompatActivity implements IMethodCal
 
         fuser = FirebaseAuth.getInstance().getCurrentUser();
 
-        reference = FirebaseDatabase.getInstance().getReference("group").child(fuser.getUid()).child(userid);
+        reference = FirebaseDatabase.getInstance().getReference("group").child(userid);
 
         reference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 Grup user = dataSnapshot.getValue(Grup.class);
                 username.setText(user.getNamagrup());
+                namegrup = user.getNamagrup();
                 if (user.getImagegrup().equals("default")){
                     profile_image.setImageResource(R.mipmap.ic_launcher);
                 } else {
@@ -195,8 +239,8 @@ public class GrupMessageActivity extends AppCompatActivity implements IMethodCal
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 for (DataSnapshot snapshot : dataSnapshot.getChildren()){
                     Token token = snapshot.getValue(Token.class);
-                    Data data = new Data(fuser.getUid(), R.mipmap.ic_launcher, username+": "+message, "Pesan baru",
-                            userid,"newgrup",fuser.getUid());
+                    Data data = new Data(fuser.getUid(), R.mipmap.ic_launcher, username+": "+message, namegrup,
+                            userid,"newgrup",userid);
 
                     Sender sender = new Sender(data, "topics/"+userid);
 

@@ -16,6 +16,11 @@ import com.example.user.isotuapp.Model.Grup;
 import com.example.user.isotuapp.R;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
@@ -54,11 +59,23 @@ public class GrupAdapter  extends RecyclerView.Adapter<GrupAdapter.ViewHolder> {
     }
 
     @Override
-    public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        Grup pet = mData.get(position);
-        holder.nameTextView.setText(pet.getNamagrup());
-        holder.keteranganTextView.setVisibility(View.GONE);
-        Picasso.get().load(pet.getImagegrup()).into(holder.profilImageview);
+    public void onBindViewHolder(@NonNull final ViewHolder holder, final int position) {
+        final Grup pet = mData.get(position);
+        DatabaseReference dbgrup = FirebaseDatabase.getInstance().getReference("group").child(pet.getIdgrup());
+        dbgrup.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                Grup grup = dataSnapshot.getValue(Grup.class);
+                holder.nameTextView.setText(grup.getNamagrup());
+                holder.keteranganTextView.setVisibility(View.GONE);
+                Picasso.get().load(grup.getImagegrup()).into(holder.profilImageview);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
         holder.itemView.setSelected(mSelectedId.contains(mDataId.get(position)));
         FirebaseAuth auth = FirebaseAuth.getInstance();
         FirebaseUser currentUser = auth.getCurrentUser();

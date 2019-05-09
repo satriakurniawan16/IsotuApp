@@ -165,7 +165,7 @@ public class InviteAdapter  extends RecyclerView.Adapter<InviteAdapter.ViewHolde
         }
     }
 
-    private void sendNotifiaction(String receiver, final String username, final String message){
+    private void sendNotifiaction(final String receiver, final String username, final String message){
         DatabaseReference tokens = FirebaseDatabase.getInstance().getReference("Tokens");
         apiService = Client.getClient("https://fcm.googleapis.com/").create(APIService.class);
         Query query = tokens.orderByKey().equalTo(receiver);
@@ -177,7 +177,7 @@ public class InviteAdapter  extends RecyclerView.Adapter<InviteAdapter.ViewHolde
                 for (DataSnapshot snapshot : dataSnapshot.getChildren()){
                     Token token = snapshot.getValue(Token.class);
                     Data data = new Data(fuser.getUid(), R.mipmap.ic_launcher, username +" : mengundang anda ke grup "+ message , username,
-                            id,"grup",fuser.getUid());
+                            receiver,"grup","");
 
                     Sender sender = new Sender(data, token.getToken());
 

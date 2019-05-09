@@ -136,7 +136,7 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder> {
             });
         }else if(chatlist.getType().equals("grup")){
             final Chatlist grup = mData.get(position);
-            DatabaseReference dbgrup = FirebaseDatabase.getInstance().getReference("group").child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child(grup.getId());
+            DatabaseReference dbgrup = FirebaseDatabase.getInstance().getReference("group").child(grup.getId());
             holder.img_on.setVisibility(View.GONE);
             holder.img_off.setVisibility(View.GONE);
             dbgrup.addListenerForSingleValueEvent(new ValueEventListener() {

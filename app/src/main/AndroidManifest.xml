@@ -107,7 +107,8 @@
         <activity android:name=".View.NotificationActivity" />
         <activity android:name=".View.InviteGroup" />
         <activity android:name=".View.InviteFriendActivity" />
-        <activity android:name=".View.GrupMessageActivity"></activity>
+        <activity android:name=".View.GrupMessageActivity" />
+        <activity android:name=".View.EditGroupActivity"></activity>
     </application>
 
 </manifest>
