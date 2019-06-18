@@ -62,21 +62,26 @@ public class HobiUserAdapter  extends RecyclerView.Adapter<HobiUserAdapter.ViewH
     @Override
     public void onBindViewHolder(@NonNull final ViewHolder holder, int position) {
         UserHobi pet = mData.get(position);
-        holder.nameTextView.setText(pet.getNamaprofil());
-        Picasso.get().load(pet.getFotoprofil()).into(holder.profilImageview);
-        DatabaseReference user = FirebaseDatabase.getInstance().getReference("user").child(pet.getIduser());
-        user.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                User user1 = dataSnapshot.getValue(User.class);
-                holder.jurusanTextView.setText(user1.getFakultas()+", "+user1.getJurusan());
-            }
+        if(pet.getIduser() != null ){
+            holder.nameTextView.setText(pet.getNamaprofil());
+            Picasso.get().load(pet.getFotoprofil()).into(holder.profilImageview);
+            DatabaseReference user = FirebaseDatabase.getInstance().getReference("user").child(pet.getIduser());
+            user.addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                    User user1 = dataSnapshot.getValue(User.class);
+                    if(user1 != null) {
+                        holder.jurusanTextView.setText(user1.getFakultas() + ", " + user1.getJurusan());
+                    }
+                }
 
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
+                @Override
+                public void onCancelled(@NonNull DatabaseError databaseError) {
 
-            }
-        });
+                }
+            });
+        }
+
         holder.itemView.setSelected(mSelectedId.contains(mDataId.get(position)));
     }
 

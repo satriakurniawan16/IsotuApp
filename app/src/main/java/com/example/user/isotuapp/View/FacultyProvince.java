@@ -137,6 +137,7 @@ public class FacultyProvince extends AppCompatActivity {
         }else{
             spinnerText.setAdapter(adapterprovinsi);
             ref = "searchbyprovince";
+            Toast.makeText(this, "ref : " +ref , Toast.LENGTH_SHORT).show();
         }
 
 
@@ -154,7 +155,9 @@ public class FacultyProvince extends AppCompatActivity {
 
                     for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                         User user = snapshot.getValue(User.class);
+                        if(user.getUid()!= null ){
                             mData.add(user);
+                        }
                     }
 
 
@@ -177,82 +180,84 @@ public class FacultyProvince extends AppCompatActivity {
                                         return;
                                     }
                                     final User pet = mData.get(position);
-                                    AlertDialog.Builder mBuilder = new AlertDialog.Builder(FacultyProvince.this);
+                                    if(!pet.getUid().equals(fuser.getUid())){
+                                        AlertDialog.Builder mBuilder = new AlertDialog.Builder(FacultyProvince.this);
 
-                                    View mView = getLayoutInflater().inflate(R.layout.modal_user,
-                                            null);
+                                        View mView = getLayoutInflater().inflate(R.layout.modal_user,
+                                                null);
 
-                                    ImageView profileImageView = (ImageView) mView.findViewById(R.id.profilepopup);
-                                    TextView nameTextView = (TextView) mView.findViewById(R.id.nameuserpopup);
-                                    TextView jurusanTextView = (TextView) mView.findViewById(R.id.jurusanpopup);
-                                    LinearLayout profileLayout = (LinearLayout) mView.findViewById(R.id.profilebutton);
-                                    LinearLayout chatLayout = (LinearLayout) mView.findViewById(R.id.chatbutton);
-                                    final LinearLayout addLayout = (LinearLayout) mView.findViewById(R.id.addbutton);
+                                        ImageView profileImageView = (ImageView) mView.findViewById(R.id.profilepopup);
+                                        TextView nameTextView = (TextView) mView.findViewById(R.id.nameuserpopup);
+                                        TextView jurusanTextView = (TextView) mView.findViewById(R.id.jurusanpopup);
+                                        LinearLayout profileLayout = (LinearLayout) mView.findViewById(R.id.profilebutton);
+                                        LinearLayout chatLayout = (LinearLayout) mView.findViewById(R.id.chatbutton);
+                                        final LinearLayout addLayout = (LinearLayout) mView.findViewById(R.id.addbutton);
 
-                                    Picasso.get().load(pet.getImage()).into(profileImageView);
-                                    nameTextView.setText(pet.getFullname());
-                                    jurusanTextView.setText(pet.getJurusan());
-                                    profileLayout.setOnClickListener(new View.OnClickListener() {
-                                        @Override
-                                        public void onClick(View v) {
-                                            Intent intent = new Intent(FacultyProvince.this,FriendProfile.class);
-                                            intent.putExtra("iduser",pet.getUid());
-                                            startActivity(intent);
-                                        }
-                                    });
+                                        Picasso.get().load(pet.getImage()).into(profileImageView);
+                                        nameTextView.setText(pet.getFullname());
+                                        jurusanTextView.setText(pet.getJurusan());
+                                        profileLayout.setOnClickListener(new View.OnClickListener() {
+                                            @Override
+                                            public void onClick(View v) {
+                                                Intent intent = new Intent(FacultyProvince.this,FriendProfile.class);
+                                                intent.putExtra("iduser",pet.getUid());
+                                                startActivity(intent);
+                                            }
+                                        });
 
 
-                                    databasecontact = FirebaseDatabase.getInstance().getReference("contact").child(fuser.getUid()).child("contactadded");
-                                    databasecontact.addListenerForSingleValueEvent(new ValueEventListener() {
-                                        @Override
-                                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                            Log.d("singlestatus", "onDataChange: " + dataSnapshot);
-                                            boolean status = false ;
-                                            boolean mystatus = false ;
-                                            for(DataSnapshot ds : dataSnapshot.getChildren()){
-                                                Log.d("Allstatus", "onDataChange: " + ds);
-                                                if(pet.getUid().equals(ds.getKey())){
-                                                    status = true;
-                                                    break;
-                                                }else{
-                                                    status = false;
+                                        databasecontact = FirebaseDatabase.getInstance().getReference("contact").child(fuser.getUid()).child("contactadded");
+                                        databasecontact.addListenerForSingleValueEvent(new ValueEventListener() {
+                                            @Override
+                                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                                Log.d("singlestatus", "onDataChange: " + dataSnapshot);
+                                                boolean status = false ;
+                                                boolean mystatus = false ;
+                                                for(DataSnapshot ds : dataSnapshot.getChildren()){
+                                                    Log.d("Allstatus", "onDataChange: " + ds);
+                                                    if(pet.getUid().equals(ds.getKey())){
+                                                        status = true;
+                                                        break;
+                                                    }else{
+                                                        status = false;
+                                                    }
+                                                }
+
+                                                if(status == true){
+                                                    addLayout.setVisibility(View.GONE);
                                                 }
                                             }
 
-                                            if(status == true){
+                                            @Override
+                                            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                                            }
+                                        });
+
+                                        addLayout.setOnClickListener(new View.OnClickListener() {
+                                            @Override
+                                            public void onClick(View v) {
+                                                addContact(new Contact(pet.getUid(),pet.getFullname(),pet.getImage(),pet.getJurusan().toString(),pet.getFakultas().toString(),pet.getSearch()));
                                                 addLayout.setVisibility(View.GONE);
                                             }
-                                        }
-
-                                        @Override
-                                        public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                                        }
-                                    });
-
-                                    addLayout.setOnClickListener(new View.OnClickListener() {
-                                        @Override
-                                        public void onClick(View v) {
-                                            addContact(new Contact(pet.getUid(),pet.getFullname(),pet.getImage(),pet.getJurusan().toString(),pet.getFakultas().toString(),pet.getSearch()));
-                                            addLayout.setVisibility(View.GONE);
-                                        }
-                                    });
+                                        });
 
 
-                                    chatLayout.setOnClickListener(new View.OnClickListener() {
-                                        @Override
-                                        public void onClick(View v) {
-                                            Intent intent = new Intent(FacultyProvince.this, MessageActivity.class);
-                                            intent.putExtra("image",pet.getImage());
-                                            intent.putExtra("name",pet.getFullname());
-                                            intent.putExtra("id",pet.getUid());
-                                            startActivity(intent);
-                                        }
-                                    });
+                                        chatLayout.setOnClickListener(new View.OnClickListener() {
+                                            @Override
+                                            public void onClick(View v) {
+                                                Intent intent = new Intent(FacultyProvince.this, MessageActivity.class);
+                                                intent.putExtra("image",pet.getImage());
+                                                intent.putExtra("name",pet.getFullname());
+                                                intent.putExtra("id",pet.getUid());
+                                                startActivity(intent);
+                                            }
+                                        });
 
-                                    mBuilder.setView(mView);
-                                    final AlertDialog dialognya = mBuilder.create();
-                                    dialognya.show();
+                                        mBuilder.setView(mView);
+                                        final AlertDialog dialognya = mBuilder.create();
+                                        dialognya.show();
+                                    }
                                 }
 
                                 @Override
@@ -278,7 +283,13 @@ public class FacultyProvince extends AppCompatActivity {
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
                 // memunculkan toast + value Spinner yang dipilih (diambil dari adapter)
-                searchUsers(spinnerText.getSelectedItem().toString());
+                if(ref.equals("searchbyprovince")){
+                    searchUsers(spinnerText.getSelectedItem().toString().toLowerCase());
+                }else {
+                    searchUsers(spinnerText.getSelectedItem().toString());
+                }
+
+                Toast.makeText(FacultyProvince.this, "selected : " +  spinnerText.getSelectedItem().toString(), Toast.LENGTH_SHORT).show();
             }
 
             @Override
@@ -299,7 +310,6 @@ public class FacultyProvince extends AppCompatActivity {
         query.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-
                 for (DataSnapshot snapshot : dataSnapshot.getChildren()){
                     User user = snapshot.getValue(User.class);
                     assert user != null;
@@ -357,9 +367,20 @@ public class FacultyProvince extends AppCompatActivity {
                     public void onSuccess(Void aVoid) {
                         Toast.makeText(getApplicationContext(),
                                 "Berhasil Ditambahkan", Toast.LENGTH_LONG).show();
-                        addNotification(contact.getUserid(),contact.getUserid(),"Menambahkan anda sebagai teman");
-                        sendNotifiaction(contact.getUserid(),contact.getNameuser(),"Menambahkan anda ke kontak",contact.getUserid(),contact.getUserid());
-                    }
+                        DatabaseReference dbuser = FirebaseDatabase.getInstance().getReference("user").child(FirebaseAuth.getInstance().getCurrentUser().getUid());
+                        dbuser.addListenerForSingleValueEvent(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                             User user = dataSnapshot.getValue(User.class);
+                                addNotification(contact.getUserid(),user.getFullname(),user.getFullname() + " Menambahkan anda sebagai teman");
+                                sendNotifiaction(contact.getUserid(),user.getFullname(),"Menambahkan anda ke kontak",contact.getUserid(),user.getUid());
+                            }
+                            @Override
+                            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                            }
+                        });
+                            }
                 });
     }
 
@@ -418,6 +439,7 @@ public class FacultyProvince extends AppCompatActivity {
         hashMap.put("postid", mUser.getUid());
         hashMap.put("ispost", true);
         hashMap.put("type", "1");
+        hashMap.put("date", System.currentTimeMillis());
         reference.child(key).setValue(hashMap).addOnSuccessListener(new OnSuccessListener<Void>() {
             @Override
             public void onSuccess(Void aVoid) {

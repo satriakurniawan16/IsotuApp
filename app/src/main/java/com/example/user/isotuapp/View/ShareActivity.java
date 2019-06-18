@@ -137,7 +137,7 @@ public class ShareActivity extends AppCompatActivity {
 
     private void displayLoader() {
         pDialog = new ProgressDialog(this);
-        pDialog.setMessage("Sending post...");
+        pDialog.setMessage("Membagikan Unggahan...");
         pDialog.setIndeterminate(false);
         pDialog.setCancelable(false);
         int d = R.drawable.custom_progress_dialog;

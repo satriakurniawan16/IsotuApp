@@ -104,24 +104,30 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                 }
             }, 100);
             final Utils utils = new Utils(getApplicationContext());
+
+            FirebaseAuth mAuth = FirebaseAuth.getInstance();
+            final FirebaseUser fuser = mAuth.getCurrentUser();
             googleMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
                 @Override
                 public boolean onMarkerClick(final Marker marker) {
                     final double vlat = marker.getPosition().latitude;
                     final double vlong = marker.getPosition().latitude;
-                    utils.animateView(progressOverlay, View.VISIBLE, 0.4f, 200);
-                    new Handler().postDelayed(new Runnable() {
-                        @Override
-                        public void run() {
-                            mLayout.setPanelState(SlidingUpPanelLayout.PanelState.ANCHORED);
-                            utils.animateView(progressOverlay, View.GONE, 0, 200);
-                            final TextView Fullname = (TextView) findViewById(R.id.nameMarker);
-                            Fullname.setText(marker.getTitle());
-                            displayInfo(marker.getSnippet());
-                        }
-                    }, TIME_OUT);
+                    if(!marker.getSnippet().equals(fuser.getUid())){
+                        utils.animateView(progressOverlay, View.VISIBLE, 0.4f, 200);
+                        new Handler().postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+                                mLayout.setPanelState(SlidingUpPanelLayout.PanelState.ANCHORED);
+                                utils.animateView(progressOverlay, View.GONE, 0, 200);
+                                final TextView Fullname = (TextView) findViewById(R.id.nameMarker);
+                                Fullname.setText(marker.getTitle());
+                                displayInfo(marker.getSnippet());
+                            }
+                        }, TIME_OUT);
+                    }
 
                     final Button buttonDirection = (Button) findViewById(R.id.getdirec);
+                    buttonDirection.setVisibility(View.GONE);
                     buttonDirection.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
@@ -390,6 +396,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         final Button buttonChat = (Button) findViewById(R.id.to_chatfriend);
         final Button buttonProfile = (Button) findViewById(R.id.toshowProfile);
         final Button buttonDirection = (Button) findViewById(R.id.getdirec);
+
 
         buttonChat.setOnClickListener(new View.OnClickListener() {
             @Override

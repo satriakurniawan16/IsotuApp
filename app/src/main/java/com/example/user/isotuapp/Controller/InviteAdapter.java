@@ -99,23 +99,37 @@ public class InviteAdapter  extends RecyclerView.Adapter<InviteAdapter.ViewHolde
             @Override
             public void onClick(View v) {
 
+                DatabaseReference dbuser = FirebaseDatabase.getInstance().getReference("user").child(FirebaseAuth.getInstance().getCurrentUser().getUid());
 
-                if(condition == false){
-                    addNotification(pet.getUserid(),mIdgrup);
-                    sendNotifiaction(pet.getUserid(),pet.getNameuser(),namagrup);
-                    condition = true;
-                    Drawable d = mContext.getResources().getDrawable(R.drawable.button_white);
-                    holder.inviteButton.setText("Invited");
-                    holder.inviteButton.setBackground(d);
-                    holder.inviteButton.setTextColor(Color.parseColor("#000000"));
-                }else{
-                    deleteNotifications(mIdgrup,pet.getUserid());
-                    condition = false;
-                    Drawable d = mContext.getResources().getDrawable(R.drawable.button_main);
-                    holder.inviteButton.setText("Invite");
-                    holder.inviteButton.setBackground(d);
-                    holder.inviteButton.setTextColor(Color.parseColor("#FFFFFF"));
-                }
+                dbuser.addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                        User user = dataSnapshot.getValue(User.class);
+                        if(condition == false){
+                            addNotification(pet.getUserid(),mIdgrup);
+                            sendNotifiaction(pet.getUserid(),user.getFullname(),user.getFullname() + "Mengundang anda ke grup");
+                            sendMessage(FirebaseAuth.getInstance().getCurrentUser().getUid(), mIdgrup, user.getFullname()+" mengundang "+ pet.getNameuser() + " ke grup" ,"","","");
+                            condition = true;
+                            Drawable d = mContext.getResources().getDrawable(R.drawable.button_white);
+                            holder.inviteButton.setText("Invited");
+                            holder.inviteButton.setBackground(d);
+                            holder.inviteButton.setTextColor(Color.parseColor("#000000"));
+                        }else{
+                            deleteNotifications(mIdgrup,pet.getUserid());
+                            condition = false;
+                            Drawable d = mContext.getResources().getDrawable(R.drawable.button_main);
+                            holder.inviteButton.setText("Invite");
+                            holder.inviteButton.setBackground(d);
+                            holder.inviteButton.setTextColor(Color.parseColor("#FFFFFF"));
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                    }
+                });
+
             }
         });
 
@@ -176,7 +190,7 @@ public class InviteAdapter  extends RecyclerView.Adapter<InviteAdapter.ViewHolde
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 for (DataSnapshot snapshot : dataSnapshot.getChildren()){
                     Token token = snapshot.getValue(Token.class);
-                    Data data = new Data(fuser.getUid(), R.mipmap.ic_launcher, username +" : mengundang anda ke grup "+ message , username,
+                    Data data = new Data(fuser.getUid(), R.mipmap.ic_launcher,  message , username,
                             receiver,"grup","");
 
                     Sender sender = new Sender(data, token.getToken());
@@ -220,6 +234,7 @@ public class InviteAdapter  extends RecyclerView.Adapter<InviteAdapter.ViewHolde
         hashMap.put("postid", postid);
         hashMap.put("ispost", true);
         hashMap.put("type", "2");
+        hashMap.put("date", System.currentTimeMillis());
         reference.child(key).setValue(hashMap).addOnSuccessListener(new OnSuccessListener<Void>() {
             @Override
             public void onSuccess(Void aVoid) {
@@ -258,5 +273,67 @@ public class InviteAdapter  extends RecyclerView.Adapter<InviteAdapter.ViewHolde
         });
     }
 
+    public void sendMessage(String sender, final String receiver, String message, String imagePost, String nameUser, String idpost) {
+
+        DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Chats");
+        String key = reference.push().getKey();
+        HashMap<String, Object> hashMap = new HashMap<>();
+        hashMap.put("id", key);
+        hashMap.put("sender", sender);
+        hashMap.put("receiver", receiver);
+        hashMap.put("message", message);
+        hashMap.put("idpost",idpost);
+        hashMap.put("imagepost",imagePost);
+        hashMap.put("userpost",nameUser);
+        hashMap.put("isseen", false);
+        hashMap.put("type", "1");
+
+        reference.child(key).setValue(hashMap);
+        final DatabaseReference chatRef = FirebaseDatabase.getInstance().getReference("Chatlist")
+                .child(FirebaseAuth.getInstance().getCurrentUser().getUid())
+                .child(receiver);
+
+        chatRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                if (!dataSnapshot.exists()){
+                    final HashMap<String, Object> user= new HashMap<>();
+                    user.put("id",receiver);
+                    user.put("type","grup");
+                    user.put("subtype","1");
+                    chatRef.setValue(user);
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+
+        final DatabaseReference chatRefReceiver = FirebaseDatabase.getInstance().getReference("Chatlist")
+                .child(receiver)
+                .child(FirebaseAuth.getInstance().getCurrentUser().getUid());
+        chatRefReceiver.child("id").setValue(FirebaseAuth.getInstance().getCurrentUser());
+
+        final String msg = message;
+
+        reference = FirebaseDatabase.getInstance().getReference("user").child(FirebaseAuth.getInstance().getCurrentUser().getUid());
+        reference.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                User user = dataSnapshot.getValue(User.class);
+                if (notify) {
+//                    sendNotifiaction(receiver, user.getFullname(), msg);
+                }
+                notify = false;
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+    }
 
 }

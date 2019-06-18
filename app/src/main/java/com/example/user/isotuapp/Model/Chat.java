@@ -9,12 +9,12 @@ public class Chat {
     private String idpost;
     private String imagepost;
     private String userpost;
+    private String type;
 
     public Chat() {
     }
 
-
-    public Chat(String sender, String receiver, String message, boolean isseen, String idpost, String imagepost, String userpost) {
+    public Chat(String sender, String receiver, String message, boolean isseen, String idpost, String imagepost, String userpost, String type) {
         this.sender = sender;
         this.receiver = receiver;
         this.message = message;
@@ -22,6 +22,15 @@ public class Chat {
         this.idpost = idpost;
         this.imagepost = imagepost;
         this.userpost = userpost;
+        this.type = type;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
     }
 
     public String getIdpost() {

@@ -214,8 +214,11 @@ public class FriendProfile extends AppCompatActivity {
 
 
         Intent intent = getIntent();
-        iduser = intent.getStringExtra("iduser") ;
-
+        if(intent.getStringExtra("iduser") != null) {
+            iduser = intent.getStringExtra("iduser");
+        }else{
+            iduser = intent.getStringExtra("id");
+        }
         mFirebaseAuth=FirebaseAuth.getInstance();
         currentUser = FirebaseAuth.getInstance().getCurrentUser();
 
@@ -385,9 +388,10 @@ public class FriendProfile extends AppCompatActivity {
                             return;
                         }
                         HobiModel pet = mData.get(position);
-                        Intent intent = new Intent(getApplicationContext(), DetailUserHobi.class);
+                        Intent intent = new Intent(FriendProfile.this, DetailUserHobi.class);
                         intent.putExtra("reference","list_hobi_user");
                         intent.putExtra("child",pet.getHobi());
+                        intent.putExtra("title","Pengguna dengan hobi yang sama");
                         startActivity(intent);
                     }
 
@@ -413,7 +417,9 @@ public class FriendProfile extends AppCompatActivity {
                         }
                         Organiasasi pet = mDataOrganisasi.get(position);
                         Intent intent = new Intent(FriendProfile.this, DetailUserHobi.class);
-                        intent.putExtra("reference",pet.getNama());
+                        intent.putExtra("reference","list_user_organisasi");
+                        intent.putExtra("child",pet.getNama());
+                        intent.putExtra("title","Pengguna dengan organisasi yang sama");
                         startActivity(intent);
                     }
 
@@ -438,8 +444,20 @@ public class FriendProfile extends AppCompatActivity {
                     public void onSuccess(Void aVoid) {
                         Toast.makeText(getApplicationContext(),
                                 "Berhasil Ditambahkan", Toast.LENGTH_LONG).show();
-                        addNotification(contact.getUserid(),contact.getUserid(),"Menambahkan anda sebagai teman");
-                        sendNotifiaction(iduser,contact.getNameuser(),"Menambahkan anda ke kontak",iduser,iduser);
+                        DatabaseReference dbuser =  FirebaseDatabase.getInstance().getReference("user").child(FirebaseAuth.getInstance().getCurrentUser().getUid());
+                        dbuser.addListenerForSingleValueEvent(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                User user = dataSnapshot.getValue(User.class);
+                                addNotification(contact.getUserid(),user.getFullname(),user.getFullname() + " Menambahkan anda sebagai teman");
+                                sendNotifiaction(contact.getUserid(),user.getFullname(),"Menambahkan anda ke kontak",contact.getUserid(),user.getUid());
+                            }
+
+                            @Override
+                            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                            }
+                        });
                     }
                 });
         addFriend.setText("Sudah berteman");
@@ -571,7 +589,7 @@ public class FriendProfile extends AppCompatActivity {
                 for (DataSnapshot snapshot : dataSnapshot.getChildren()){
                     Token token = snapshot.getValue(Token.class);
                     Data data = new Data(fuser.getUid(), R.mipmap.ic_launcher, username+" "+message, username,
-                            userid,"profile", idpost);
+                            userid,"profile", fuser.getUid());
 
                     Sender sender = new Sender(data, token.getToken());
 

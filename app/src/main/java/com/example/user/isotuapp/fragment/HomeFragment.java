@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.SimpleItemAnimator;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -33,7 +34,6 @@ public class HomeFragment extends Fragment {
     private PostAdapter postAdapter;
     private List<Post> postList;
 
-    private RecyclerView recyclerView_story;
 
     private List<String> followingList;
     FirebaseAuth auth;
@@ -121,13 +121,14 @@ public class HomeFragment extends Fragment {
                         }
                     }
                 }
+
+                postAdapter.notifyDataSetChanged();
                 Log.d("duplicatedata", "onDataChange: " + postList);
                 if(postList.size() == 0 ){
                     emptyview.setVisibility(View.VISIBLE);
                 }else {
                     emptyview.setVisibility(View.GONE);
                 }
-                postAdapter.notifyDataSetChanged();
                 progress_circular.setVisibility(View.GONE);
             }
 
@@ -137,5 +138,7 @@ public class HomeFragment extends Fragment {
             }
         });
     }
+
+
 //
 }

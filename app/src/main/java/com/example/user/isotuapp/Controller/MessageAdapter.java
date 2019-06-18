@@ -64,6 +64,8 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHold
             Glide.with(mContext).load(imageurl).into(holder.profile_image);
         }
 
+        holder.nameUser.setVisibility(View.GONE);
+
         if(!chat.getImagepost().equals("")){
             holder.imagePost.setVisibility(View.VISIBLE);
             Picasso.get().load(chat.getImagepost()).into(holder.imagePost);
@@ -110,6 +112,7 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHold
         public TextView createdby;
         public ImageView imagePost;
         public TextView shareStatus ;
+        public TextView nameUser ;
 
 
 
@@ -121,6 +124,7 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHold
             txt_seen = itemView.findViewById(R.id.txt_seen);
             createdby = itemView.findViewById(R.id.user_share);
             imagePost = itemView.findViewById(R.id.imageShare);
+            nameUser = itemView.findViewById(R.id.name_user);
             shareStatus = itemView.findViewById(R.id.status_share);
             itemView.setFocusable(true);
             itemView.setOnClickListener(this);

@@ -30,6 +30,7 @@ public class GrupMessageAdapter extends RecyclerView.Adapter<GrupMessageAdapter.
 
     public static  final int MSG_TYPE_LEFT = 0;
     public static  final int MSG_TYPE_RIGHT = 1;
+    public static  final int MSG_TYPE_CENTER = 2;
 
     private Context mContext;
     private List<Chat> mChat;
@@ -49,8 +50,11 @@ public class GrupMessageAdapter extends RecyclerView.Adapter<GrupMessageAdapter.
         if (viewType == MSG_TYPE_RIGHT) {
             View view = LayoutInflater.from(mContext).inflate(R.layout.chat_item_right, parent, false);
             return new GrupMessageAdapter.ViewHolder(view);
-        } else {
+        } else if(viewType == MSG_TYPE_LEFT) {
             View view = LayoutInflater.from(mContext).inflate(R.layout.chat_item_left, parent, false);
+            return new GrupMessageAdapter.ViewHolder(view);
+        }else{
+            View view = LayoutInflater.from(mContext).inflate(R.layout.chat_item_center, parent, false);
             return new GrupMessageAdapter.ViewHolder(view);
         }
     }
@@ -161,10 +165,14 @@ public class GrupMessageAdapter extends RecyclerView.Adapter<GrupMessageAdapter.
     @Override
     public int getItemViewType(int position) {
         fuser = FirebaseAuth.getInstance().getCurrentUser();
-        if (mChat.get(position).getSender().equals(fuser.getUid())){
-            return MSG_TYPE_RIGHT;
-        } else {
-            return MSG_TYPE_LEFT;
+        if(mChat.get(position).getType().equals("0")) {
+            if (mChat.get(position).getSender().equals(fuser.getUid())) {
+                return MSG_TYPE_RIGHT;
+            } else {
+                return MSG_TYPE_LEFT;
+            }
+        }else{
+            return MSG_TYPE_CENTER;
         }
     }
 

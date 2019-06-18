@@ -77,6 +77,8 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ImageViewHolde
     boolean statuslike = false;
     private FirebaseUser firebaseUser;
     APIService apiService;
+    public static  final int POST_TYPE_0 = 0;
+    public static  final int POST_TYPE_1 = 1;
 
     public PostAdapter(Context context, List<Post> posts) {
         mContext = context;
@@ -86,8 +88,13 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ImageViewHolde
     @NonNull
     @Override
     public PostAdapter.ImageViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(mContext).inflate(R.layout.list_item_post, parent, false);
-        return new PostAdapter.ImageViewHolder(view);
+        if (viewType == POST_TYPE_0) {
+            View view = LayoutInflater.from(mContext).inflate(R.layout.list_item_post, parent, false);
+            return new PostAdapter.ImageViewHolder(view);
+        } else {
+            View view = LayoutInflater.from(mContext).inflate(R.layout.list_item_post_share, parent, false);
+            return new PostAdapter.ImageViewHolder(view);
+        }
     }
 
     @Override
@@ -97,7 +104,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ImageViewHolde
         FirebaseAuth auth = FirebaseAuth.getInstance();
         FirebaseUser currentUser = auth.getCurrentUser();
         if (model.getType().equals("1")) {
-            holder.firstLinear.setVisibility(View.VISIBLE);
+//            holder.firstLinear.setVisibility(View.VISIBLE);
             if (!model.getIduser().equals(currentUser.getUid())) {
                 holder.moreShareLayout.setVisibility(View.GONE);
             } else {
@@ -155,16 +162,16 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ImageViewHolde
                 }
             });
 
-
-            holder.secondLinear.setPadding(10, 10, 10, 10);
-            holder.thirdLinear.setPadding(10, 10, 10, 10);
-            holder.thirdLinear.setBackgroundResource(R.drawable.custom_border);
-            holder.postCommentLayout.setVisibility(View.GONE);
-            holder.commentShare.setVisibility(View.VISIBLE);
-            holder.textShare.setVisibility(View.GONE);
-            holder.postNumShareTextView.setVisibility(View.GONE);
-            holder.sharePostingImageView.setVisibility(View.GONE);
-            holder.captionTextView.setVisibility(View.VISIBLE);
+//
+//            holder.secondLinear.setPadding(10, 10, 10, 10);
+//            holder.thirdLinear.setPadding(10, 10, 10, 10);
+//            holder.thirdLinear.setBackgroundResource(R.drawable.custom_border);
+//            holder.postCommentLayout.setVisibility(View.GONE);
+//            holder.commentShare.setVisibility(View.VISIBLE);
+//            holder.textShare.setVisibility(View.GONE);
+//            holder.postNumShareTextView.setVisibility(View.GONE);
+//            holder.sharePostingImageView.setVisibility(View.GONE);
+//            holder.captionTextView.setVisibility(View.VISIBLE);
             id = model.getIdpost();
             Glide.with(mContext)
                     .load(model.getImageuser())
@@ -548,6 +555,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ImageViewHolde
         hashMap.put("postid", postid);
         hashMap.put("ispost", true);
         hashMap.put("type", "0");
+        hashMap.put("date", System.currentTimeMillis());
         reference.child(key).setValue(hashMap).addOnSuccessListener(new OnSuccessListener<Void>() {
             @Override
             public void onSuccess(Void aVoid) {
@@ -703,6 +711,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ImageViewHolde
                                                     if (!idUser.equals(mAuth.getUid())) {
                                                         sendNotifiaction(idUser, usr.getFullname(), "", idUser, postId);
                                                     }
+                                                    notifyDataSetChanged();
                                                 }
 
                                                 @Override
@@ -720,6 +729,16 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ImageViewHolde
 
                     }
                 });
+    }
+
+    @Override
+    public int getItemViewType(int position) {
+        if(mPosts.get(position).getType().equals("0")){
+            return POST_TYPE_0;
+        }else {
+            return POST_TYPE_1;
+        }
+
     }
 
     private void sendNotifiaction(String receiver, final String username, final String message, final String userid, final String idpost) {

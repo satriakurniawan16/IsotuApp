@@ -137,97 +137,97 @@ public class DetailUserHobi extends AppCompatActivity {
                     @Override
                     public void onItemClick(int position) {
                         final UserHobi pet = mData.get(position);
-                        AlertDialog.Builder mBuilder = new AlertDialog.Builder(DetailUserHobi.this);
+                        if(!pet.getIduser().equals(currentUser.getUid())){
+                            AlertDialog.Builder mBuilder = new AlertDialog.Builder(DetailUserHobi.this);
+                            View mView = getLayoutInflater().inflate(R.layout.modal_user,
+                                    null);
+                            ImageView profileImageView = (ImageView) mView.findViewById(R.id.profilepopup);
+                            TextView nameTextView = (TextView) mView.findViewById(R.id.nameuserpopup);
+                            final TextView jurusanTextView = (TextView) mView.findViewById(R.id.jurusanpopup);
+                            LinearLayout profileLayout = (LinearLayout) mView.findViewById(R.id.profilebutton);
+                            LinearLayout chatLayout = (LinearLayout) mView.findViewById(R.id.chatbutton);
+                            final LinearLayout addLayout = (LinearLayout) mView.findViewById(R.id.addbutton);
 
-                        View mView = getLayoutInflater().inflate(R.layout.modal_user,
-                                null);
+                            Picasso.get().load(pet.getFotoprofil()).into(profileImageView);
+                            nameTextView.setText(pet.getNamaprofil());
+                            DatabaseReference dbuser = FirebaseDatabase.getInstance().getReference("user").child(pet.getIduser());
+                            dbuser.addListenerForSingleValueEvent(new ValueEventListener() {
+                                @Override
+                                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                    final User usr = dataSnapshot.getValue(User.class);
+                                    jurusanTextView.setText(usr.getJurusan());
 
-                        ImageView profileImageView = (ImageView) mView.findViewById(R.id.profilepopup);
-                        TextView nameTextView = (TextView) mView.findViewById(R.id.nameuserpopup);
-                        final TextView jurusanTextView = (TextView) mView.findViewById(R.id.jurusanpopup);
-                        LinearLayout profileLayout = (LinearLayout) mView.findViewById(R.id.profilebutton);
-                        LinearLayout chatLayout = (LinearLayout) mView.findViewById(R.id.chatbutton);
-                        final LinearLayout addLayout = (LinearLayout) mView.findViewById(R.id.addbutton);
+                                    addLayout.setOnClickListener(new View.OnClickListener() {
+                                        @Override
+                                        public void onClick(View v) {
+                                            addContact(new Contact(usr.getUid(),usr.getFullname(),usr.getImage(),usr.getJurusan(),
+                                                    usr.getFakultas().toString(),usr.getSearch()));
+                                            addLayout.setVisibility(View.GONE);
+                                        }
+                                    });
+                                }
 
-                        Picasso.get().load(pet.getFotoprofil()).into(profileImageView);
-                        nameTextView.setText(pet.getNamaprofil());
-                        DatabaseReference dbuser = FirebaseDatabase.getInstance().getReference("user").child(pet.getIduser());
-                        dbuser.addListenerForSingleValueEvent(new ValueEventListener() {
-                            @Override
-                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                final User usr = dataSnapshot.getValue(User.class);
-                                jurusanTextView.setText(usr.getJurusan());
+                                @Override
+                                public void onCancelled(@NonNull DatabaseError databaseError) {
 
-                                addLayout.setOnClickListener(new View.OnClickListener() {
-                                    @Override
-                                    public void onClick(View v) {
-                                        addContact(new Contact(usr.getUid(),usr.getFullname(),usr.getImage(),usr.getJurusan(),
-                                                usr.getFakultas().toString(),usr.getSearch()));
+                                }
+                            });
+                            profileLayout.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+                                    Intent intent = new Intent(DetailUserHobi.this,FriendProfile.class);
+                                    intent.putExtra("iduser",pet.getIduser());
+                                    startActivity(intent);
+                                }
+                            });
+
+
+                            databasecontact = FirebaseDatabase.getInstance().getReference("contact").child(currentUser.getUid()).child("contactadded");
+                            databasecontact.addListenerForSingleValueEvent(new ValueEventListener() {
+                                @Override
+                                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                    Log.d("singlestatus", "onDataChange: " + dataSnapshot);
+                                    boolean status = false ;
+                                    boolean mystatus = false ;
+                                    for(DataSnapshot ds : dataSnapshot.getChildren()){
+                                        Log.d("Allstatus", "onDataChange: " + ds);
+                                        if(pet.getIduser().equals(ds.getKey())){
+                                            status = true;
+                                            break;
+                                        }else{
+                                            status = false;
+                                        }
+                                    }
+
+                                    if(status == true){
                                         addLayout.setVisibility(View.GONE);
                                     }
-                                });
-                            }
-
-                            @Override
-                            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                            }
-                        });
-                        profileLayout.setOnClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-                                Intent intent = new Intent(DetailUserHobi.this,FriendProfile.class);
-                                intent.putExtra("iduser",pet.getIduser());
-                                startActivity(intent);
-                            }
-                        });
-
-
-                        databasecontact = FirebaseDatabase.getInstance().getReference("contact").child(currentUser.getUid()).child("contactadded");
-                        databasecontact.addListenerForSingleValueEvent(new ValueEventListener() {
-                            @Override
-                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                Log.d("singlestatus", "onDataChange: " + dataSnapshot);
-                                boolean status = false ;
-                                boolean mystatus = false ;
-                                for(DataSnapshot ds : dataSnapshot.getChildren()){
-                                    Log.d("Allstatus", "onDataChange: " + ds);
-                                    if(pet.getIduser().equals(ds.getKey())){
-                                        status = true;
-                                        break;
-                                    }else{
-                                        status = false;
-                                    }
                                 }
 
-                                if(status == true){
-                                    addLayout.setVisibility(View.GONE);
+                                @Override
+                                public void onCancelled(@NonNull DatabaseError databaseError) {
+
                                 }
-                            }
-
-                            @Override
-                            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                            }
-                        });
+                            });
 
 
 
-                        chatLayout.setOnClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-                                Intent intent = new Intent(DetailUserHobi.this, MessageActivity.class);
-                                intent.putExtra("image",pet.getFotoprofil());
-                                intent.putExtra("name",pet.getNamaprofil());
-                                intent.putExtra("id",pet.getIduser());
-                                startActivity(intent);
-                            }
-                        });
+                            chatLayout.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+                                    Intent intent = new Intent(DetailUserHobi.this, MessageActivity.class);
+                                    intent.putExtra("image",pet.getFotoprofil());
+                                    intent.putExtra("name",pet.getNamaprofil());
+                                    intent.putExtra("id",pet.getIduser());
+                                    startActivity(intent);
+                                }
+                            });
 
-                        mBuilder.setView(mView);
-                        final AlertDialog dialognya = mBuilder.create();
-                        dialognya.show();
+                            mBuilder.setView(mView);
+                            final AlertDialog dialognya = mBuilder.create();
+                            dialognya.show();
 
+                        }
                     }
 
                     @Override
@@ -247,8 +247,20 @@ public class DetailUserHobi extends AppCompatActivity {
                     public void onSuccess(Void aVoid) {
                         Toast.makeText(getApplicationContext(),
                                 "Berhasil Ditambahkan", Toast.LENGTH_LONG).show();
-                        addNotification(contact.getUserid(),contact.getUserid(),"Menambahkan anda sebagai teman");
-                        sendNotifiaction(contact.getUserid(),contact.getNameuser(),"Menambahkan anda ke kontak",contact.getUserid(),contact.getUserid());
+                        DatabaseReference dbuser =  FirebaseDatabase.getInstance().getReference("user").child(FirebaseAuth.getInstance().getCurrentUser().getUid());
+                        dbuser.addListenerForSingleValueEvent(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                User user = dataSnapshot.getValue(User.class);
+                                addNotification(contact.getUserid(),user.getFullname(),user.getFullname() + " Menambahkan anda sebagai teman");
+                                sendNotifiaction(contact.getUserid(),user.getFullname(),"Menambahkan anda ke kontak",contact.getUserid(),user.getUid());
+                            }
+
+                            @Override
+                            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                            }
+                        });
                     }
                 });
     }
@@ -308,6 +320,7 @@ public class DetailUserHobi extends AppCompatActivity {
         hashMap.put("postid", mUser.getUid());
         hashMap.put("ispost", true);
         hashMap.put("type", "1");
+        hashMap.put("date", System.currentTimeMillis());
         reference.child(key).setValue(hashMap).addOnSuccessListener(new OnSuccessListener<Void>() {
             @Override
             public void onSuccess(Void aVoid) {

@@ -772,4 +772,11 @@ public class ProfileFragment extends Fragment {
         });
     }
 
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        databaseorganiasi.removeEventListener(childEventListenerOrgnanisasi);
+        database.removeEventListener(childEventListener);
+    }
+
 }

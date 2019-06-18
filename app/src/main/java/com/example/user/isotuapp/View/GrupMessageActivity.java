@@ -24,6 +24,7 @@ import com.example.user.isotuapp.Model.Chat;
 import com.example.user.isotuapp.Model.Grup;
 import com.example.user.isotuapp.Model.Post;
 import com.example.user.isotuapp.Model.User;
+import com.example.user.isotuapp.Model.UserHobi;
 import com.example.user.isotuapp.Notification.Client;
 import com.example.user.isotuapp.Notification.Data;
 import com.example.user.isotuapp.Notification.MyResponse;
@@ -390,6 +391,7 @@ public class GrupMessageActivity extends AppCompatActivity implements IMethodCal
         hashMap.put("imagepost",imagePost);
         hashMap.put("userpost",nameUser);
         hashMap.put("isseen", false);
+        hashMap.put("type", "0");
 
         reference.child(key).setValue(hashMap);
         final DatabaseReference chatRef = FirebaseDatabase.getInstance().getReference("Chatlist")
@@ -403,6 +405,7 @@ public class GrupMessageActivity extends AppCompatActivity implements IMethodCal
                     final HashMap<String, Object> user= new HashMap<>();
                     user.put("id",userid);
                     user.put("type","grup");
+                    user.put("subtype","1");
                     chatRef.setValue(user);
                 }
             }
@@ -413,10 +416,30 @@ public class GrupMessageActivity extends AppCompatActivity implements IMethodCal
             }
         });
 
-        final DatabaseReference chatRefReceiver = FirebaseDatabase.getInstance().getReference("Chatlist")
-                .child(userid)
-                .child(fuser.getUid());
-        chatRefReceiver.child("id").setValue(fuser.getUid());
+        final DatabaseReference chatRefReceiver = FirebaseDatabase.getInstance().getReference("Chatlist");
+
+        DatabaseReference mygrup = FirebaseDatabase.getInstance().getReference("groupmember").child(userid);
+        mygrup.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                for (DataSnapshot snapshot : dataSnapshot.getChildren()){
+                    UserHobi userHobi = snapshot.getValue(UserHobi.class);
+                    final HashMap<String, Object> userdung= new HashMap<>();
+                    userdung.put("id",userid);
+                    userdung.put("type","grup");
+                    userdung.put("subtype","0");
+                    if(userHobi.getIduser() != fuser.getUid()){
+                        chatRefReceiver.child(userHobi.getIduser())
+                                .child(userid).setValue(userdung);
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
 
         final String msg = message;
 

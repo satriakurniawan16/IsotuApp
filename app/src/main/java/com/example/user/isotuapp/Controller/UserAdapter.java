@@ -99,7 +99,7 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder> {
                     }
 
                     if (ischat){
-                        lastMessage(user.getUid(), holder.last_msg,"message");
+                        lastMessage(user.getUid(), holder.last_msg,"message","");
                     } else {
                         holder.last_msg.setVisibility(View.GONE);
                     }
@@ -151,7 +151,7 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder> {
                     }
 
                     if (ischat){
-                        lastMessage(newGrup.getIdgrup(), holder.last_msg,"grup");
+                        lastMessage(newGrup.getIdgrup(), holder.last_msg,"grup",grup.getSubtype());
                     } else {
                         holder.last_msg.setVisibility(View.GONE);
                     }
@@ -212,7 +212,7 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder> {
     }
 
     //check for last message
-    private void lastMessage(final String userid, final TextView last_msg,final String type){
+    private void lastMessage(final String userid, final TextView last_msg,final String type,final String subtype){
         theLastMessage = "default";
         final FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Chats");
@@ -227,8 +227,15 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder> {
                                 chat.getReceiver().equals(userid) && chat.getSender().equals(firebaseUser.getUid())) {
                             theLastMessage = chat.getMessage();
                             nameUser = chat.getSender();
-
                         }
+
+                        if (chat.getReceiver().equals(userid) && !chat.getSender().equals(firebaseUser.getUid()) ||
+                                chat.getReceiver().equals(userid) && chat.getSender().equals(firebaseUser.getUid())) {
+                            theLastMessage = chat.getMessage();
+                            nameUser = chat.getSender();
+                        }
+
+
                     }
                 }
 
@@ -247,7 +254,11 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder> {
                                 @Override
                                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                                     User user = dataSnapshot.getValue(User.class);
-                                    last_msg.setText(user.getFullname() +" : "+message);
+                                    if(subtype.equals("0")){
+                                        last_msg.setText(user.getFullname() +" : "+message);
+                                    }else{
+                                        last_msg.setText(message);
+                                    }
                                 }
 
                                 @Override

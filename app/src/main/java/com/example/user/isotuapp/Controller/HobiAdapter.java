@@ -94,6 +94,7 @@ public class HobiAdapter  extends RecyclerView.Adapter<HobiAdapter.ViewHolder> {
         }
     }
 
+
     public interface ClickHandler {
         void onItemClick(int position);
         boolean onItemLongClick(int position);

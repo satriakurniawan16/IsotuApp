@@ -227,16 +227,20 @@ public class ContactFragment extends Fragment {
                                 null);
 
                         LinearLayout hapus = (LinearLayout) mView.findViewById(R.id.hapus);
-                        hapus.setOnClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-                                database.child(pet.getUserid()).removeValue();
-                            }
-                        });
+
 
                         mBuilder.setView(mView);
                         final AlertDialog dialognya = mBuilder.create();
                         dialognya.show();
+
+                        hapus.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                database.child(pet.getUserid()).removeValue();
+                                dialognya.dismiss();
+                            }
+                        });
+
 
                         return true;
                     }

@@ -7,6 +7,7 @@ import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
+import android.text.format.DateUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -84,6 +85,7 @@ public class NotificationAdapter  extends RecyclerView.Adapter<NotificationAdapt
             }
         });
 
+        holder.dateNotifTextView.setText(DateUtils.getRelativeTimeSpanString(pet.getDate()));
         holder.notifLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -160,6 +162,7 @@ public class NotificationAdapter  extends RecyclerView.Adapter<NotificationAdapt
                                                 member.put("fotoprofil",user.getImage());
                                                 member.put("namaprofil", user.getFullname());
                                                 dbmember.child(FirebaseAuth.getInstance().getCurrentUser().getUid()).setValue(member);
+                                                sendMessage(FirebaseAuth.getInstance().getCurrentUser().getUid(), pet.getPostid(), user.getFullname()+" bergabung ke grup" ,"","","");
                                             }
 
                                             @Override
@@ -229,6 +232,7 @@ public class NotificationAdapter  extends RecyclerView.Adapter<NotificationAdapt
         final ImageView imageuserImageView;
         final TextView nameUserTextView;
         final TextView textNotifTextView;
+        final TextView dateNotifTextView;
         final LinearLayout notifLayout;
 
         ViewHolder(View itemView) {
@@ -236,6 +240,7 @@ public class NotificationAdapter  extends RecyclerView.Adapter<NotificationAdapt
             imageuserImageView= (ImageView) itemView.findViewById(R.id.userimagenotif);
             nameUserTextView = (TextView) itemView.findViewById(R.id.namenotif);
             textNotifTextView = (TextView) itemView.findViewById(R.id.textnotif);
+            dateNotifTextView = (TextView) itemView.findViewById(R.id.datenotif);
             notifLayout = (LinearLayout) itemView.findViewById(R.id.rootnotif);
         }
 
@@ -254,4 +259,68 @@ public class NotificationAdapter  extends RecyclerView.Adapter<NotificationAdapt
         void onItemClick(int position);
         boolean onItemLongClick(int position);
     }
+
+    public void sendMessage(String sender, final String receiver, String message, String imagePost, String nameUser, String idpost) {
+
+        DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Chats");
+        String key = reference.push().getKey();
+        HashMap<String, Object> hashMap = new HashMap<>();
+        hashMap.put("id", key);
+        hashMap.put("sender", sender);
+        hashMap.put("receiver", receiver);
+        hashMap.put("message", message);
+        hashMap.put("idpost",idpost);
+        hashMap.put("imagepost",imagePost);
+        hashMap.put("userpost",nameUser);
+        hashMap.put("isseen", false);
+        hashMap.put("type", "1");
+
+        reference.child(key).setValue(hashMap);
+        final DatabaseReference chatRef = FirebaseDatabase.getInstance().getReference("Chatlist")
+                .child(FirebaseAuth.getInstance().getCurrentUser().getUid())
+                .child(receiver);
+
+        chatRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                if (!dataSnapshot.exists()){
+                    final HashMap<String, Object> user= new HashMap<>();
+                    user.put("id",receiver);
+                    user.put("type","grup");
+                    user.put("subtype","1");
+                    chatRef.setValue(user);
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+
+        final DatabaseReference chatRefReceiver = FirebaseDatabase.getInstance().getReference("Chatlist")
+                .child(receiver)
+                .child(FirebaseAuth.getInstance().getCurrentUser().getUid());
+        chatRefReceiver.child("id").setValue(FirebaseAuth.getInstance().getCurrentUser());
+
+        final String msg = message;
+
+        reference = FirebaseDatabase.getInstance().getReference("user").child(FirebaseAuth.getInstance().getCurrentUser().getUid());
+        reference.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                User user = dataSnapshot.getValue(User.class);
+//                if (notify) {
+//                    sendNotifiaction(receiver, user.getFullname(), msg);
+//                }
+//                notify = false;
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+    }
+
 }

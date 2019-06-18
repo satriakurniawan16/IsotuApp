@@ -9,8 +9,10 @@ import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.ActionMode;
 import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -19,6 +21,7 @@ import android.widget.Toast;
 import com.bumptech.glide.Glide;
 import com.example.user.isotuapp.Controller.MessageAdapter;
 import com.example.user.isotuapp.Model.Chat;
+import com.example.user.isotuapp.Model.Contact;
 import com.example.user.isotuapp.Model.Post;
 import com.example.user.isotuapp.Model.User;
 import com.example.user.isotuapp.Notification.Client;
@@ -30,6 +33,8 @@ import com.example.user.isotuapp.R;
 import com.example.user.isotuapp.fragment.APIService;
 import com.example.user.isotuapp.utils.Constants;
 import com.example.user.isotuapp.utils.IMethodCaller;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -37,6 +42,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
+import com.google.firebase.database.ServerValue;
 import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Picasso;
 
@@ -79,6 +85,16 @@ public class MessageActivity extends AppCompatActivity implements IMethodCaller 
 
     boolean notify = false;
 
+    LinearLayout addFriendLayout;
+
+    TextView nameUser;
+
+    DatabaseReference databasecontact;
+
+    Button addFriendContact;
+
+    LinearLayout addPicture;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -109,19 +125,38 @@ public class MessageActivity extends AppCompatActivity implements IMethodCaller 
         username = findViewById(R.id.username);
         btn_send = findViewById(R.id.btn_send);
         text_send = findViewById(R.id.text_send);
+        addPicture = findViewById(R.id.addPict);
 
         intent = getIntent();
         userid = intent.getStringExtra("id");
-
+        addFriendContact = findViewById(R.id.add_contact_lol);
+        addFriendLayout = findViewById(R.id.add_friend);
+        nameUser = findViewById(R.id.name_user);
         fuser = FirebaseAuth.getInstance().getCurrentUser();
 
         reference = FirebaseDatabase.getInstance().getReference("user").child(userid);
 
+        addPicture.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                
+            }
+        });
+        loaddata();
+
+        addFriendLayout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Toast.makeText(MessageActivity.this, "LOLL", Toast.LENGTH_SHORT).show();
+            }
+        });
+
         reference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                User user = dataSnapshot.getValue(User.class);
+                final User user = dataSnapshot.getValue(User.class);
                 username.setText(user.getFullname());
+                nameUser.setText("Anda belum menambahkan "+user.getFullname()+" ke kontak");
                 if (user.getImage().equals("default")){
                     profile_image.setImageResource(R.mipmap.ic_launcher);
                 } else {
@@ -157,6 +192,41 @@ public class MessageActivity extends AppCompatActivity implements IMethodCaller 
         });
     }
 
+    private void loaddata() {
+        FirebaseAuth auth = FirebaseAuth.getInstance();
+        final FirebaseUser currentUser = auth.getCurrentUser();
+        databasecontact = FirebaseDatabase.getInstance().getReference("contact").child(currentUser.getUid()).child("contactadded");
+        databasecontact.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                Log.d("singlestatus", "onDataChange: " + dataSnapshot);
+                boolean status = false;
+                boolean mystatus = false;
+                for (DataSnapshot ds : dataSnapshot.getChildren()) {
+                    Log.d("Allstatus", "onDataChange: " + ds);
+                    if (userid.equals(ds.getKey())) {
+                        status = true;
+                        break;
+                    }
+                    if (userid.equals(currentUser.getUid())) {
+                        mystatus = true;
+                        break;
+                    }
+                }
+
+                if (status == true) {
+                    addFriendLayout.setVisibility(View.GONE);
+                } else {
+                    addFriendLayout.setVisibility(View.VISIBLE);
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+    }
 
 
 
@@ -211,6 +281,100 @@ public class MessageActivity extends AppCompatActivity implements IMethodCaller 
                         hashMap.put("isseen", true);
                         snapshot.getRef().updateChildren(hashMap);
                     }
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+    }
+
+    private void addContact(final Contact contact) {
+        databasecontact.child(userid).setValue(contact).
+                addOnSuccessListener(this, new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                        Toast.makeText(getApplicationContext(),
+                                "Berhasil Ditambahkan", Toast.LENGTH_LONG).show();
+                        DatabaseReference dbuser = FirebaseDatabase.getInstance().getReference("user").child(fuser.getUid());
+                        dbuser.addListenerForSingleValueEvent(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                User user = dataSnapshot.getValue(User.class);
+                                addNotification(contact.getUserid(),contact.getUserid(),"Menambahkan anda sebagai teman");
+                                sendNotifiactionFriend(userid,user.getFullname(),"Menambahkan anda ke kontak",userid,userid);
+                            }
+
+                            @Override
+                            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                            }
+                        });
+                            }
+                });
+        addFriendLayout.setVisibility(View.GONE);
+    }
+
+    private void addNotification(String userid, String postid,String text){
+        DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Notifications").child(userid);
+        HashMap<String, Object> hashMap = new HashMap<>();
+        FirebaseAuth authuser = FirebaseAuth.getInstance();
+        FirebaseUser mUser = authuser.getCurrentUser();
+        String key;
+        key = reference.push().getKey();
+        hashMap.put("id",key);
+        hashMap.put("userid", mUser.getUid());
+        hashMap.put("text", text);
+        hashMap.put("postid", mUser.getUid());
+        hashMap.put("ispost", true);
+        hashMap.put("type", "1");
+        reference.child(key).setValue(hashMap).addOnSuccessListener(new OnSuccessListener<Void>() {
+            @Override
+            public void onSuccess(Void aVoid) {
+                Toast.makeText(MessageActivity.this, "Berhasil terimpan", Toast.LENGTH_SHORT).show();
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                Toast.makeText(MessageActivity.this, "errorpak " , Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private void sendNotifiactionFriend(String receiver, final String username, final String message,final String userid,final String idpost){
+        apiService = Client.getClient("https://fcm.googleapis.com/").create(APIService.class);
+        FirebaseAuth mauth = FirebaseAuth.getInstance();
+        final FirebaseUser fuser = mauth.getCurrentUser();
+        DatabaseReference tokens = FirebaseDatabase.getInstance().getReference("Tokens");
+        Query query = tokens.orderByKey().equalTo(receiver);
+        query.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                for (DataSnapshot snapshot : dataSnapshot.getChildren()){
+                    Token token = snapshot.getValue(Token.class);
+                    Data data = new Data(fuser.getUid(), R.mipmap.ic_launcher, username+" "+message, username,
+                            userid,"profile", idpost);
+
+                    Sender sender = new Sender(data, token.getToken());
+
+                    apiService.sendNotification(sender)
+                            .enqueue(new Callback<MyResponse>() {
+                                @Override
+                                public void onResponse(Call<MyResponse> call, Response<MyResponse> response) {
+                                    if (response.code() == 200){
+                                        if (response.body().success != 1){
+//                                            Toast.makeText(MessageActivity.this, "Failed!", Toast.LENGTH_SHORT).show();
+                                        }
+                                    }
+                                }
+
+                                @Override
+                                public void onFailure(Call<MyResponse> call, Throwable t) {
+
+                                }
+                            });
                 }
             }
 
@@ -316,6 +480,7 @@ public class MessageActivity extends AppCompatActivity implements IMethodCaller 
         hashMap.put("imagepost",imagePost);
         hashMap.put("userpost",nameUser);
         hashMap.put("isseen", false);
+        hashMap.put("type", "0");
 
         reference.child(key).setValue(hashMap);
         final DatabaseReference chatRef = FirebaseDatabase.getInstance().getReference("Chatlist")
@@ -329,6 +494,7 @@ public class MessageActivity extends AppCompatActivity implements IMethodCaller 
                     final HashMap<String, Object> user= new HashMap<>();
                     user.put("id",userid);
                     user.put("type","message");
+                    user.put("date",ServerValue.TIMESTAMP);
                     chatRef.setValue(user);
                 }
             }
@@ -342,7 +508,11 @@ public class MessageActivity extends AppCompatActivity implements IMethodCaller 
         final DatabaseReference chatRefReceiver = FirebaseDatabase.getInstance().getReference("Chatlist")
                 .child(userid)
                 .child(fuser.getUid());
-        chatRefReceiver.child("id").setValue(fuser.getUid());
+                final HashMap<String, Object> userlol= new HashMap<>();
+        userlol.put("id",userid);
+        userlol.put("type","message");
+        userlol.put("date",ServerValue.TIMESTAMP);
+        chatRefReceiver.setValue(userlol);
 
         final String msg = message;
 
@@ -362,5 +532,22 @@ public class MessageActivity extends AppCompatActivity implements IMethodCaller 
 
             }
         });
+    }
+
+    public void addContact(View view) {
+        DatabaseReference dbuser = FirebaseDatabase.getInstance().getReference("user").child(userid);
+        dbuser.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                User user = dataSnapshot.getValue(User.class);
+                        addContact(new Contact(userid,user.getFullname(),user.getImage(),user.getJurusan(),user.getFakultas(),user.getSearch()));
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+
     }
 }

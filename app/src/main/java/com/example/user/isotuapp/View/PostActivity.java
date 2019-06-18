@@ -130,7 +130,12 @@ public class PostActivity extends AppCompatActivity {
 
 
         Intent intent = getIntent();
-        idpost = intent.getStringExtra(Constants.EXTRA_POST);
+        if(intent.getStringExtra(Constants.EXTRA_POST )!= null){
+            idpost = intent.getStringExtra(Constants.EXTRA_POST);
+        }else{
+            idpost = intent.getStringExtra("id");
+        }
+
         Log.d("lol", "idpost: " + idpost);
 
         mFirebaseAuth = FirebaseAuth.getInstance();
@@ -369,7 +374,7 @@ public class PostActivity extends AppCompatActivity {
                 .addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
-                        User user = dataSnapshot.getValue(User.class);
+                        final User user = dataSnapshot.getValue(User.class);
                         mComment.setUser(user);
                         FirebaseUtils.getCommentRef(idpost)
                                 .child(uid)
@@ -380,7 +385,7 @@ public class PostActivity extends AppCompatActivity {
                             @Override
                             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                                 Post post = dataSnapshot.getValue(Post.class);
-                                sendNotifiaction(post.getUser().getUid(),fullname,"Mengomentari postingan anda",post.getUser().getUid(),idpost);
+                                sendNotifiaction(post.getUser().getUid(),user.getFullname(),user.getFullname()+ " : Mengomentari postingan anda",post.getUser().getUid(),idpost);
                                 addNotification(post.getUser().getUid(),idpost,"mengomentari postingan anda");
                             }
 
@@ -442,6 +447,91 @@ public class PostActivity extends AppCompatActivity {
                         Intent intent = new Intent(PostActivity.this, FriendProfile.class);
                         intent.putExtra("iduser", model.getUser().getUid());
                         startActivity(intent);
+                    }
+                });
+
+                viewHolder.rootLayout.setOnLongClickListener(new View.OnLongClickListener() {
+                    @Override
+                    public boolean onLongClick(View v) {
+                        final AlertDialog.Builder mBuilder = new AlertDialog.Builder(PostActivity.this);
+                        final View mView = getLayoutInflater().inflate(R.layout.popup_message,
+                                null);
+                        DatabaseReference dbinitilize = FirebaseDatabase.getInstance().getReference("posting").child(idpost);
+                        dbinitilize.addListenerForSingleValueEvent(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                Post post = dataSnapshot.getValue(Post.class);
+                                if(post.getType().equals("0")){
+                                    if(post.getUser().getUid().equals(currentUser.getUid())){
+                                        LinearLayout deleteComment =  mView.findViewById(R.id.hapus);
+
+                                        mBuilder.setView(mView);
+                                        final AlertDialog dialognya = mBuilder.create();
+                                        dialognya.show();
+                                        deleteComment.setOnClickListener(new View.OnClickListener() {
+                                            @Override
+                                            public void onClick(View v) {
+                                                DatabaseReference dbcomment =  FirebaseDatabase.getInstance().getReference("comments").child(idpost).child(model.getCommentId());
+                                                dbcomment.removeValue();
+                                                decNumComment();
+                                                dialognya.dismiss();
+                                            }
+                                        });
+                                    }else if(model.getUser().getUid().equals(currentUser.getUid())){
+                                            LinearLayout deleteComment =  mView.findViewById(R.id.hapus);
+                                        mBuilder.setView(mView);
+                                        final AlertDialog dialognya = mBuilder.create();
+                                        dialognya.show();
+                                            deleteComment.setOnClickListener(new View.OnClickListener() {
+                                                @Override
+                                                public void onClick(View v) {
+                                                    DatabaseReference dbcomment =  FirebaseDatabase.getInstance().getReference("comments").child(idpost).child(model.getCommentId());
+                                                    dbcomment.removeValue();
+                                                    decNumComment();
+                                                    dialognya.dismiss();
+                                                }
+                                            });
+                                        }
+
+                                }else if(post.getType().equals("1")){
+                                    if(post.getIduser().equals(currentUser.getUid())){
+                                        LinearLayout deleteComment =  mView.findViewById(R.id.hapus);
+                                        mBuilder.setView(mView);
+                                        final AlertDialog dialognya = mBuilder.create();
+                                        dialognya.show();
+                                        deleteComment.setOnClickListener(new View.OnClickListener() {
+                                            @Override
+                                            public void onClick(View v) {
+                                                DatabaseReference dbcomment =  FirebaseDatabase.getInstance().getReference("comments").child(idpost).child(model.getCommentId());
+                                                dbcomment.removeValue();
+                                                decNumComment();
+                                                dialognya.dismiss();
+                                            }
+                                        });
+                                    }else if(model.getUser().getUid().equals(currentUser.getUid())){
+                                        LinearLayout deleteComment =  mView.findViewById(R.id.hapus);
+                                        mBuilder.setView(mView);
+                                        final AlertDialog dialognya = mBuilder.create();
+                                        dialognya.show();
+                                        deleteComment.setOnClickListener(new View.OnClickListener() {
+                                            @Override
+                                            public void onClick(View v) {
+                                                DatabaseReference dbcomment =  FirebaseDatabase.getInstance().getReference("comments").child(idpost).child(model.getCommentId());
+                                                dbcomment.removeValue();
+                                                decNumComment();
+                                                dialognya.dismiss();
+                                            }
+                                        });
+                                    }
+                                }
+                            }
+
+                            @Override
+                            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                            }
+                        });
+                        return true;
                     }
                 });
             }
@@ -585,6 +675,7 @@ public class PostActivity extends AppCompatActivity {
         hashMap.put("postid", postid);
         hashMap.put("ispost", true);
         hashMap.put("type", "0");
+        hashMap.put("date", System.currentTimeMillis());
         reference.child(key).setValue(hashMap).addOnSuccessListener(new OnSuccessListener<Void>() {
             @Override
             public void onSuccess(Void aVoid) {
@@ -623,6 +714,25 @@ public class PostActivity extends AppCompatActivity {
         });
     }
 
+
+    public void decNumComment(){
+        FirebaseUtils.getPostRef().child(idpost)
+                .child(Constants.NUM_COMMENTS_KEY)
+                .runTransaction(new Transaction.Handler() {
+                    @Override
+                    public Transaction.Result doTransaction(MutableData mutableData) {
+                        long num = (long) mutableData.getValue();
+                        mutableData.setValue(num - 1);
+                        return Transaction.success(mutableData);
+                    }
+
+                    @Override
+                    public void onComplete(DatabaseError databaseError, boolean b, DataSnapshot dataSnapshot) {
+                        initPost();
+                    }
+                });
+    }
+
     @Override
     protected void onStart() {
         super.onStart();
@@ -658,7 +768,6 @@ public class PostActivity extends AppCompatActivity {
                                         }
                                     }
                                 }
-
                                 @Override
                                 public void onFailure(Call<MyResponse> call, Throwable t) {
 
@@ -679,6 +788,7 @@ public class PostActivity extends AppCompatActivity {
         TextView usernameTextView;
         TextView timeTextView;
         TextView commentTextView;
+        LinearLayout rootLayout;
 
         public CommentHolder(View itemView) {
             super(itemView);
@@ -686,6 +796,7 @@ public class PostActivity extends AppCompatActivity {
             usernameTextView = (TextView) itemView.findViewById(R.id.username_comment);
             timeTextView = (TextView) itemView.findViewById(R.id.date_comment);
             commentTextView = (TextView) itemView.findViewById(R.id.comment_text);
+            rootLayout = (LinearLayout) itemView.findViewById(R.id.rootlayoutcomment);
         }
 
         public void setUsername(String username) {

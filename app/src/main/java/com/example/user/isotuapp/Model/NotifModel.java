@@ -2,9 +2,18 @@ package com.example.user.isotuapp.Model;
 
 public class NotifModel {
     String id,userid,text,postid,type;
+    long date;
     boolean ispost;
 
     public NotifModel() {
+    }
+
+    public long getDate() {
+        return date;
+    }
+
+    public void setDate(long date) {
+        this.date = date;
     }
 
     public boolean isIspost() {

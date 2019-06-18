@@ -197,17 +197,18 @@ public class FindingFriend extends AppCompatActivity {
                     Location compareLoc = new Location("compare");
                     float minDist = mindistance;
                     float distance = Float.MAX_VALUE;
-
-                    if(user.getLatitude() != null && user.getLongitude() != null) {
-                        compareLoc.setLatitude(user.getLatitude());
-                        compareLoc.setLongitude(user.getLongitude());
-                        distance = currentLocation.distanceTo(compareLoc);
-                            if (user.getUid() != fuser.getUid()) {
+                    if(user.getUid() != null ){
+                        if(user.getLatitude() != null && user.getLongitude() != null) {
+                            compareLoc.setLatitude(user.getLatitude());
+                            compareLoc.setLongitude(user.getLongitude());
+                            distance = currentLocation.distanceTo(compareLoc);
+                            if (!user.getUid().equals(fuser.getUid())) {
                                 if (distance >= minDist && distance <= maxdistance && user.getUid() != fuser.getUid()) {
                                     mData.add(user);
                                 }
                             }
                         }
+                    }
                         if(mData == null) {
                             emptyView.setVisibility(View.VISIBLE);
                         }else {
@@ -354,9 +355,22 @@ public class FindingFriend extends AppCompatActivity {
                     public void onSuccess(Void aVoid) {
                         Toast.makeText(getApplicationContext(),
                                 "Berhasil Ditambahkan", Toast.LENGTH_LONG).show();
-                        addNotification(contact.getUserid(),contact.getUserid(),"Menambahkan anda sebagai teman");
-                        sendNotifiaction(contact.getUserid(),contact.getNameuser(),"Menambahkan anda ke kontak",contact.getUserid(),contact.getUserid());
-                    }
+                        DatabaseReference dbuser =  FirebaseDatabase.getInstance().getReference("user").child(FirebaseAuth.getInstance().getCurrentUser().getUid());
+                        dbuser.addListenerForSingleValueEvent(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                User user = dataSnapshot.getValue(User.class);
+                                addNotification(contact.getUserid(),user.getFullname(),user.getFullname() + " Menambahkan anda sebagai teman");
+                                sendNotifiaction(contact.getUserid(),user.getFullname(),"Menambahkan anda ke kontak",contact.getUserid(),user.getUid());
+                            }
+
+                            @Override
+                            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                            }
+                        });
+
+                            }
                 });
     }
 
@@ -415,6 +429,7 @@ public class FindingFriend extends AppCompatActivity {
         hashMap.put("postid", mUser.getUid());
         hashMap.put("ispost", true);
         hashMap.put("type", "1");
+        hashMap.put("date", System.currentTimeMillis());
         reference.child(key).setValue(hashMap).addOnSuccessListener(new OnSuccessListener<Void>() {
             @Override
             public void onSuccess(Void aVoid) {

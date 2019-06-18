@@ -45,15 +45,13 @@
                         app:titleTextColor="@color/colorWhite" >
 
 
-                        <RelativeLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            >
+
 
                             <RelativeLayout
                                 android:id="@+id/notification_direct"
                                 android:layout_width="25dp"
                                 android:layout_height="25dp"
+                                android:layout_gravity="right"
                                 android:layout_marginRight="15dp"
                                 android:layout_alignParentRight="true"
                                 android:layout_centerInParent="true"
@@ -90,6 +88,7 @@
                                 android:id="@+id/addgrupdirect"
                                 android:layout_width="25dp"
                                 android:layout_height="25dp"
+                                android:layout_gravity="right"
                                 android:layout_toLeftOf="@id/notification_direct"
                                 android:layout_margin="5dp">
 
@@ -100,7 +99,6 @@
 
                             </RelativeLayout>
 
-                        </RelativeLayout>
                     </android.support.v7.widget.Toolbar>
 
 

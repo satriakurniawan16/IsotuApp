@@ -60,13 +60,13 @@ public class MyFirebaseMessaging extends FirebaseMessagingService {
         Intent intent = null;
         if(type.equals("message")){
             intent = new Intent(this, MessageActivity.class);
-        }else if(type.equals("post")){
+        }if(type.equals("post")){
             intent = new Intent(this,PostActivity.class);
-        }else if(type.equals("profile")){
+        }if(type.equals("profile")){
             intent = new Intent(this,FriendProfile.class);
-        }else if(type.equals("grup")){
+        }if(type.equals("grup")){
             intent = new Intent(this,NotificationActivity.class);
-        }else if(type.equals("newgrup")){
+        }if(type.equals("newgrup")){
             intent = new Intent(this,GrupMessageActivity.class);
         }
         Bundle bundle = new Bundle();

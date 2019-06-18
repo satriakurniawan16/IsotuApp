@@ -257,11 +257,15 @@ public class ShareAdapter  extends RecyclerView.Adapter<ShareAdapter.ViewHolder>
                 .child(fuser.getUid())
                 .child(id);
 
+
         chatRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 if (!dataSnapshot.exists()){
-                    chatRef.child("id").setValue(id);
+                    final HashMap<String, Object> user= new HashMap<>();
+                    user.put("id",id);
+                    user.put("type","message");
+                    chatRef.setValue(user);
                 }
             }
 
@@ -274,7 +278,11 @@ public class ShareAdapter  extends RecyclerView.Adapter<ShareAdapter.ViewHolder>
         final DatabaseReference chatRefReceiver = FirebaseDatabase.getInstance().getReference("Chatlist")
                 .child(id)
                 .child(fuser.getUid());
-        chatRefReceiver.child("id").setValue(fuser.getUid());
+
+        final HashMap<String, Object> userlol= new HashMap<>();
+        userlol.put("id",id);
+        userlol.put("type","message");
+        chatRefReceiver.setValue(userlol);
 
         final String msg = nameUser;
 

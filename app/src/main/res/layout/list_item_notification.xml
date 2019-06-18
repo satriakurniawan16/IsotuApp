@@ -17,6 +17,11 @@
             android:layout_height="60dp"
             android:layout_margin="2dp"/>
 
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:gravity="center|left">
         <TextView
             android:id="@+id/namenotif"
             android:layout_width="wrap_content"
@@ -25,6 +30,7 @@
             android:textStyle="bold"
             android:layout_marginLeft="10dp"
             />
+
         <TextView
             android:id="@+id/textnotif"
             android:layout_width="wrap_content"
@@ -33,6 +39,16 @@
             android:layout_marginLeft="10dp"
             />
 
+         <TextView
+            android:id="@+id/datenotif"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="1 menit yang lalu"
+             android:textSize="12dp"
+            android:layout_marginLeft="10dp"
+            />
+
+        </LinearLayout>
     </LinearLayout>
 
 </android.support.constraint.ConstraintLayout>
