@@ -12,10 +12,16 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.example.user.isotuapp.Model.Contact;
+import com.example.user.isotuapp.Model.User;
 import com.example.user.isotuapp.Model.UserHobi;
 import com.example.user.isotuapp.R;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
@@ -29,7 +35,7 @@ public class ContactAdapter  extends RecyclerView.Adapter<ContactAdapter.ViewHol
     private View mEmptyView;
 
     public ContactAdapter(Context context, ArrayList<Contact> data, ArrayList<String> dataId,View emptyView,
-                           ClickHandler handler) {
+                          ClickHandler handler) {
         mContext = context;
         mData = data;
         mDataId = dataId;
@@ -54,11 +60,23 @@ public class ContactAdapter  extends RecyclerView.Adapter<ContactAdapter.ViewHol
     }
 
     @Override
-    public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        Contact pet = mData.get(position);
-        holder.nameTextView.setText(pet.getNameuser());
-        holder.keteranganTextView.setText(pet.getMajoruser()+", "+pet.getFacultyuser());
-        Picasso.get().load(pet.getImageuser()).into(holder.profilImageview);
+    public void onBindViewHolder(@NonNull final ViewHolder holder, int position) {
+        final Contact pet = mData.get(position);
+        DatabaseReference dbuser = FirebaseDatabase.getInstance().getReference("user").child(pet.getUserid());
+        dbuser.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                User user = dataSnapshot.getValue(User.class);
+                holder.nameTextView.setText(user.getFullname());
+                holder.keteranganTextView.setText(user.getJurusan()+", "+user.getFakultas());
+                Picasso.get().load(user.getImage()).into(holder.profilImageview);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
         holder.itemView.setSelected(mSelectedId.contains(mDataId.get(position)));
         FirebaseAuth auth = FirebaseAuth.getInstance();
         FirebaseUser currentUser = auth.getCurrentUser();

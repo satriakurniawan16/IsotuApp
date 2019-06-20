@@ -111,6 +111,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ImageViewHolde
                 holder.moreShareLayout.setVisibility(View.VISIBLE);
             }
 
+
             holder.moreShareLayout.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -141,7 +142,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ImageViewHolde
                         public void onClick(View v) {
                             AlertDialog.Builder builder = new AlertDialog.Builder(mContext)
                                     .setMessage("Apakah anda yakin untuk menghapus ?")
-                                    .setPositiveButton("Delete", new DialogInterface.OnClickListener() {
+                                    .setPositiveButton("Ya", new DialogInterface.OnClickListener() {
                                         @Override
                                         public void onClick(DialogInterface dialog, int which) {
                                             DatabaseReference dbfpost = FirebaseDatabase.getInstance().getReference("posting");
@@ -149,7 +150,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ImageViewHolde
                                             dialoglol.dismiss();
                                         }
                                     })
-                                    .setNegativeButton("cancel", new DialogInterface.OnClickListener() {
+                                    .setNegativeButton("Tidak", new DialogInterface.OnClickListener() {
                                         @Override
                                         public void onClick(DialogInterface dialog, int which) {
                                             dialog.cancel();
@@ -173,10 +174,22 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ImageViewHolde
 //            holder.sharePostingImageView.setVisibility(View.GONE);
 //            holder.captionTextView.setVisibility(View.VISIBLE);
             id = model.getIdpost();
-            Glide.with(mContext)
-                    .load(model.getImageuser())
-                    .into(holder.imageUserImageView);
 
+            DatabaseReference dbusershare = FirebaseDatabase.getInstance().getReference("user").child(model.getIduser());
+            dbusershare.addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                    User user = dataSnapshot.getValue(User.class);
+
+                    Picasso.get().load(user.getImage()).into(holder.imageUserImageView);
+
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                }
+            });
             holder.imageUserImageView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -246,7 +259,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ImageViewHolde
         holder.postNumLikesTextView.setText(String.valueOf(model.getNumlikes()));
         holder.postTimeCreatedTextView.setText(DateUtils.getRelativeTimeSpanString(model.getTimeCreated()));
         holder.postOwnerUsernameTextView.setText(model.getUser().getFullname());
-        holder.captionTextView.setText(model.getText());
+        holder.captionTextView.setText(model.getCaptionshare());
         holder.postNumShareTextView.setText(String.valueOf(model.getNumshare()));
         FirebaseAuth mAuth = FirebaseAuth.getInstance();
         DatabaseReference dblike = FirebaseDatabase.getInstance().
@@ -337,9 +350,25 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ImageViewHolde
             }
         });
 
-        Glide.with(mContext)
-                .load(model.getUser().getImage())
-                .into(holder.postOwnerDisplayImageView);
+        DatabaseReference dbuser = FirebaseDatabase.getInstance().getReference("user").child(model.getUser().getUid());
+        dbuser.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                User user = dataSnapshot.getValue(User.class);
+                try {
+                    Glide.with(mContext)
+                            .load(user.getImage())
+                            .into(holder.postOwnerDisplayImageView);
+                }catch (Exception e){
+                    e.printStackTrace();
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
 
 
         if (model.getImage() != null && !model.getImage().equals("")) {
@@ -559,12 +588,12 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ImageViewHolde
         reference.child(key).setValue(hashMap).addOnSuccessListener(new OnSuccessListener<Void>() {
             @Override
             public void onSuccess(Void aVoid) {
-                Toast.makeText(mContext, "Berhasil terimpan", Toast.LENGTH_SHORT).show();
+//                Toast.makeText(mContext, "Berhasil terimpan", Toast.LENGTH_SHORT).show();
             }
         }).addOnFailureListener(new OnFailureListener() {
             @Override
             public void onFailure(@NonNull Exception e) {
-                Toast.makeText(mContext, "errorpak ", Toast.LENGTH_SHORT).show();
+//                Toast.makeText(mContext, "errorpak ", Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -580,7 +609,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ImageViewHolde
                                 .addOnCompleteListener(new OnCompleteListener<Void>() {
                                     @Override
                                     public void onComplete(@NonNull Task<Void> task) {
-                                        Toast.makeText(mContext, "Deleted!", Toast.LENGTH_SHORT).show();
+//                                        Toast.makeText(mContext, "Deleted!", Toast.LENGTH_SHORT).show();
                                     }
                                 });
                     }
@@ -707,9 +736,9 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ImageViewHolde
                                                     hobiuser.put("fotoprofil", usr.getImage());
                                                     hobiuser.put("namaprofil", usr.getFullname());
                                                     dbuserliked.child(mAuth.getUid()).setValue(hobiuser);
-                                                    addNotification(idUser, postId);
                                                     if (!idUser.equals(mAuth.getUid())) {
                                                         sendNotifiaction(idUser, usr.getFullname(), "", idUser, postId);
+                                                        addNotification(idUser, postId);
                                                     }
                                                     notifyDataSetChanged();
                                                 }

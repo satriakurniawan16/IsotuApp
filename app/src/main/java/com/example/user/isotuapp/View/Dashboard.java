@@ -466,17 +466,15 @@ public class Dashboard extends AppCompatActivity  {
 
 
     private void status(final String status){
-        mAuth = FirebaseAuth.getInstance();
-        mAuthListener = new FirebaseAuth.AuthStateListener(){
-            @Override
-            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
 
-                    reference = FirebaseDatabase.getInstance().getReference("user").child(FirebaseAuth.getInstance().getCurrentUser().getUid());
-                    HashMap<String, Object> hashMap = new HashMap<>();
-                    hashMap.put("status", status);
-                    reference.updateChildren(hashMap);
-            }
-        };
+        try {
+            reference = FirebaseDatabase.getInstance().getReference("user").child(FirebaseAuth.getInstance().getCurrentUser().getUid());
+            HashMap<String, Object> hashMap = new HashMap<>();
+            hashMap.put("status", status);
+            reference.updateChildren(hashMap);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
 
@@ -801,7 +799,7 @@ public class Dashboard extends AppCompatActivity  {
     final Utils utils = new Utils(this);
     public void getSliding(final String idpostny){
         idpost = idpostny;
-        Toast.makeText(getApplicationContext(), "thissssss", Toast.LENGTH_SHORT).show();
+//        Toast.makeText(getApplicationContext(), "thissssss", Toast.LENGTH_SHORT).show();
         mData.clear();
         database = FirebaseDatabase.getInstance().getReference("contact").child(currentUser.getUid()).child("contactadded");
         database.addChildEventListener(childEventListener);

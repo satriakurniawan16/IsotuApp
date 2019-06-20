@@ -495,6 +495,11 @@ public class FriendProfile extends AppCompatActivity {
                     hapusContact.setVisibility(View.GONE);
                     addFriend.setText("Tambahkan sebagai teman +");
                 }
+
+                if(iduser.equals(FirebaseAuth.getInstance().getCurrentUser().getUid())){
+                   addFriend.setVisibility(View.GONE);
+                   hapusContact.setVisibility(View.GONE);
+                }
             }
 
             @Override
@@ -537,12 +542,13 @@ public class FriendProfile extends AppCompatActivity {
         hashMap.put("userid", mUser.getUid());
         hashMap.put("text", text);
         hashMap.put("postid", mUser.getUid());
+        hashMap.put("date", System.currentTimeMillis());
         hashMap.put("ispost", true);
         hashMap.put("type", "1");
         reference.child(key).setValue(hashMap).addOnSuccessListener(new OnSuccessListener<Void>() {
             @Override
             public void onSuccess(Void aVoid) {
-                Toast.makeText(FriendProfile.this, "Berhasil terimpan", Toast.LENGTH_SHORT).show();
+//                Toast.makeText(FriendProfile.this, "Berhasil terimpan", Toast.LENGTH_SHORT).show();
             }
         }).addOnFailureListener(new OnFailureListener() {
             @Override
@@ -669,6 +675,25 @@ public class FriendProfile extends AppCompatActivity {
         }
         mAdapterShare = new ShareAdapter(FriendProfile.this, mDataShare, mDataIdShare, "");
         recyclerView.setAdapter(mAdapter);
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        status("offline");
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        status("online");
+    }
+
+    private void status(final String status){
+        DatabaseReference reference = FirebaseDatabase.getInstance().getReference("user").child(FirebaseAuth.getInstance().getCurrentUser().getUid());
+        HashMap<String, Object> hashMap = new HashMap<>();
+        hashMap.put("status", status);
+        reference.updateChildren(hashMap);
     }
 
 

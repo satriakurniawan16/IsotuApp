@@ -101,6 +101,7 @@
 
         <LinearLayout
             android:id="@+id/addPict"
+            android:visibility="gone"
             android:layout_width="50dp"
             android:layout_height="40dp"
             android:orientation="vertical"

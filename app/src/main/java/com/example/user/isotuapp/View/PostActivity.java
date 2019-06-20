@@ -11,6 +11,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.text.format.DateUtils;
@@ -128,7 +129,17 @@ public class PostActivity extends AppCompatActivity {
             mComment = (Comment) savedInstanceState.getSerializable(BUNDLE_COMMENT);
         }
 
-
+        Toolbar toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setTitle("");
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                // and this
+                startActivity(new Intent(PostActivity.this, Dashboard.class).setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
+            }
+        });
         Intent intent = getIntent();
         if(intent.getStringExtra(Constants.EXTRA_POST )!= null){
             idpost = intent.getStringExtra(Constants.EXTRA_POST);
@@ -209,7 +220,7 @@ public class PostActivity extends AppCompatActivity {
         final FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
 
 
-        DatabaseReference dbs = FirebaseDatabase.getInstance().getReference("posting").child(idpost);
+        final DatabaseReference dbs = FirebaseDatabase.getInstance().getReference("posting").child(idpost);
         if(dbs == null){
         LinearLayout linearLayout = findViewById(R.id.kondisi);
         linearLayout.setVisibility(View.GONE);
@@ -220,91 +231,125 @@ public class PostActivity extends AppCompatActivity {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                     final Post post = dataSnapshot.getValue(Post.class);
-                    postLikeLayout.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            onLikeClick(idpost,post.getUser().getUid());
+                    try {
+
+                        postLikeLayout.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                onLikeClick(idpost,post.getUser().getUid());
+                            }
+                        });
+
+                        if (post.getImage() != null) {
+                            postDisplayImageView.setVisibility(View.VISIBLE);
+                            Picasso.get().load(post.getImage()).fit()
+                                    .into(postDisplayImageView);
+                        } else {
+                            postDisplayImageView.setImageBitmap(null);
+                            postDisplayImageView.setVisibility(View.GONE);
                         }
-                    });
-
-                    if (post.getImage() != null) {
-                        postDisplayImageView.setVisibility(View.VISIBLE);
-                        Picasso.get().load(post.getImage()).fit()
-                                .into(postDisplayImageView);
-                    } else {
-                        postDisplayImageView.setImageBitmap(null);
-                        postDisplayImageView.setVisibility(View.GONE);
-                    }
-                    Picasso.get().load(post.getUser().getImage()).fit()
-                            .into(postOwnerDisplayImageView);
-
-                    postOwnerDisplayImageView.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            Intent intent = new Intent(PostActivity.this, FriendProfile.class);
-                            intent.putExtra("iduser", post.getUser().getUid());
-                            startActivity(intent);
-                        }
-                    });
 
 
-                    postOwnerUsernameTextView.setText(post.getUser().getFullname());
-                    postOwnerUsernameTextView.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            Intent intent = new Intent(PostActivity.this, FriendProfile.class);
-                            intent.putExtra("iduser", post.getUser().getUid());
-                            startActivity(intent);
-                        }
-                    });
-                    postTimeCreatedTextView.setText(DateUtils.getRelativeTimeSpanString(post.getTimeCreated()));
-                    postTextTextView.setText(post.getText());
-                    postNumLikesTextView.setText(String.valueOf(post.getNumlikes()));
-                    postNumCommentsTextView.setText(String.valueOf(post.getNumComment()));
-                    postNumShareTextView.setText(String.valueOf(post.getNumshare()));
+                        DatabaseReference dbuser = FirebaseDatabase.getInstance().getReference("user").child(post.getUser().getUid());
+                        dbuser.addValueEventListener(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                User user = dataSnapshot.getValue(User.class);
 
-                    postShareLayout.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            AlertDialog.Builder mBuilder = new AlertDialog.Builder(PostActivity.this);
 
-                            View mView = getLayoutInflater().inflate(R.layout.pop_up_share,
-                                    null);
-                            TextView shareFriend = (TextView) mView.findViewById(R.id.share_to_friend);
+                                Picasso.get().load(user.getImage()).fit()
+                                        .into(postOwnerDisplayImageView);
 
-                            TextView shareHome = (TextView) mView.findViewById(R.id.share_to_home);
-                            mBuilder.setView(mView);
 
-                            final AlertDialog dialog = mBuilder.create();
-                            dialog.show();
-                            shareFriend.setOnClickListener(new View.OnClickListener() {
-                                @Override
-                                public void onClick(View v) {
-                                    dialog.dismiss();
-                                    getSliding(idpost);
-                                }
-                            });
-                            shareHome.setOnClickListener(new View.OnClickListener() {
-                                @Override
-                                public void onClick(View v) {
-                                    Intent intent = new Intent(PostActivity.this, ShareActivity.class);
-                                    if (post.getImage() != null) {
-                                        intent.putExtra("imagepost", post.getImage());
-                                    } else {
-                                        intent.putExtra("imagepost", "");
+                                postOwnerUsernameTextView.setText(user.getFullname());
+
+                            }
+
+                            @Override
+                            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                            }
+                        });
+
+
+                        postOwnerDisplayImageView.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                Intent intent = new Intent(PostActivity.this, FriendProfile.class);
+                                intent.putExtra("iduser", post.getUser().getUid());
+                                startActivity(intent);
+                            }
+                        });
+
+
+                        LinearLayout empty = findViewById(R.id.emptyview);
+                        empty.setVisibility(View.GONE);
+                        postOwnerUsernameTextView.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                Intent intent = new Intent(PostActivity.this, FriendProfile.class);
+                                intent.putExtra("iduser", post.getUser().getUid());
+                                startActivity(intent);
+                            }
+                        });
+                        postTimeCreatedTextView.setText(DateUtils.getRelativeTimeSpanString(post.getTimeCreated()));
+                        postTextTextView.setText(post.getText());
+                        postNumLikesTextView.setText(String.valueOf(post.getNumlikes()));
+                        postNumCommentsTextView.setText(String.valueOf(post.getNumComment()));
+                        postNumShareTextView.setText(String.valueOf(post.getNumshare()));
+
+                        postShareLayout.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                AlertDialog.Builder mBuilder = new AlertDialog.Builder(PostActivity.this);
+
+                                View mView = getLayoutInflater().inflate(R.layout.pop_up_share,
+                                        null);
+                                TextView shareFriend = (TextView) mView.findViewById(R.id.share_to_friend);
+
+                                TextView shareHome = (TextView) mView.findViewById(R.id.share_to_home);
+                                mBuilder.setView(mView);
+
+                                final AlertDialog dialog = mBuilder.create();
+                                dialog.show();
+                                shareFriend.setOnClickListener(new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View v) {
+                                        dialog.dismiss();
+                                        getSliding(idpost);
                                     }
-                                    intent.putExtra("userpost", post.getUser().getFullname());
-                                    intent.putExtra("idpost", post.getPostId());
-                                    intent.putExtra("imageuserpost", post.getUser().getImage());
-                                    intent.putExtra("captionpost", post.getText());
-                                    intent.putExtra("iduser", post.getUser().getUid());
-                                    String lol = String.valueOf(post.getTimeCreated());
-                                    intent.putExtra("timecreated", lol);
-                                    startActivity(intent);
-                                }
-                            });
-                        }
-                    });
+                                });
+                                shareHome.setOnClickListener(new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View v) {
+                                        Intent intent = new Intent(PostActivity.this, ShareActivity.class);
+                                        if (post.getImage() != null) {
+                                            intent.putExtra("imagepost", post.getImage());
+                                        } else {
+                                            intent.putExtra("imagepost", "");
+                                        }
+                                        intent.putExtra("userpost", post.getUser().getFullname());
+                                        intent.putExtra("idpost", post.getPostId());
+                                        intent.putExtra("imageuserpost", post.getUser().getImage());
+                                        intent.putExtra("captionpost", post.getText());
+                                        intent.putExtra("iduser", post.getUser().getUid());
+                                        String lol = String.valueOf(post.getTimeCreated());
+                                        intent.putExtra("timecreated", lol);
+                                        startActivity(intent);
+                                    }
+                                });
+                            }
+                        });
+
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        LinearLayout linearLayout = findViewById(R.id.rootView);
+                        LinearLayout empty = findViewById(R.id.emptyview);
+                        LinearLayout commentField = findViewById(R.id.rootComment);
+                        commentField.setVisibility(View.GONE);
+                        empty.setVisibility(View.VISIBLE);
+                        linearLayout.setVisibility(View.GONE);
+                    }
 
                 }
 
@@ -353,7 +398,7 @@ public class PostActivity extends AppCompatActivity {
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
-        outState.putSerializable(BUNDLE_COMMENT, mComment);
+//        outState.putSerializable(BUNDLE_COMMENT, mComment);
         super.onSaveInstanceState(outState);
     }
 
@@ -385,8 +430,10 @@ public class PostActivity extends AppCompatActivity {
                             @Override
                             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                                 Post post = dataSnapshot.getValue(Post.class);
-                                sendNotifiaction(post.getUser().getUid(),user.getFullname(),user.getFullname()+ " : Mengomentari postingan anda",post.getUser().getUid(),idpost);
-                                addNotification(post.getUser().getUid(),idpost,"mengomentari postingan anda");
+                                if(!post.getUser().getUid().equals(currentUser.getUid())){
+                                    sendNotifiaction(post.getUser().getUid(),user.getFullname(),user.getFullname()+ " : Mengomentari postingan anda",post.getUser().getUid(),idpost);
+                                    addNotification(post.getUser().getUid(),idpost,"mengomentari postingan anda");
+                                }
                             }
 
                             @Override
@@ -432,14 +479,11 @@ public class PostActivity extends AppCompatActivity {
                 FirebaseUtils.getCommentRef(idpost)
         ) {
             @Override
-            protected void populateViewHolder(CommentHolder viewHolder, final Comment model, int position) {
+            protected void populateViewHolder(final CommentHolder viewHolder, final Comment model, int position) {
                 viewHolder.setUsername(model.getUser().getUsername());
                 viewHolder.setComment(model.getComment());
                 viewHolder.setTime(DateUtils.getRelativeTimeSpanString(model.getTimeCreated()));
 
-                Glide.with(PostActivity.this)
-                        .load(model.getUser().getImage())
-                        .into(viewHolder.commentOwnerDisplay);
 
                 commentRecyclerView.setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -447,6 +491,20 @@ public class PostActivity extends AppCompatActivity {
                         Intent intent = new Intent(PostActivity.this, FriendProfile.class);
                         intent.putExtra("iduser", model.getUser().getUid());
                         startActivity(intent);
+                    }
+                });
+
+                final DatabaseReference dbuser = FirebaseDatabase.getInstance().getReference("user").child(model.getUser().getUid());
+                dbuser.addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                        User user = dataSnapshot.getValue(User.class);
+                        Picasso.get().load(user.getImage()).into(viewHolder.commentOwnerDisplay);
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
+
                     }
                 });
 
@@ -542,13 +600,13 @@ public class PostActivity extends AppCompatActivity {
 
     @Override
     public void onSaveInstanceState(Bundle outState, PersistableBundle outPersistentState) {
-        outState.putSerializable(BUNDLE_COMMENT, mComment);
+//        outState.putSerializable(BUNDLE_COMMENT, mComment);
         super.onSaveInstanceState(outState);
     }
 
     private void onLikeClick(final String postId,final String IdUser) {
         Log.d("tesketololan", "onLikeClick: " + postId);
-        Toast.makeText(getApplicationContext(), "terclick", Toast.LENGTH_SHORT).show();
+//        Toast.makeText(getApplicationContext(), "terclick", Toast.LENGTH_SHORT).show();
         final DatabaseReference dbuserliked = FirebaseDatabase.getInstance().getReference("userpostliked").child(postId);
         final FirebaseAuth mAuth = FirebaseAuth.getInstance();
         FirebaseUtils.getPostLikedRef(postId)
@@ -598,15 +656,29 @@ public class PostActivity extends AppCompatActivity {
                                             dbf.addListenerForSingleValueEvent(new ValueEventListener() {
                                                 @Override
                                                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                                    User usr = dataSnapshot.getValue(User.class);
+                                                    final User usr = dataSnapshot.getValue(User.class);
                                                     final HashMap<String, Object> hobiuser = new HashMap<>();
                                                     hobiuser.put("iduser", usr.getUid());
                                                     hobiuser.put("fotoprofil", usr.getImage());
                                                     hobiuser.put("namaprofil", usr.getFullname());
                                                     dbuserliked.child(mAuth.getUid()).setValue(hobiuser);
-                                                    addNotification(IdUser,postId,"menyukai postingan anda");
+                                                    final DatabaseReference dbpost = FirebaseDatabase.getInstance().getReference("posting").child(postId);
+                                                    dbpost.addValueEventListener(new ValueEventListener() {
+                                                        @Override
+                                                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                                            Post post = dataSnapshot.getValue(Post.class);
+                                                            if(!post.getUser().getUid().equals(currentUser.getUid())) {
+                                                                addNotification(IdUser, postId, "menyukai postingan anda");
+                                                                sendNotifiaction(IdUser, usr.getFullname(), "Menyukai postingan anda", IdUser, postId);
+                                                            }
+                                                        }
+
+                                                        @Override
+                                                        public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                                                        }
+                                                    });
                                                     initPost();
-                                                    sendNotifiaction(IdUser,usr.getFullname(),"Menyukai postingan anda",IdUser,postId);
                                                 }
 
                                                 @Override
@@ -679,7 +751,7 @@ public class PostActivity extends AppCompatActivity {
         reference.child(key).setValue(hashMap).addOnSuccessListener(new OnSuccessListener<Void>() {
             @Override
             public void onSuccess(Void aVoid) {
-                Toast.makeText(PostActivity.this, "Berhasil terimpan", Toast.LENGTH_SHORT).show();
+//                Toast.makeText(PostActivity.this, "Berhasil terimpan", Toast.LENGTH_SHORT).show();
             }
         }).addOnFailureListener(new OnFailureListener() {
             @Override
@@ -810,6 +882,25 @@ public class PostActivity extends AppCompatActivity {
         public void setComment(String comment) {
             commentTextView.setText(comment);
         }
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        status("offline");
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        status("online");
+    }
+
+    private void status(final String status){
+        DatabaseReference reference = FirebaseDatabase.getInstance().getReference("user").child(FirebaseAuth.getInstance().getCurrentUser().getUid());
+        HashMap<String, Object> hashMap = new HashMap<>();
+        hashMap.put("status", status);
+        reference.updateChildren(hashMap);
     }
 
 }

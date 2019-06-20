@@ -34,6 +34,7 @@ import com.example.user.isotuapp.R;
 import com.example.user.isotuapp.fragment.APIService;
 import com.example.user.isotuapp.utils.Constants;
 import com.example.user.isotuapp.utils.IMethodCaller;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -83,6 +84,7 @@ public class GrupMessageActivity extends AppCompatActivity implements IMethodCal
 
     private ArrayList<String> mDataId;
 
+    String namuser = "";
     boolean notify = false;
     String namegrup;
 
@@ -104,6 +106,9 @@ public class GrupMessageActivity extends AppCompatActivity implements IMethodCal
             }
         });
 
+
+        reference = FirebaseDatabase.getInstance().getReference("Chats");
+
         apiService = Client.getClient("https://fcm.googleapis.com/").create(APIService.class);
 
         recyclerView = findViewById(R.id.recycler_view);
@@ -116,6 +121,18 @@ public class GrupMessageActivity extends AppCompatActivity implements IMethodCal
         username = findViewById(R.id.username);
         btn_send = findViewById(R.id.btn_send);
         text_send = findViewById(R.id.text_send);
+
+        DatabaseReference dbuser = FirebaseDatabase.getInstance().getReference("user").child(FirebaseAuth.getInstance().getCurrentUser().getUid());
+        dbuser.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                User userbro = dataSnapshot.getValue(User.class);
+                namegrup = userbro.getFullname();
+            }
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+            }
+        });
 
         setting = findViewById(R.id.setting);
         setting.setOnClickListener(new View.OnClickListener() {
@@ -144,10 +161,34 @@ public class GrupMessageActivity extends AppCompatActivity implements IMethodCal
                 settingExit.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
+
                         DatabaseReference db = FirebaseDatabase.getInstance().getReference("group").child(fuser.getUid());
                         db.child(userid).removeValue();
+                        DatabaseReference dbexit = FirebaseDatabase.getInstance().getReference("ChatlistGrup").child(fuser.getUid());
+                        dbexit.child(userid).removeValue();
+                        db.child(userid).removeValue();
+
                         DatabaseReference member = FirebaseDatabase.getInstance().getReference("groupmember").child(userid);
-                        member.child(fuser.getUid()).removeValue();
+                        member.child(fuser.getUid()).removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
+                            @Override
+                            public void onSuccess(Void aVoid) {
+
+                            }
+                        });
+
+                        DatabaseReference dbuser = FirebaseDatabase.getInstance().getReference("user").child(FirebaseAuth.getInstance().getCurrentUser().getUid());
+                        dbuser.addListenerForSingleValueEvent(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                User user = dataSnapshot.getValue(User.class);
+                                MessageExit(FirebaseAuth.getInstance().getCurrentUser().getUid(), userid, user.getFullname()+" keluar grup" ,"","","");
+                            }
+
+                            @Override
+                            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                            }
+                        });
                         Intent intent = new Intent(GrupMessageActivity.this,Dashboard.class);
                         startActivity(intent);
                     }
@@ -199,6 +240,7 @@ public class GrupMessageActivity extends AppCompatActivity implements IMethodCal
                 } else {
                     //and this
                     Glide.with(getApplicationContext()).load(user.getImagegrup()).into(profile_image);
+
                 }
             }
 
@@ -321,13 +363,31 @@ public class GrupMessageActivity extends AppCompatActivity implements IMethodCal
                         @Override
                         public boolean onItemLongClick(int position) {
                             if (mActionMode != null) return false;
-                            AlertDialog.Builder mBuilder = new AlertDialog.Builder(GrupMessageActivity.this);
+                            final Chat chat1 = mchat.get(position);
+                            if(chat1.getSender().equals(fuser.getUid())){
+                                AlertDialog.Builder mBuilder = new AlertDialog.Builder(GrupMessageActivity.this);
+                                View mView = getLayoutInflater().inflate(R.layout.popup_message,
+                                        null);
+                                LinearLayout hapus = mView.findViewById(R.id.hapus);
 
-                            View mView = getLayoutInflater().inflate(R.layout.popup_message,
-                                    null);
-                            mBuilder.setView(mView);
-                            final AlertDialog dialog = mBuilder.create();
-                            dialog.show();
+                                mBuilder.setView(mView);
+                                final AlertDialog dialog = mBuilder.create();
+                                dialog.show();
+                                hapus.setOnClickListener(new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View v) {
+//                                        Toast.makeText(GrupMessageActivity.this, "lol : " + chat1.getId(), Toast.LENGTH_SHORT).show();
+                                        DatabaseReference ref = FirebaseDatabase.getInstance().getReference("Chats");
+                                        ref.child(chat1.getId()).removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
+                                            @Override
+                                            public void onSuccess(Void aVoid) {
+                                                dialog.dismiss();
+                                                messageAdapter.notifyDataSetChanged();
+                                            }
+                                        });
+                                    }
+                                });
+                            }
                             return true;
                         }
                     });
@@ -394,7 +454,7 @@ public class GrupMessageActivity extends AppCompatActivity implements IMethodCal
         hashMap.put("type", "0");
 
         reference.child(key).setValue(hashMap);
-        final DatabaseReference chatRef = FirebaseDatabase.getInstance().getReference("Chatlist")
+        final DatabaseReference chatRef = FirebaseDatabase.getInstance().getReference("ChatlistGrup")
                 .child(fuser.getUid())
                 .child(userid);
 
@@ -416,7 +476,7 @@ public class GrupMessageActivity extends AppCompatActivity implements IMethodCal
             }
         });
 
-        final DatabaseReference chatRefReceiver = FirebaseDatabase.getInstance().getReference("Chatlist");
+        final DatabaseReference chatRefReceiver = FirebaseDatabase.getInstance().getReference("ChatlistGrup");
 
         DatabaseReference mygrup = FirebaseDatabase.getInstance().getReference("groupmember").child(userid);
         mygrup.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -460,4 +520,65 @@ public class GrupMessageActivity extends AppCompatActivity implements IMethodCal
             }
         });
     }
-}
+    public void MessageExit(String sender, final String receiver, String message, String imagePost, String nameUser, String idpost) {
+        DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Chats");
+        String key = reference.push().getKey();
+        HashMap<String, Object> hashMap = new HashMap<>();
+        hashMap.put("id", key);
+        hashMap.put("sender", sender);
+        hashMap.put("receiver", receiver);
+        hashMap.put("message", message);
+        hashMap.put("idpost",idpost);
+        hashMap.put("imagepost",imagePost);
+        hashMap.put("userpost",nameUser);
+        hashMap.put("isseen", false);
+        hashMap.put("type", "1");
+
+        reference.child(key).setValue(hashMap);
+
+
+        final DatabaseReference chatRefReceiver = FirebaseDatabase.getInstance().getReference("ChatlistGrup");
+
+        DatabaseReference mygrup = FirebaseDatabase.getInstance().getReference("groupmember").child(userid);
+        mygrup.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                for (DataSnapshot snapshot : dataSnapshot.getChildren()){
+                    UserHobi userHobi = snapshot.getValue(UserHobi.class);
+                    final HashMap<String, Object> userdung= new HashMap<>();
+                    userdung.put("id",userid);
+                    userdung.put("type","grup");
+                    userdung.put("subtype","0");
+                    if(userHobi.getIduser() != fuser.getUid()){
+                        chatRefReceiver.child(userHobi.getIduser())
+                                .child(userid).setValue(userdung);
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+
+        final String msg = message;
+
+        reference = FirebaseDatabase.getInstance().getReference("user").child(fuser.getUid());
+        reference.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                User user = dataSnapshot.getValue(User.class);
+                if (notify) {
+                    sendNotifiaction(receiver, user.getFullname(), msg);
+                }
+                notify = false;
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+        }
+    }

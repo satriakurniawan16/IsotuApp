@@ -103,10 +103,10 @@ public class LoginScreen extends AppCompatActivity {
         Pattern p = Pattern.compile(Config.regEx);
         Matcher m = p.matcher(getEmailId);
         if (getEmailId.equals("") || getEmailId.length() == 0 || getPassword.equals("") || getPassword.length() == 0) {
-            Toast.makeText(this, "Enter both credentials.", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Email atau password tidak boleh kosong", Toast.LENGTH_SHORT).show();
             pDialog.dismiss();
         } else if (!m.find()){
-            Toast.makeText(this, "Your Email Id is Invalid.", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Email anda tidak valid.", Toast.LENGTH_SHORT).show();
             pDialog.dismiss();
         } else {
             mAuth.signInWithEmailAndPassword(getEmailId, getPassword)
@@ -115,7 +115,7 @@ public class LoginScreen extends AppCompatActivity {
                         public void onComplete(@NonNull Task<AuthResult> task) {
                             pDialog.dismiss();
                             if (!task.isSuccessful()) {
-                                Toast.makeText(LoginScreen.this, "Your email account is not registered.", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(LoginScreen.this, "Email anda belum terdaftar", Toast.LENGTH_SHORT).show();
                             } else {
                                 sendToHome();
                             }
@@ -133,7 +133,7 @@ public class LoginScreen extends AppCompatActivity {
 
     private void displayLoader() {
         pDialog = new ProgressDialog(this);
-        pDialog.setMessage("Account Verification...");
+        pDialog.setMessage("Verifikasi Akun");
         pDialog.setIndeterminate(false);
         pDialog.setCancelable(false);
         int d = R.drawable.custom_progress_dialog;

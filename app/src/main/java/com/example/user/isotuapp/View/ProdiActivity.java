@@ -420,6 +420,25 @@ public class ProdiActivity extends AppCompatActivity {
 
     }
 
+    @Override
+    public void onPause() {
+        super.onPause();
+        status("offline");
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        status("online");
+    }
+
+    private void status(final String status){
+        DatabaseReference reference = FirebaseDatabase.getInstance().getReference("user").child(FirebaseAuth.getInstance().getCurrentUser().getUid());
+        HashMap<String, Object> hashMap = new HashMap<>();
+        hashMap.put("status", status);
+        reference.updateChildren(hashMap);
+    }
+
     public void jurusan (final ArrayAdapter<String> adapterjurusan ){
         spinnerProdi.setAdapter(adapterjurusan);
         spinnerProdi.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {

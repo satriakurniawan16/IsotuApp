@@ -68,7 +68,7 @@ public class EventFragment extends Fragment {
         @Override
         public void onChildRemoved(@NonNull DataSnapshot dataSnapshot) {
             int pos = mDataId.indexOf(dataSnapshot.getKey());
-//            mDataId.remove(pos);
+            mDataId.remove(pos);
             mData.remove(pos);
             mAdapter.updateEmptyView();
             mAdapter.notifyDataSetChanged();

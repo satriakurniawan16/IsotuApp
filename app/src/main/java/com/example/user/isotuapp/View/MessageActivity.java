@@ -147,7 +147,7 @@ public class MessageActivity extends AppCompatActivity implements IMethodCaller 
         addFriendLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(MessageActivity.this, "LOLL", Toast.LENGTH_SHORT).show();
+//                Toast.makeText(MessageActivity.this, "LOLL", Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -333,7 +333,7 @@ public class MessageActivity extends AppCompatActivity implements IMethodCaller 
         reference.child(key).setValue(hashMap).addOnSuccessListener(new OnSuccessListener<Void>() {
             @Override
             public void onSuccess(Void aVoid) {
-                Toast.makeText(MessageActivity.this, "Berhasil terimpan", Toast.LENGTH_SHORT).show();
+//                Toast.makeText(MessageActivity.this, "Berhasil terimpan", Toast.LENGTH_SHORT).show();
             }
         }).addOnFailureListener(new OnFailureListener() {
             @Override
@@ -414,13 +414,29 @@ public class MessageActivity extends AppCompatActivity implements IMethodCaller 
                         @Override
                         public boolean onItemLongClick(int position) {
                             if (mActionMode != null) return false;
-                            AlertDialog.Builder mBuilder = new AlertDialog.Builder(MessageActivity.this);
+                            final Chat chat1 = mchat.get(position);
+                            if(chat1.getSender().equals(fuser.getUid())){
+                                AlertDialog.Builder mBuilder = new AlertDialog.Builder(MessageActivity.this);
+                                View mView = getLayoutInflater().inflate(R.layout.popup_message,
+                                        null);
+                                LinearLayout hapus = mView.findViewById(R.id.hapus);
 
-                            View mView = getLayoutInflater().inflate(R.layout.popup_message,
-                                    null);
-                            mBuilder.setView(mView);
-                            final AlertDialog dialog = mBuilder.create();
-                            dialog.show();
+                                mBuilder.setView(mView);
+                                final AlertDialog dialog = mBuilder.create();
+                                dialog.show();
+                                hapus.setOnClickListener(new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View v) {
+                                        reference.child(chat1.getId()).removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
+                                            @Override
+                                            public void onSuccess(Void aVoid) {
+                                                dialog.dismiss();
+                                            }
+                                        });
+                                    }
+                                });
+                            }
+
                             return true;
                         }
                     });
@@ -509,7 +525,7 @@ public class MessageActivity extends AppCompatActivity implements IMethodCaller 
                 .child(userid)
                 .child(fuser.getUid());
                 final HashMap<String, Object> userlol= new HashMap<>();
-        userlol.put("id",userid);
+        userlol.put("id",fuser.getUid());
         userlol.put("type","message");
         userlol.put("date",ServerValue.TIMESTAMP);
         chatRefReceiver.setValue(userlol);

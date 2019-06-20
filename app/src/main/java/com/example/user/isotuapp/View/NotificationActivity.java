@@ -1,6 +1,7 @@
 package com.example.user.isotuapp.View;
 
 import android.app.AlertDialog;
+import android.app.Notification;
 import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
@@ -18,6 +19,7 @@ import android.widget.Toast;
 
 import com.example.user.isotuapp.Controller.NotificationAdapter;
 import com.example.user.isotuapp.Controller.SearchUserAdapter;
+import com.example.user.isotuapp.Model.Contact;
 import com.example.user.isotuapp.Model.Grup;
 import com.example.user.isotuapp.Model.NotifModel;
 import com.example.user.isotuapp.Model.Post;
@@ -34,6 +36,7 @@ import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public class NotificationActivity extends AppCompatActivity {
 
@@ -87,6 +90,7 @@ public class NotificationActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         display();
+        status("online");
     }
 
     private void display () {
@@ -99,7 +103,7 @@ public class NotificationActivity extends AppCompatActivity {
                 NotifModel notifModel = snapshot.getValue(NotifModel.class);
                 mData.add(notifModel);
                 }
-                mAdapter = new NotificationAdapter(NotificationActivity.this, mData, mDataId,
+                mAdapter = new NotificationAdapter(NotificationActivity.this, mData, mDataId,emptyView,
                         new NotificationAdapter.ClickHandler() {
                             @Override
                             public void onItemClick(int position) {
@@ -136,6 +140,7 @@ public class NotificationActivity extends AppCompatActivity {
                             @Override
                             public boolean onItemLongClick(int position) {
                                 if (mActionMode != null) return false;
+                                final NotifModel pet = mData.get(position);
                                 return true;
                             }
                         });
@@ -151,4 +156,21 @@ public class NotificationActivity extends AppCompatActivity {
             }
         });
     }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        status("offline");
+    }
+
+
+
+    private void status(final String status){
+        DatabaseReference reference = FirebaseDatabase.getInstance().getReference("user").child(FirebaseAuth.getInstance().getCurrentUser().getUid());
+        HashMap<String, Object> hashMap = new HashMap<>();
+        hashMap.put("status", status);
+        reference.updateChildren(hashMap);
+    }
+
+
 }

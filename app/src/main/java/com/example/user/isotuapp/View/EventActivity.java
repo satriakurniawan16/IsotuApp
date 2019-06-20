@@ -43,6 +43,7 @@ import com.theartofdev.edmodo.cropper.CropImageView;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.HashMap;
 import java.util.Locale;
 import java.util.UUID;
 
@@ -187,7 +188,30 @@ public class EventActivity extends AppCompatActivity {
         btnPostEvent.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                sendPost();
+                if (TextUtils.isEmpty(titelField.getText().toString())){
+                    Toast.makeText(getApplicationContext(), "Judul tidak boleh kosong!", Toast.LENGTH_SHORT).show();
+                    return;
+                }if (TextUtils.isEmpty(scheduleField.getText().toString())){
+                    Toast.makeText(getApplicationContext(), "Tanggal tidak boleh kosong!", Toast.LENGTH_SHORT).show();
+                    return;
+                }if (TextUtils.isEmpty(timeStartField.getText().toString())){
+                    Toast.makeText(getApplicationContext(), "Jam mulai tidak boleh kosong!", Toast.LENGTH_SHORT).show();
+                    return;
+                }if (TextUtils.isEmpty(timeEndField.getText().toString())){
+                    Toast.makeText(getApplicationContext(), "Jam berakhir tidak boleh kosong!", Toast.LENGTH_SHORT).show();
+                    return;
+                }if (TextUtils.isEmpty(locationField.getText().toString())){
+                    Toast.makeText(getApplicationContext(), "Lokasi tidak boleh kosong!", Toast.LENGTH_SHORT).show();
+                    return;
+                }if (TextUtils.isEmpty(descriptionField.getText().toString())){
+                    Toast.makeText(getApplicationContext(), "Deskripsi tidak boleh kosong!", Toast.LENGTH_SHORT).show();
+                    return;
+                }if(filepath == null ){
+                    Toast.makeText(getApplicationContext(), "gambar tidak boleh kosong !", Toast.LENGTH_SHORT).show();
+                    return;
+                }else {
+                    sendPost();
+                }
             }
         });
 
@@ -309,4 +333,23 @@ public class EventActivity extends AppCompatActivity {
         pDialog.setIndeterminateDrawable(drawable);
         pDialog.show();
     }
+    @Override
+    public void onPause() {
+        super.onPause();
+        status("offline");
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        status("online");
+    }
+
+    private void status(final String status){
+        DatabaseReference reference = FirebaseDatabase.getInstance().getReference("user").child(FirebaseAuth.getInstance().getCurrentUser().getUid());
+        HashMap<String, Object> hashMap = new HashMap<>();
+        hashMap.put("status", status);
+        reference.updateChildren(hashMap);
+    }
+
 }

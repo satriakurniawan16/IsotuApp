@@ -276,7 +276,7 @@ public class CompleteProfile extends AppCompatActivity {
             public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
                 // memunculkan toast + value Spinner yang dipilih (diambil dari adapter)
                 positonProvinsi = i;
-                Toast.makeText(CompleteProfile.this, "Selected "+ adapterprovinsi.getItem(i), Toast.LENGTH_SHORT).show();
+//                Toast.makeText(CompleteProfile.this, "Selected "+ adapterprovinsi.getItem(i), Toast.LENGTH_SHORT).show();
             }
 
             @Override
@@ -327,27 +327,27 @@ public class CompleteProfile extends AppCompatActivity {
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
 
                 if (TextUtils.isEmpty(fullnameString)){
-                    Toast.makeText(getApplicationContext(), "Enter fullname!", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getApplicationContext(), "Nama tidak boleh kosong!", Toast.LENGTH_SHORT).show();
                     return;
                 }if (TextUtils.isEmpty(nimString)){
-                    Toast.makeText(getApplicationContext(), "Enter nim!", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getApplicationContext(), "Nim tidak boleh kosong!", Toast.LENGTH_SHORT).show();
                     return;
                 }if (TextUtils.isEmpty(facultyString)){
-                    Toast.makeText(getApplicationContext(), "Enter faculty!", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getApplicationContext(), "Fakultas tidak boleh kosong!", Toast.LENGTH_SHORT).show();
                     return;
                 }if (TextUtils.isEmpty(majorString)){
-                    Toast.makeText(getApplicationContext(), "Enter major!", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getApplicationContext(), "Jurusan tidak boleh kosong", Toast.LENGTH_SHORT).show();
                     return;
                 }if (TextUtils.isEmpty(numberString)){
-                    Toast.makeText(getApplicationContext(), "Enter Number Phone!", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getApplicationContext(), "No Hp tidak boleh kosong!", Toast.LENGTH_SHORT).show();
                     return;
                 }if(filepath == null){
-                    Toast.makeText(CompleteProfile.this, "Take Your Profile!", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(CompleteProfile.this, "Ambil foto profile!", Toast.LENGTH_SHORT).show();
                 }
                 else{
                     final StorageReference ref = storageReference.child("users/"+ UUID.randomUUID().toString());
                     final ProgressDialog progressDialog = new ProgressDialog(CompleteProfile.this);
-                    progressDialog.setTitle("Uploading...");
+                    progressDialog.setTitle("Mengunggah profil");
                     progressDialog.show();
                     UploadTask uploadTask = ref.putFile(filepath);
                     uploadTask.addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
@@ -425,7 +425,7 @@ public class CompleteProfile extends AppCompatActivity {
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
                 // memunculkan toast + value Spinner yang dipilih (diambil dari adapter)
-                Toast.makeText(CompleteProfile.this, "Selected "+ adapterjurusan.getItem(i), Toast.LENGTH_SHORT).show();
+//                Toast.makeText(CompleteProfile.this, "Selected "+ adapterjurusan.getItem(i), Toast.LENGTH_SHORT).show();
                 positionJurusan = i ;
             }
 

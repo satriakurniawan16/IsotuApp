@@ -22,6 +22,7 @@ import com.example.user.isotuapp.Model.Grup;
 import com.example.user.isotuapp.Model.NotifModel;
 import com.example.user.isotuapp.Model.Organiasasi;
 import com.example.user.isotuapp.Model.User;
+import com.example.user.isotuapp.Model.UserHobi;
 import com.example.user.isotuapp.Notification.Data;
 import com.example.user.isotuapp.R;
 import com.example.user.isotuapp.View.FriendProfile;
@@ -29,6 +30,7 @@ import com.example.user.isotuapp.View.NotificationActivity;
 import com.example.user.isotuapp.View.PostActivity;
 import com.example.user.isotuapp.utils.Constants;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -46,16 +48,17 @@ public class NotificationAdapter  extends RecyclerView.Adapter<NotificationAdapt
     private ArrayList<NotifModel> mData;
     private ArrayList<String> mDataId;
     private ArrayList<String> mSelectedId;
-    LinearLayout emptyView;
+    LinearLayout mEmptyView;
     boolean join = false;
 
-    public NotificationAdapter(Context context, ArrayList<NotifModel> data, ArrayList<String> dataId,
+    public NotificationAdapter(Context context, ArrayList<NotifModel> data, ArrayList<String> dataId,LinearLayout emptyView,
                              ClickHandler handler) {
         mContext = context;
         mData = data;
         mDataId = dataId;
         mClickHandler = handler;
         mSelectedId = new ArrayList<>();
+        mEmptyView = emptyView;
     }
 
 
@@ -70,22 +73,69 @@ public class NotificationAdapter  extends RecyclerView.Adapter<NotificationAdapt
     @Override
     public void onBindViewHolder(@NonNull final ViewHolder holder, final int position) {
         final NotifModel pet = mData.get(position);
-        DatabaseReference dbuser = FirebaseDatabase.getInstance().getReference("user").child(pet.getUserid());
-        dbuser.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                User user = dataSnapshot.getValue(User.class);
-                Picasso.get().load(user.getImage()).into(holder.imageuserImageView);
-                holder.nameUserTextView.setText(user.getFullname());
-            }
+        boolean status = false ;
 
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
+        if (mData.size() == 0) {
+            mEmptyView.setVisibility(View.VISIBLE);
+        }
+        else {
+            mEmptyView.setVisibility(View.GONE);
+        }
 
-            }
-        });
+        if(pet.getPostid() != null ){
+            DatabaseReference dbnotif  =  FirebaseDatabase.getInstance().getReference("Notifications").child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child(pet.getId());
+            HashMap<String, Object> hashMap = new HashMap<>();
+            hashMap.put("ispost", false);
+            dbnotif.updateChildren(hashMap);
+        }
+        try {
+            DatabaseReference dbuser = FirebaseDatabase.getInstance().getReference("user").child(pet.getUserid());
+            dbuser.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                    User user = dataSnapshot.getValue(User.class);
+                    Picasso.get().load(user.getImage()).into(holder.imageuserImageView);
+                    holder.nameUserTextView.setText(user.getFullname());
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                }
+            });
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+
 
         holder.dateNotifTextView.setText(DateUtils.getRelativeTimeSpanString(pet.getDate()));
+        holder.notifLayout.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                View mView = LayoutInflater.from(mContext).inflate(R.layout.popup_message, null);
+                AlertDialog.Builder mBuilder = new AlertDialog.Builder(mContext);
+                mBuilder.setView(mView);
+                final AlertDialog dialognya = mBuilder.create();
+                LinearLayout hapus = mView.findViewById(R.id.hapus);
+                hapus.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        DatabaseReference databasenotif = FirebaseDatabase.getInstance().getReference("Notifications").child(FirebaseAuth.getInstance().getCurrentUser().getUid());
+                        databasenotif.child(pet.getId()).removeValue();
+                        mData.remove(position);
+                        notifyDataSetChanged();
+                        if (mData.size() == 0) {
+                            mEmptyView.setVisibility(View.VISIBLE);
+                        }
+                        dialognya.dismiss();
+                    }
+                });
+
+                mBuilder.setView(mView);
+                dialognya.show();
+                return false;
+            }
+        });
         holder.notifLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -132,13 +182,19 @@ public class NotificationAdapter  extends RecyclerView.Adapter<NotificationAdapt
 
 
 
-                    DatabaseReference dbgroup = FirebaseDatabase.getInstance().getReference("group").child(pet.getUserid()).child(pet.getPostid());
+                    DatabaseReference dbgroup = FirebaseDatabase.getInstance().getReference("group").child(pet.getPostid());
                     dbgroup.addListenerForSingleValueEvent(new ValueEventListener() {
                         @Override
                         public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                             final Grup grup = dataSnapshot.getValue(Grup.class);
-                            Picasso.get().load(grup.getImagegrup()).into(imageGrup);
-                            nameGrup.setText(grup.getNamagrup());
+                            try {
+                                Picasso.get().load(grup.getImagegrup()).into(imageGrup);
+                                nameGrup.setText(grup.getNamagrup());
+                            }catch (Exception e){
+                                e.printStackTrace();
+                                nameGrup.setText("Tidak ditemukan");
+                                joinButton.setVisibility(View.GONE);
+                            }
 
                             joinButton.setOnClickListener(new View.OnClickListener() {
                                 @Override
@@ -192,10 +248,7 @@ public class NotificationAdapter  extends RecyclerView.Adapter<NotificationAdapt
             holder.notifLayout.setBackgroundColor(Color.parseColor("#eeeeee"));
         }
 
-        DatabaseReference dbnotif  =  FirebaseDatabase.getInstance().getReference("Notifications").child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child(pet.getId());
-        HashMap<String, Object> hashMap = new HashMap<>();
-        hashMap.put("ispost", false);
-        dbnotif.updateChildren(hashMap);
+
 
         holder.textNotifTextView.setText(pet.getText());
     }
@@ -260,7 +313,7 @@ public class NotificationAdapter  extends RecyclerView.Adapter<NotificationAdapt
         boolean onItemLongClick(int position);
     }
 
-    public void sendMessage(String sender, final String receiver, String message, String imagePost, String nameUser, String idpost) {
+    public void sendMessage(final String sender, final String receiver, String message, String imagePost, String nameUser, String idpost) {
 
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Chats");
         String key = reference.push().getKey();
@@ -275,9 +328,11 @@ public class NotificationAdapter  extends RecyclerView.Adapter<NotificationAdapt
         hashMap.put("isseen", false);
         hashMap.put("type", "1");
 
+        FirebaseAuth mAuth = FirebaseAuth.getInstance();
+        final FirebaseUser fuser = mAuth.getCurrentUser();
         reference.child(key).setValue(hashMap);
-        final DatabaseReference chatRef = FirebaseDatabase.getInstance().getReference("Chatlist")
-                .child(FirebaseAuth.getInstance().getCurrentUser().getUid())
+        final DatabaseReference chatRef = FirebaseDatabase.getInstance().getReference("ChatlistGrup")
+                .child(fuser.getUid())
                 .child(receiver);
 
         chatRef.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -298,22 +353,23 @@ public class NotificationAdapter  extends RecyclerView.Adapter<NotificationAdapt
             }
         });
 
-        final DatabaseReference chatRefReceiver = FirebaseDatabase.getInstance().getReference("Chatlist")
-                .child(receiver)
-                .child(FirebaseAuth.getInstance().getCurrentUser().getUid());
-        chatRefReceiver.child("id").setValue(FirebaseAuth.getInstance().getCurrentUser());
+        final DatabaseReference chatRefReceiver = FirebaseDatabase.getInstance().getReference("ChatlistGrup");
 
-        final String msg = message;
-
-        reference = FirebaseDatabase.getInstance().getReference("user").child(FirebaseAuth.getInstance().getCurrentUser().getUid());
-        reference.addValueEventListener(new ValueEventListener() {
+        DatabaseReference mygrup = FirebaseDatabase.getInstance().getReference("groupmember").child(receiver);
+        mygrup.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                User user = dataSnapshot.getValue(User.class);
-//                if (notify) {
-//                    sendNotifiaction(receiver, user.getFullname(), msg);
-//                }
-//                notify = false;
+                for (DataSnapshot snapshot : dataSnapshot.getChildren()){
+                    UserHobi userHobi = snapshot.getValue(UserHobi.class);
+                    final HashMap<String, Object> userdung= new HashMap<>();
+                    userdung.put("id",receiver);
+                    userdung.put("type","grup");
+                    userdung.put("subtype","0");
+                    if(userHobi.getIduser() != fuser.getUid()){
+                        chatRefReceiver.child(userHobi.getIduser())
+                                .child(receiver).setValue(userdung);
+                    }
+                }
             }
 
             @Override
@@ -321,6 +377,10 @@ public class NotificationAdapter  extends RecyclerView.Adapter<NotificationAdapt
 
             }
         });
+
+        final String msg = message;
+
+
     }
 
 }

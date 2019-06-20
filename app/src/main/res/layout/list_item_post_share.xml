@@ -247,6 +247,7 @@
                 android:id="@+id/comment_posting"
                 android:layout_width="30dp"
                 android:layout_height="match_parent"
+                android:visibility="gone"
                 android:gravity="center">
 
                 <ImageView
@@ -272,6 +273,7 @@
             <LinearLayout
                 android:id="@+id/share_posting"
                 android:layout_width="30dp"
+                android:visibility="gone"
                 android:layout_height="match_parent"
                 android:gravity="center">
 

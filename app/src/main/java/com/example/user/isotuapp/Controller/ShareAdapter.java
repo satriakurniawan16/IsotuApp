@@ -118,13 +118,19 @@ public class ShareAdapter  extends RecyclerView.Adapter<ShareAdapter.ViewHolder>
                     @Override
                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                         Post post = dataSnapshot.getValue(Post.class);
-                        String message = post.getText();
-                        String imagepost = "";
-                        if(post.getImage() != null) {
-                            imagepost = post.getImage();
+
+                        try {
+                                 String message = post.getText();
+                                String imagepost = "";
+                                if(post.getImage() != null) {
+                                    imagepost = post.getImage();
+                                }
+                                String nameuser = post.getUser().getFullname();
+                                sendMessage(sender,receiver,message,imagepost,nameuser,idpost);
+
+                        } catch (Exception e) {
+                            e.printStackTrace();
                         }
-                        String nameuser = post.getUser().getFullname();
-                        sendMessage(sender,receiver,message,imagepost,nameuser,idpost);
                     }
 
                     @Override
@@ -280,7 +286,7 @@ public class ShareAdapter  extends RecyclerView.Adapter<ShareAdapter.ViewHolder>
                 .child(fuser.getUid());
 
         final HashMap<String, Object> userlol= new HashMap<>();
-        userlol.put("id",id);
+        userlol.put("id",fuser.getUid());
         userlol.put("type","message");
         chatRefReceiver.setValue(userlol);
 

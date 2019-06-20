@@ -289,7 +289,7 @@ public class FacultyProvince extends AppCompatActivity {
                     searchUsers(spinnerText.getSelectedItem().toString());
                 }
 
-                Toast.makeText(FacultyProvince.this, "selected : " +  spinnerText.getSelectedItem().toString(), Toast.LENGTH_SHORT).show();
+//                Toast.makeText(FacultyProvince.this, "selected : " +  spinnerText.getSelectedItem().toString(), Toast.LENGTH_SHORT).show();
             }
 
             @Override
@@ -443,14 +443,34 @@ public class FacultyProvince extends AppCompatActivity {
         reference.child(key).setValue(hashMap).addOnSuccessListener(new OnSuccessListener<Void>() {
             @Override
             public void onSuccess(Void aVoid) {
-                Toast.makeText(FacultyProvince.this, "Berhasil terimpan", Toast.LENGTH_SHORT).show();
+//                Toast.makeText(FacultyProvince.this, "Berhasil terimpan", Toast.LENGTH_SHORT).show();
             }
         }).addOnFailureListener(new OnFailureListener() {
             @Override
             public void onFailure(@NonNull Exception e) {
-                Toast.makeText(FacultyProvince.this, "errorpak " , Toast.LENGTH_SHORT).show();
+//                Toast.makeText(FacultyProvince.this, "errorpak " , Toast.LENGTH_SHORT).show();
             }
         });
     }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        status("offline");
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        status("online");
+    }
+
+    private void status(final String status){
+        DatabaseReference reference = FirebaseDatabase.getInstance().getReference("user").child(FirebaseAuth.getInstance().getCurrentUser().getUid());
+        HashMap<String, Object> hashMap = new HashMap<>();
+        hashMap.put("status", status);
+        reference.updateChildren(hashMap);
+    }
+
 
 }

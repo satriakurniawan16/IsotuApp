@@ -703,6 +703,7 @@ public class ProfileFragment extends Fragment {
     }
 
     public void logOut() {
+                    status("offline");
                     FirebaseAuth.getInstance().signOut();
                     goLogInScreen();
     }
@@ -778,5 +779,14 @@ public class ProfileFragment extends Fragment {
         databaseorganiasi.removeEventListener(childEventListenerOrgnanisasi);
         database.removeEventListener(childEventListener);
     }
+
+
+    private void status(final String status){
+        DatabaseReference reference = FirebaseDatabase.getInstance().getReference("user").child(FirebaseAuth.getInstance().getCurrentUser().getUid());
+        HashMap<String, Object> hashMap = new HashMap<>();
+        hashMap.put("status", status);
+        reference.updateChildren(hashMap);
+    }
+
 
 }

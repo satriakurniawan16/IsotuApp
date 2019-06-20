@@ -31,22 +31,22 @@
                 <LinearLayout
                     android:id="@+id/emptyview"
                     android:layout_width="match_parent"
-                    android:orientation="vertical"
                     android:layout_height="match_parent"
-                    android:visibility="gone"
-                    android:gravity="center">
+                    android:gravity="center"
+                    android:orientation="vertical"
+                    android:visibility="visible">
 
                     <ImageView
                         android:layout_width="100dp"
                         android:layout_height="100dp"
                         android:layout_marginBottom="10dp"
-                        android:src="@mipmap/empty_search"/>
+                        android:src="@mipmap/empty_search" />
+
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Post tidak ditemukan"
-                        android:textSize="20dp"
-                        />
+                        android:textSize="20dp" />
                 </LinearLayout>
 
 
@@ -55,184 +55,210 @@
                     android:layout_height="match_parent"
                     android:nestedScrollingEnabled="true">
 
+
                     <LinearLayout
                         android:id="@+id/kondisi"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:orientation="vertical">
 
-                        <LinearLayout
+                        <android.support.design.widget.AppBarLayout
+                            android:id="@+id/bar_layout"
                             android:layout_width="match_parent"
-                            android:layout_height="80dp"
-                            android:orientation="horizontal">
+                            android:layout_height="wrap_content">
 
-                            <de.hdodenhof.circleimageview.CircleImageView
-                                android:id="@+id/image_profile_detail"
-                                android:layout_width="60dp"
-                                android:layout_height="60dp"
-                                android:layout_margin="10dp"
+                            <android.support.v7.widget.Toolbar
+                                android:id="@+id/toolbar"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:background="@color/colorMain"
+                                android:theme="@style/Base.ThemeOverlay.AppCompat.Dark.ActionBar"
+                                app:popupTheme="@style/MyMaterialTheme" />
+
+                        </android.support.design.widget.AppBarLayout>
+
+
+                        <LinearLayout
+                            android:id="@+id/rootView"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:orientation="vertical">
+
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="80dp"
+                                android:orientation="horizontal">
+
+                                <de.hdodenhof.circleimageview.CircleImageView
+                                    android:id="@+id/image_profile_detail"
+                                    android:layout_width="60dp"
+                                    android:layout_height="60dp"
+                                    android:layout_margin="10dp"
+                                    android:src="@mipmap/ic_launcher" />
+
+                                <LinearLayout
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="match_parent"
+                                    android:gravity="center"
+                                    android:orientation="vertical">
+
+                                    <TextView
+                                        android:id="@+id/name_profile_detail"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:gravity="center"
+                                        android:text="Satria Kurniawan"
+                                        android:textColor="#000"
+                                        android:textSize="20dp"
+                                        android:textStyle="bold" />
+
+                                    <TextView
+                                        android:id="@+id/date_posting_detail"
+                                        android:layout_width="match_parent"
+                                        android:layout_height="wrap_content"
+                                        android:gravity="left"
+                                        android:text="tetew" />
+                                </LinearLayout>
+                            </LinearLayout>
+
+                            <ImageView
+                                android:id="@+id/image_posting_detail"
+                                android:layout_width="match_parent"
+                                android:layout_height="270dp"
                                 android:src="@mipmap/ic_launcher" />
 
-                            <LinearLayout
+                            <TextView
+                                android:id="@+id/caption_posting_detail"
                                 android:layout_width="wrap_content"
-                                android:layout_height="match_parent"
-                                android:gravity="center"
-                                android:orientation="vertical">
+                                android:layout_height="wrap_content"
+                                android:layout_marginLeft="10dp"
+                                android:layout_marginTop="10dp"
+                                android:layout_marginRight="10dp"
+                                android:text="Lorem ipsum dolor sit amet, consectetur adipiscing elit,  sed do eiusmod tempor incididunt ut labore et dolore  magna aliqua. Ut enim ad minim veniam,  in culpa qui officia ."
+                                android:textColor="#000" />
+
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="30dp"
+                                android:gravity="left|center"
+                                android:orientation="horizontal">
+
+                                <LinearLayout
+                                    android:id="@+id/like_posting_detail"
+                                    android:layout_width="30dp"
+                                    android:layout_height="match_parent"
+                                    android:gravity="center">
+
+                                    <ImageView
+                                        android:id="@+id/status_like_detail"
+                                        android:layout_width="20dp"
+                                        android:layout_height="20dp"
+                                        android:layout_marginLeft="10dp"
+                                        android:src="@mipmap/emptylike" />
+                                </LinearLayout>
+
+                                <LinearLayout
+                                    android:id="@+id/comment_posting_detail"
+                                    android:layout_width="30dp"
+                                    android:layout_height="match_parent"
+                                    android:gravity="center">
+
+                                    <ImageView
+                                        android:layout_width="20dp"
+                                        android:layout_height="20dp"
+                                        android:layout_marginLeft="10dp"
+                                        android:src="@mipmap/comment" />
+                                </LinearLayout>
+
+                                <LinearLayout
+                                    android:id="@+id/share_posting_detail"
+                                    android:layout_width="30dp"
+                                    android:layout_height="match_parent"
+                                    android:gravity="center">
+
+                                    <ImageView
+                                        android:layout_width="20dp"
+                                        android:layout_height="20dp"
+                                        android:layout_marginLeft="10dp"
+                                        android:src="@mipmap/share" />
+                                </LinearLayout>
+
+                            </LinearLayout>
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="30dp"
+                                android:gravity="left|center"
+                                android:orientation="horizontal">
 
                                 <TextView
-                                    android:id="@+id/name_profile_detail"
+                                    android:id="@+id/number_like_detail"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
-                                    android:gravity="center"
-                                    android:text="Satria Kurniawan"
-                                    android:textColor="#000"
-                                    android:textSize="20dp"
-                                    android:textStyle="bold" />
+                                    android:layout_marginLeft="10dp"
+                                    android:text="0"
+                                    android:textColor="@color/colorMain"
+                                    android:textSize="16dp" />
 
                                 <TextView
-                                    android:id="@+id/date_posting_detail"
-                                    android:layout_width="match_parent"
+                                    android:id="@+id/userlikedetail"
+                                    android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
-                                    android:gravity="left"
-                                    android:text="tetew" />
-                            </LinearLayout>
-                        </LinearLayout>
+                                    android:layout_marginLeft="2dp"
+                                    android:text="Likes"
+                                    android:textColor="@color/colorMain"
+                                    android:textSize="16dp" />
 
-                        <ImageView
-                            android:id="@+id/image_posting_detail"
-                            android:layout_width="match_parent"
-                            android:layout_height="270dp"
-                            android:src="@mipmap/ic_launcher" />
-
-                        <TextView
-                            android:id="@+id/caption_posting_detail"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginLeft="10dp"
-                            android:layout_marginTop="10dp"
-                            android:layout_marginRight="10dp"
-                            android:text="Lorem ipsum dolor sit amet, consectetur adipiscing elit,  sed do eiusmod tempor incididunt ut labore et dolore  magna aliqua. Ut enim ad minim veniam,  in culpa qui officia ."
-                            android:textColor="#000" />
-
-
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="30dp"
-                            android:gravity="left|center"
-                            android:orientation="horizontal">
-
-                            <LinearLayout
-                                android:id="@+id/like_posting_detail"
-                                android:layout_width="30dp"
-                                android:layout_height="match_parent"
-                                android:gravity="center">
-
-                                <ImageView
-                                    android:id="@+id/status_like_detail"
-                                    android:layout_width="20dp"
-                                    android:layout_height="20dp"
+                                <TextView
+                                    android:id="@+id/number_comment_detail"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
                                     android:layout_marginLeft="10dp"
-                                    android:src="@mipmap/emptylike" />
-                            </LinearLayout>
+                                    android:text="0"
+                                    android:textColor="@color/colorMain"
+                                    android:textSize="16dp" />
 
-                            <LinearLayout
-                                android:id="@+id/comment_posting_detail"
-                                android:layout_width="30dp"
-                                android:layout_height="match_parent"
-                                android:gravity="center">
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginLeft="2dp"
+                                    android:text="Comments"
+                                    android:textColor="@color/colorMain"
+                                    android:textSize="16dp" />
 
-                                <ImageView
-                                    android:layout_width="20dp"
-                                    android:layout_height="20dp"
+                                <TextView
+                                    android:id="@+id/number_share_detail"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
                                     android:layout_marginLeft="10dp"
-                                    android:src="@mipmap/comment" />
+                                    android:text="0"
+                                    android:textColor="@color/colorMain"
+                                    android:textSize="16dp" />
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginLeft="2dp"
+                                    android:text="Share"
+                                    android:textColor="@color/colorMain"
+                                    android:textSize="16dp" />
+
                             </LinearLayout>
 
-                            <LinearLayout
-                                android:id="@+id/share_posting_detail"
-                                android:layout_width="30dp"
-                                android:layout_height="match_parent"
-                                android:gravity="center">
-
-                                <ImageView
-                                    android:layout_width="20dp"
-                                    android:layout_height="20dp"
-                                    android:layout_marginLeft="10dp"
-                                    android:src="@mipmap/share" />
-                            </LinearLayout>
+                            <android.support.v7.widget.RecyclerView
+                                android:id="@+id/comment_recyclerview"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content" />
 
                         </LinearLayout>
-
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="30dp"
-                            android:gravity="left|center"
-                            android:orientation="horizontal">
-
-                            <TextView
-                                android:id="@+id/number_like_detail"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginLeft="10dp"
-                                android:text="0"
-                                android:textColor="@color/colorMain"
-                                android:textSize="16dp" />
-
-                            <TextView
-                                android:id="@+id/userlikedetail"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginLeft="2dp"
-                                android:text="Likes"
-                                android:textColor="@color/colorMain"
-                                android:textSize="16dp" />
-
-                            <TextView
-                                android:id="@+id/number_comment_detail"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginLeft="10dp"
-                                android:text="0"
-                                android:textColor="@color/colorMain"
-                                android:textSize="16dp" />
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginLeft="2dp"
-                                android:text="Comments"
-                                android:textColor="@color/colorMain"
-                                android:textSize="16dp" />
-
-                            <TextView
-                                android:id="@+id/number_share_detail"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginLeft="10dp"
-                                android:text="0"
-                                android:textColor="@color/colorMain"
-                                android:textSize="16dp" />
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginLeft="2dp"
-                                android:text="Share"
-                                android:textColor="@color/colorMain"
-                                android:textSize="16dp" />
-
-                        </LinearLayout>
-
-                        <android.support.v7.widget.RecyclerView
-                            android:id="@+id/comment_recyclerview"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content" />
-
                     </LinearLayout>
 
                 </ScrollView>
 
                 <LinearLayout
+                    android:id="@+id/rootComment"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_alignParentBottom="true"
@@ -272,15 +298,15 @@
         </FrameLayout>
 
         <LinearLayout
+            android:id="@+id/dragView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@drawable/rounded_edge"
             android:alpha="0.9"
-            android:orientation="vertical"
-            android:fitsSystemWindows="true"
+            android:background="@drawable/rounded_edge"
             android:clickable="true"
+            android:fitsSystemWindows="true"
             android:focusable="false"
-            android:id="@+id/dragView">
+            android:orientation="vertical">
 
             <RelativeLayout
                 android:layout_width="match_parent"
@@ -291,17 +317,16 @@
                     android:id="@+id/rootlol"
                     android:layout_width="match_parent"
                     android:layout_height="70dp"
-                    android:background="@color/colorWhite"
                     android:layout_below="@+id/navbar"
-                    android:padding="10dp"
-                    >
+                    android:background="@color/colorWhite"
+                    android:padding="10dp">
 
                     <EditText
                         android:id="@+id/searchuser_topost"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:backgroundTint="#eeeeee"
-                        android:hint="Cari berdasarkan nama ..."/>
+                        android:hint="Cari berdasarkan nama ..." />
 
 
                 </LinearLayout>
@@ -312,12 +337,11 @@
                     android:layout_below="@id/rootlol"
                     android:orientation="vertical">
 
-                    <android.support.v7.widget.RecyclerView
+                    <android.support.v7.widget.RecyclerView xmlns:android="http://schemas.android.com/apk/res/android"
                         android:id="@+id/listusertoshare"
-                        xmlns:android="http://schemas.android.com/apk/res/android"
-                        android:scrollbars="vertical"
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content" />
+                        android:layout_height="wrap_content"
+                        android:scrollbars="vertical" />
 
                 </LinearLayout>
 

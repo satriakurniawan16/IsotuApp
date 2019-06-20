@@ -185,7 +185,7 @@ public class DetailEventActivity extends AppCompatActivity {
                 Intent intentlol = new Intent(DetailEventActivity.this,DetailUserHobi.class);
                 intentlol.putExtra("reference","list_event_atender");
                 intentlol.putExtra("child",titleEvent.getText().toString());
-                intent.putExtra("title","Calon peserta");
+                intentlol.putExtra("title","Peserta");
                 startActivity(intentlol);
             }
         });
@@ -216,4 +216,24 @@ public class DetailEventActivity extends AppCompatActivity {
         });
 
     }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        status("offline");
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        status("online");
+    }
+
+    private void status(final String status){
+        DatabaseReference reference = FirebaseDatabase.getInstance().getReference("user").child(FirebaseAuth.getInstance().getCurrentUser().getUid());
+        HashMap<String, Object> hashMap = new HashMap<>();
+        hashMap.put("status", status);
+        reference.updateChildren(hashMap);
+    }
+
 }

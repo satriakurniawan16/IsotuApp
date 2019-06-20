@@ -213,6 +213,7 @@ public class ContactFragment extends Fragment {
                             }
                         });
 
+
                         mBuilder.setView(mView);
                         final AlertDialog dialognya = mBuilder.create();
                         dialognya.show();
@@ -236,12 +237,11 @@ public class ContactFragment extends Fragment {
                         hapus.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
+//                                Toast.makeText(getContext(), "", Toast.LENGTH_SHORT).show();
                                 database.child(pet.getUserid()).removeValue();
                                 dialognya.dismiss();
                             }
                         });
-
-
                         return true;
                     }
                 });
@@ -281,7 +281,22 @@ public class ContactFragment extends Fragment {
                     @Override
                     public boolean onItemLongClick(int position) {
                         if (mActionModeGrup != null) return false;
+                        final Grup pet = mDatagrup.get(position);
+                        AlertDialog.Builder mBuilder = new AlertDialog.Builder(getContext());
+                        View mView = getActivity().getLayoutInflater().inflate(R.layout.popup_message,
+                                null);
 
+                        LinearLayout hapus = (LinearLayout) mView.findViewById(R.id.hapus);
+                        hapus.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                databaseGrup.child(pet.getIdgrup()).removeValue();
+                            }
+                        });
+
+                        mBuilder.setView(mView);
+                        final AlertDialog dialognya = mBuilder.create();
+                        dialognya.show();
 
                         return true;
                     }

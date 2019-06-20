@@ -60,7 +60,9 @@ public class Posting extends AppCompatActivity {
     private Post mPost;
     private ProgressDialog pDialog;
     private Uri mSelectedUri;
+    private ImageView backPress;
     String key;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,6 +73,14 @@ public class Posting extends AppCompatActivity {
         image_posting = (ImageView) findViewById(R.id.imagePosting);
         button_camera = (FloatingActionButton) findViewById(R.id.open_camera);
         button_sent = (FloatingActionButton) findViewById(R.id.sentPost);
+        backPress = (ImageView) findViewById(R.id.backPress);
+        backPress.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(Posting.this,Dashboard.class);
+                startActivity(intent);
+            }
+        });
         mFirebaseAuth=FirebaseAuth.getInstance();
         currentUser = FirebaseAuth.getInstance().getCurrentUser();;
 
@@ -228,6 +238,25 @@ public class Posting extends AppCompatActivity {
                         finish();
                     }
                 });
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        status("offline");
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        status("online");
+    }
+
+    private void status(final String status){
+        DatabaseReference reference = FirebaseDatabase.getInstance().getReference("user").child(FirebaseAuth.getInstance().getCurrentUser().getUid());
+        HashMap<String, Object> hashMap = new HashMap<>();
+        hashMap.put("status", status);
+        reference.updateChildren(hashMap);
     }
 
 

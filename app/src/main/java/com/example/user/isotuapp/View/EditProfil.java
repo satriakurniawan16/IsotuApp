@@ -382,7 +382,7 @@ public class EditProfil extends AppCompatActivity {
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
                 // memunculkan toast + value Spinner yang dipilih (diambil dari adapter)
-                Toast.makeText(EditProfil.this, "Selected "+ adapter.getItem(i), Toast.LENGTH_SHORT).show();
+//                Toast.makeText(EditProfil.this, "Selected "+ adapter.getItem(i), Toast.LENGTH_SHORT).show();
                 positionfakultas = i ;
                 switch (i){
                     case 0 :
@@ -422,7 +422,7 @@ public class EditProfil extends AppCompatActivity {
             public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
                 // memunculkan toast + value Spinner yang dipilih (diambil dari adapter)
                 positionprovinsi = i;
-                Toast.makeText(EditProfil.this, "Selected "+ adapterprovinsi.getItem(i), Toast.LENGTH_SHORT).show();
+//                Toast.makeText(EditProfil.this, "Selected "+ adapterprovinsi.getItem(i), Toast.LENGTH_SHORT).show();
             }
 
             @Override
@@ -438,7 +438,7 @@ public class EditProfil extends AppCompatActivity {
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
                 // memunculkan toast + value Spinner yang dipilih (diambil dari adapter)
-                Toast.makeText(EditProfil.this, "Selected "+ adapterjurusan.getItem(i), Toast.LENGTH_SHORT).show();
+//                Toast.makeText(EditProfil.this, "Selected "+ adapterjurusan.getItem(i), Toast.LENGTH_SHORT).show();
                 positionjurusan = i ;
             }
 
@@ -447,6 +447,24 @@ public class EditProfil extends AppCompatActivity {
 
             }
         });
+    }
+    @Override
+    public void onPause() {
+        super.onPause();
+        status("offline");
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        status("online");
+    }
+
+    private void status(final String status){
+        DatabaseReference reference = FirebaseDatabase.getInstance().getReference("user").child(FirebaseAuth.getInstance().getCurrentUser().getUid());
+        HashMap<String, Object> hashMap = new HashMap<>();
+        hashMap.put("status", status);
+        reference.updateChildren(hashMap);
     }
 
 }

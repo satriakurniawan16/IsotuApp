@@ -2,7 +2,7 @@ package com.example.user.isotuapp.Model;
 
 import java.io.Serializable;
 
-public class Comment implements Serializable {
+public class Comment  {
     private User user;
     private String commentId;
     private long timeCreated;

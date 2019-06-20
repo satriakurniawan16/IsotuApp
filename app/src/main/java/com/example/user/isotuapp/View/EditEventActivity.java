@@ -44,6 +44,7 @@ import com.theartofdev.edmodo.cropper.CropImageView;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.HashMap;
 import java.util.Locale;
 import java.util.UUID;
 
@@ -329,7 +330,7 @@ public class EditEventActivity extends AppCompatActivity {
                     public void onSuccess(Void aVoid) {
                         Log.d("lo", "berhasil");
                         Toast.makeText(getApplicationContext(),
-                                "Berhasil Ditambahkan", Toast.LENGTH_LONG).show();
+                                "Tersimpan", Toast.LENGTH_LONG).show();
                         pDialog.dismiss();
                         Intent intent = new Intent(EditEventActivity .this, Dashboard.class);
                         startActivity(intent);
@@ -355,5 +356,24 @@ public class EditEventActivity extends AppCompatActivity {
         Drawable drawable = getResources().getDrawable(d);
         pDialog.setIndeterminateDrawable(drawable);
         pDialog.show();
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        status("offline");
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        status("online");
+    }
+
+    private void status(final String status){
+        DatabaseReference reference = FirebaseDatabase.getInstance().getReference("user").child(FirebaseAuth.getInstance().getCurrentUser().getUid());
+        HashMap<String, Object> hashMap = new HashMap<>();
+        hashMap.put("status", status);
+        reference.updateChildren(hashMap);
     }
 }

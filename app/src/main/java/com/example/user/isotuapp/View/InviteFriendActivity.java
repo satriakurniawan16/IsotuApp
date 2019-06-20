@@ -9,6 +9,8 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
@@ -26,6 +28,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public class InviteFriendActivity extends AppCompatActivity {
 
@@ -38,6 +41,7 @@ public class InviteFriendActivity extends AppCompatActivity {
     private ArrayList<String> mDataId;
     private InviteAdapter mAdapter;
     String idgrup,namagrup;
+    Button toGrup;
 
     private ChildEventListener childEventListener = new ChildEventListener() {
         @Override
@@ -83,9 +87,18 @@ public class InviteFriendActivity extends AppCompatActivity {
         mDataId = new ArrayList<>();
         searchUser = (EditText) findViewById(R.id.searchuser_topost);
 
-        Intent intent = getIntent();
+        final Intent intent = getIntent();
         idgrup = intent.getStringExtra("idgrup");
         namagrup =  intent.getStringExtra("namagrup");
+        toGrup = (Button) findViewById(R.id.finish_button);
+        toGrup.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent1 = new Intent(InviteFriendActivity.this,GrupMessageActivity.class);
+                intent1.putExtra("id",idgrup);
+                startActivity(intent1);
+            }
+        });
         recyclerView = findViewById(R.id.listusertoinvite);
         recyclerView.setHasFixedSize(true);
         LinearLayoutManager layoutManager =
@@ -132,6 +145,24 @@ public class InviteFriendActivity extends AppCompatActivity {
         recyclerView.setAdapter(mAdapter);
     }
 
+    @Override
+    public void onPause() {
+        super.onPause();
+        status("offline");
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        status("online");
+    }
+
+    private void status(final String status){
+        DatabaseReference reference = FirebaseDatabase.getInstance().getReference("user").child(FirebaseAuth.getInstance().getCurrentUser().getUid());
+        HashMap<String, Object> hashMap = new HashMap<>();
+        hashMap.put("status", status);
+        reference.updateChildren(hashMap);
+    }
 
 
 }

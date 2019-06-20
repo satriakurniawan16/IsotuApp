@@ -3,6 +3,7 @@ package com.example.user.isotuapp.Model;
 public class Chat {
 
     private String sender;
+    private String id;
     private String receiver;
     private String message;
     private boolean isseen;
@@ -23,6 +24,14 @@ public class Chat {
         this.imagepost = imagepost;
         this.userpost = userpost;
         this.type = type;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 
     public String getType() {

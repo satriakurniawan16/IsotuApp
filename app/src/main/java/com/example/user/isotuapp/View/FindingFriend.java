@@ -129,7 +129,7 @@ public class FindingFriend extends AppCompatActivity {
                         break;
 
                 }
-                Toast.makeText(FindingFriend.this, "Selected "+ adapter.getItem(i), Toast.LENGTH_SHORT).show();
+//                Toast.makeText(FindingFriend.this, "Selected "+ adapter.getItem(i), Toast.LENGTH_SHORT).show();
             }
 
             @Override
@@ -433,14 +433,34 @@ public class FindingFriend extends AppCompatActivity {
         reference.child(key).setValue(hashMap).addOnSuccessListener(new OnSuccessListener<Void>() {
             @Override
             public void onSuccess(Void aVoid) {
-                Toast.makeText(FindingFriend.this, "Berhasil terimpan", Toast.LENGTH_SHORT).show();
+//                Toast.makeText(FindingFriend.this, "Berhasil terimpan", Toast.LENGTH_SHORT).show();
             }
         }).addOnFailureListener(new OnFailureListener() {
             @Override
             public void onFailure(@NonNull Exception e) {
-                Toast.makeText(FindingFriend.this, "errorpak " , Toast.LENGTH_SHORT).show();
+//                Toast.makeText(FindingFriend.this, "errorpak " , Toast.LENGTH_SHORT).show();
             }
         });
     }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        status("offline");
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        status("online");
+    }
+
+    private void status(final String status){
+        DatabaseReference reference = FirebaseDatabase.getInstance().getReference("user").child(FirebaseAuth.getInstance().getCurrentUser().getUid());
+        HashMap<String, Object> hashMap = new HashMap<>();
+        hashMap.put("status", status);
+        reference.updateChildren(hashMap);
+    }
+
 
 }
